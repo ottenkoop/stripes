@@ -1,0 +1,422 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		74BAB81C1A039DD800C2361F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74BAB81B1A039DD800C2361F /* AppDelegate.swift */; };
+		74BAB81E1A039DD800C2361F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74BAB81D1A039DD800C2361F /* ViewController.swift */; };
+		74BAB8211A039DD800C2361F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 74BAB81F1A039DD800C2361F /* Main.storyboard */; };
+		74BAB8231A039DD800C2361F /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 74BAB8221A039DD800C2361F /* Images.xcassets */; };
+		74BAB8261A039DD800C2361F /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 74BAB8241A039DD800C2361F /* LaunchScreen.xib */; };
+		74BAB8321A039DD800C2361F /* StripesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74BAB8311A039DD800C2361F /* StripesTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		74BAB82C1A039DD800C2361F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 74BAB80E1A039DD800C2361F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 74BAB8151A039DD800C2361F;
+			remoteInfo = Stripes;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		74BAB8161A039DD800C2361F /* Stripes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Stripes.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		74BAB81A1A039DD800C2361F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		74BAB81B1A039DD800C2361F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		74BAB81D1A039DD800C2361F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		74BAB8201A039DD800C2361F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		74BAB8221A039DD800C2361F /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		74BAB8251A039DD800C2361F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
+		74BAB82B1A039DD800C2361F /* StripesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StripesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		74BAB8301A039DD800C2361F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		74BAB8311A039DD800C2361F /* StripesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StripesTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		74BAB8131A039DD800C2361F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		74BAB8281A039DD800C2361F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		74BAB80D1A039DD800C2361F = {
+			isa = PBXGroup;
+			children = (
+				74BAB8181A039DD800C2361F /* Stripes */,
+				74BAB82E1A039DD800C2361F /* StripesTests */,
+				74BAB8171A039DD800C2361F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		74BAB8171A039DD800C2361F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				74BAB8161A039DD800C2361F /* Stripes.app */,
+				74BAB82B1A039DD800C2361F /* StripesTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		74BAB8181A039DD800C2361F /* Stripes */ = {
+			isa = PBXGroup;
+			children = (
+				74BAB81B1A039DD800C2361F /* AppDelegate.swift */,
+				74BAB81D1A039DD800C2361F /* ViewController.swift */,
+				74BAB81F1A039DD800C2361F /* Main.storyboard */,
+				74BAB8221A039DD800C2361F /* Images.xcassets */,
+				74BAB8241A039DD800C2361F /* LaunchScreen.xib */,
+				74BAB8191A039DD800C2361F /* Supporting Files */,
+			);
+			path = Stripes;
+			sourceTree = "<group>";
+		};
+		74BAB8191A039DD800C2361F /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				74BAB81A1A039DD800C2361F /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		74BAB82E1A039DD800C2361F /* StripesTests */ = {
+			isa = PBXGroup;
+			children = (
+				74BAB8311A039DD800C2361F /* StripesTests.swift */,
+				74BAB82F1A039DD800C2361F /* Supporting Files */,
+			);
+			path = StripesTests;
+			sourceTree = "<group>";
+		};
+		74BAB82F1A039DD800C2361F /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				74BAB8301A039DD800C2361F /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		74BAB8151A039DD800C2361F /* Stripes */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 74BAB8351A039DD800C2361F /* Build configuration list for PBXNativeTarget "Stripes" */;
+			buildPhases = (
+				74BAB8121A039DD800C2361F /* Sources */,
+				74BAB8131A039DD800C2361F /* Frameworks */,
+				74BAB8141A039DD800C2361F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Stripes;
+			productName = Stripes;
+			productReference = 74BAB8161A039DD800C2361F /* Stripes.app */;
+			productType = "com.apple.product-type.application";
+		};
+		74BAB82A1A039DD800C2361F /* StripesTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 74BAB8381A039DD800C2361F /* Build configuration list for PBXNativeTarget "StripesTests" */;
+			buildPhases = (
+				74BAB8271A039DD800C2361F /* Sources */,
+				74BAB8281A039DD800C2361F /* Frameworks */,
+				74BAB8291A039DD800C2361F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				74BAB82D1A039DD800C2361F /* PBXTargetDependency */,
+			);
+			name = StripesTests;
+			productName = StripesTests;
+			productReference = 74BAB82B1A039DD800C2361F /* StripesTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		74BAB80E1A039DD800C2361F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0610;
+				ORGANIZATIONNAME = KoDev;
+				TargetAttributes = {
+					74BAB8151A039DD800C2361F = {
+						CreatedOnToolsVersion = 6.1;
+					};
+					74BAB82A1A039DD800C2361F = {
+						CreatedOnToolsVersion = 6.1;
+						TestTargetID = 74BAB8151A039DD800C2361F;
+					};
+				};
+			};
+			buildConfigurationList = 74BAB8111A039DD800C2361F /* Build configuration list for PBXProject "Stripes" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 74BAB80D1A039DD800C2361F;
+			productRefGroup = 74BAB8171A039DD800C2361F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				74BAB8151A039DD800C2361F /* Stripes */,
+				74BAB82A1A039DD800C2361F /* StripesTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		74BAB8141A039DD800C2361F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				74BAB8211A039DD800C2361F /* Main.storyboard in Resources */,
+				74BAB8261A039DD800C2361F /* LaunchScreen.xib in Resources */,
+				74BAB8231A039DD800C2361F /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		74BAB8291A039DD800C2361F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		74BAB8121A039DD800C2361F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				74BAB81E1A039DD800C2361F /* ViewController.swift in Sources */,
+				74BAB81C1A039DD800C2361F /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		74BAB8271A039DD800C2361F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				74BAB8321A039DD800C2361F /* StripesTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		74BAB82D1A039DD800C2361F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 74BAB8151A039DD800C2361F /* Stripes */;
+			targetProxy = 74BAB82C1A039DD800C2361F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		74BAB81F1A039DD800C2361F /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				74BAB8201A039DD800C2361F /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		74BAB8241A039DD800C2361F /* LaunchScreen.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				74BAB8251A039DD800C2361F /* Base */,
+			);
+			name = LaunchScreen.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		74BAB8331A039DD800C2361F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		74BAB8341A039DD800C2361F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		74BAB8361A039DD800C2361F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = Stripes/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		74BAB8371A039DD800C2361F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = Stripes/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		74BAB8391A039DD800C2361F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = StripesTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Stripes.app/Stripes";
+			};
+			name = Debug;
+		};
+		74BAB83A1A039DD800C2361F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = StripesTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Stripes.app/Stripes";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		74BAB8111A039DD800C2361F /* Build configuration list for PBXProject "Stripes" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				74BAB8331A039DD800C2361F /* Debug */,
+				74BAB8341A039DD800C2361F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		74BAB8351A039DD800C2361F /* Build configuration list for PBXNativeTarget "Stripes" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				74BAB8361A039DD800C2361F /* Debug */,
+				74BAB8371A039DD800C2361F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		74BAB8381A039DD800C2361F /* Build configuration list for PBXNativeTarget "StripesTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				74BAB8391A039DD800C2361F /* Debug */,
+				74BAB83A1A039DD800C2361F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 74BAB80E1A039DD800C2361F /* Project object */;
+}
