@@ -23,4 +23,20 @@ class Game: PFObject {
         
         return game
     }
+    
+    class func userScoredAPoint(game : PFObject) {
+        if PFUser.currentUser() == game["user"] as PFUser {
+            var userPoints : Int = game["userPoints"] as Int
+            userPoints += 1
+            
+            game["userPoints"] = userPoints
+        } else {
+            var user2Points : Int = game["user2Points"] as Int
+            user2Points += 1
+            
+            game["user2Points"] = user2Points
+        }
+        
+        game.saveInBackgroundWithBlock ({(succeeded: Bool!, err: NSError!) -> Void in println(succeeded) })
+    }
 }

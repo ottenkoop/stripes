@@ -291,7 +291,13 @@ class GameEngineController: UIViewController {
     }
     
     func stripePressed (stripe: UIButton!) {
-        stripe.backgroundColor = UIColor.greenColor()
+        
+        if stripe.backgroundColor == UIColor.greenColor() {
+            stripe.backgroundColor == UIColor.whiteColor()
+        } else {
+            stripe.backgroundColor = UIColor.greenColor()
+        }
+
         stripe.selected = true
         
         // Find and select the hidden double stripe.
@@ -299,9 +305,9 @@ class GameEngineController: UIViewController {
         selectDoubleHiddenStripe(stripe)
         checkIfSquareIsFull(stripe)
         
-//        for stripe in allStripes {
-//            stripe.userInteractionEnabled = false
-//        }
+        for stripe in allStripes {
+            stripe.userInteractionEnabled = false
+        }
         
         stripe.userInteractionEnabled = true
     }
@@ -330,7 +336,7 @@ class GameEngineController: UIViewController {
         }
     }
     
-    func checkIfSquareIsFull(stripe : UIButton) {Ç
+    func checkIfSquareIsFull(stripe : UIButton) {
         var square = stripe.superview!
         var selectedStripesInSquare = 0
         var gameId = gameObject[0].objectId
@@ -344,7 +350,8 @@ class GameEngineController: UIViewController {
         if selectedStripesInSquare == 4 {
             square.backgroundColor = UIColor.yellowColor()
             
-            println()
+            Game.userScoredAPoint(gameObject[0])
+            squareHandler.addSquareAndRelationToUser(gameObject[0].objectId, squareIndex: square.tag, rowIndex: square.superview!.tag )
         }
     }
     
