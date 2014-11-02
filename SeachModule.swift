@@ -10,4 +10,11 @@ class searchModule: PFObject {
         
         return game
     }
+    
+    class func findPlayedStripes(game: PFObject) -> PFQuery {
+        let predicate = NSPredicate(format: "belongsToGame = %@", game)
+        var playedStripesQuery = PFQuery(className: "Stripe", predicate: predicate)
+        
+        return playedStripesQuery
+    }
 }

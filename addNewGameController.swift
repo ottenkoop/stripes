@@ -24,11 +24,14 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
         
         addTableView()
         loadTableViewContent()
+        addNavigationItems()
     }
     
     func addTableView() {
+        var navBar = navigationController?.navigationBar
         self.friendTableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "cell")
         self.view.addSubview(friendTableView)
+        
         
         friendTableView.setTranslatesAutoresizingMaskIntoConstraints(false)
         friendTableView.constrainToSize(CGSizeMake(400, 400))
@@ -82,6 +85,10 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
         var gameObjectId = Game.addGame("\(opponentName!)", grid: 5)
         
         self.presentViewController(GameOverviewController(), animated: true, completion: nil)
+    }
+    
+    func addNavigationItems() {
+       navigationItem.title = "New Game" 
     }
 }
 

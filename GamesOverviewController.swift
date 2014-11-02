@@ -29,11 +29,12 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         loadTableViewContent()
         addNavigationItems()
         
-
+//        squareHandler.findSomething()
     }
     
     func addNewGameBtn() {
         let newGameBtn = UIButton ()
+        var navBar = navigationController?.navigationBar
         
         newGameBtn.backgroundColor = UIColor.colorWithRGBHex(0x5AB103)
         newGameBtn.setTitle("New Game", forState: .Normal)
@@ -42,7 +43,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         self.view.addSubview(newGameBtn)
         newGameBtn.setTranslatesAutoresizingMaskIntoConstraints(false)
         newGameBtn.constrainToSize(CGSizeMake(screenWidth, 60))
-        newGameBtn.pinAttribute(.Top, toAttribute: .Bottom, ofItem: self.topLayoutGuide, withConstant: 0)
+        newGameBtn.pinAttribute(.Top, toAttribute: .Bottom, ofItem: navBar, withConstant: 0)
     }
     
     func addTableView() {
@@ -51,8 +52,8 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         
         gameTableView.setTranslatesAutoresizingMaskIntoConstraints(false)
         gameTableView.constrainToSize(CGSizeMake(screenWidth, screenHeight - 150))
-        gameTableView.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: self.view)
-        gameTableView.pinAttribute(.Left, toAttribute: .Left, ofItem: self.view)
+        gameTableView.pinAttribute(.Top, toAttribute: .Top, ofItem: self.view)
+//        gameTableView.pinAttribute(.Left, toAttribute: .Left, ofItem: self.view)
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -77,9 +78,8 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         
         if game["user"].objectId == PFUser.currentUser().objectId {
             userObjectId = game["user2"].objectId
-        } else if game["user2"].objectId == PFUser.currentUser().objectId{
+        } else {
             userObjectId = game["user"].objectId
-            
         }
 
         var opponentUserQuery = PFUser.query()
@@ -90,7 +90,6 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
             } else {
                 cell!.textLabel.text = String(opponentUser["fullName"] as NSString)
             }
-            
         }
 
         cell!.detailTextLabel?.text = String(game.objectId as NSString)
@@ -99,9 +98,9 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        var game : PFObject = allGames[Int(indexPath.row)] as PFObject
         
-        println("row tapped")
-        
+        openGame(game)
     }
     
     func loadTableViewContent() {
@@ -110,10 +109,10 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         gameQuery.findObjectsInBackgroundWithBlock {
             (objects: [AnyObject]!, error: NSError!) -> Void in
             if error == nil {
-                // The find succeeded.
                 self.allGames = objects
-                self.gameTableView.reloadData()
+                
                 self.navigationItem.title = "Games"
+                self.gameTableView.reloadData()
             } else {
                 let alert = UIAlertView(title: "Connection Failed", message: "There seems to be an error with your internet connection.", delegate: self, cancelButtonTitle: "Try Again")
                 alert.show()
@@ -124,13 +123,20 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func newGame() {
-        self.presentViewController(addNewGameController(), animated: true, completion: nil)
+        self.navigationController?.presentViewController(addNewGameController(), animated: true, completion: nil)
+    }
+    
+    func openGame(game : PFObject) {
+        let gameController = GameEngineController()
+        
+        gameController.gameObject = [game]
+        self.presentViewController(gameController, animated: true, completion: nil)
     }
     
     func addNavigationItems() {
         navigationItem.title = "Connecting..."
-        var refreshButton = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "newGame") //Use a selector
-        navigationItem.rightBarButtonItem = refreshButton
+        var addNewGameBtn = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "newGame") //Use a selector
+        navigationItem.rightBarButtonItem = addNewGameBtn
     }
     
     override func didReceiveMemoryWarning() {

@@ -37,6 +37,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             window!.rootViewController = loginController!
         }
         
+//        window!.rootViewController = gameEngineController!
+        
         window!.makeKeyAndVisible()
         
         FBLoginView.self

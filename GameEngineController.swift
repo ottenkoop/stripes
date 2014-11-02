@@ -2,7 +2,7 @@ import UIKit
 
 class GameEngineController: UIViewController {
 
-    internal var gameID : String = ""
+    var gameObject : [PFObject] = []
     private var playField = UIView (frame: CGRectZero)
     
     let screenWidth : CGFloat = UIScreen.mainScreen().bounds.size.width
@@ -11,11 +11,12 @@ class GameEngineController: UIViewController {
     private var playFieldHeight : CGFloat = 0
     private var playFieldWidth : CGFloat = 0
 
-    let rowsAmount: [Int] = [0,1,2]
-    let squaresAmount: [Int] = [0,1,2]
+    private var rowsAmount: [Int] = []
+    private var squaresAmount: [Int] = []
     
     private var allRows : [UIView] = []
     private var allSquares : [UIView] = []
+    private var allStripes : [UIButton] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,30 +25,12 @@ class GameEngineController: UIViewController {
         self.view.addSubview(playField)
         
         addPlayFieldPosition()
-        
-        findGame()
-
-        
-        // println(gameID)
-
-        // maak van int een array.
-        //        var legeArray : [Int] = []
-        //        0.upTo(squaresAmount - 1, {legeArray += [$0]})
-        //
-        //        println(legeArray)
-        
-    }
     
-    func findGame() {
-        
-        
-        
-        showScreen()
+        buildUpGame()
     }
     
     func addPlayFieldPosition() {
         playField.setTranslatesAutoresizingMaskIntoConstraints(false)
-        playField.backgroundColor = UIColor.redColor()
         
         if (UIInterfaceOrientationIsPortrait(self.interfaceOrientation)) {
             
@@ -68,17 +51,62 @@ class GameEngineController: UIViewController {
         }
     }
 
-    func showScreen() {
-        
-//        Game.addGame()
-        
+    func buildUpGame() {
+        setGrid()
+        loadPlayedStripes()
+
         addGrid (rowsAmount, sqauresAmount: squaresAmount)
+    }
+    
+    func setGrid() {
+        var gridInt : Int = gameObject[0]["grid"] as Int
         
-        var rowIndex : Int = 1
-        var squareIndex : Int = 2
-        var buttonIndex : Int = 0
+        0.upTo(gridInt - 1, { self.rowsAmount += [$0] })
+        0.upTo(gridInt - 1, { self.squaresAmount += [$0] })
+    }
+    
+    func loadPlayedStripes () {
+        var game = gameObject[0]
         
-        findStripe(rowIndex, squareIndex: squareIndex, buttonIndex: buttonIndex)
+        var playedStripesQuery = searchModule.findPlayedStripes(game)
+
+        playedStripesQuery.findObjectsInBackgroundWithBlock {
+            (objects: [AnyObject]!, error: NSError!) -> Void in
+            if error == nil {
+                // The find succeeded.
+                println(objects)
+                
+                for object in objects {
+                    self.setPlayedStripe(object)
+                }
+                
+            } else {
+                let alert = UIAlertView(title: "Connection Failed", message: "There seems to be an error with your internet connection.", delegate: self, cancelButtonTitle: "Try Again")
+                alert.show()
+                
+                println("Error: %@ %@", error, error.userInfo!)
+            }
+        }
+    }
+    
+    func setPlayedStripe (stripe : AnyObject) {
+        var rowIndex : Int = stripe["rowIdx"] as Int
+        var squareIndex : Int = stripe["squareIdx"] as Int
+        var stripeIndex : Int = stripe["stripeIdx"] as Int
+        
+        var playedStripe : UIButton = allRows[rowIndex].subviews[squareIndex].subviews[stripeIndex] as UIButton
+        
+        if stripe["user"] as PFUser == PFUser.currentUser() {
+            playedStripe.backgroundColor = UIColor.greenColor()
+        } else {
+            playedStripe.backgroundColor = UIColor.redColor()
+        }
+        
+        selectDoubleHiddenStripe(playedStripe)
+        
+        playedStripe.selected = true
+        playedStripe.userInteractionEnabled = false
+        
     }
     
     func addGrid (rowsAmount: [Int], sqauresAmount: [Int]) {
@@ -133,29 +161,23 @@ class GameEngineController: UIViewController {
             var newSquare = addSquare(squareIndex, rowindex: rowindex)
 
             allSquares += [newSquare]
-            
-//            newSquare.pinAttribute(.Top, toAttribute: .Top, ofItem: allRows[rowindex])
+
         }
 
         for square in allSquares {
             if square.tag == 0 {
-                square.backgroundColor = UIColor.greenColor()
                 square.centerInContainerOnAxis(.CenterY)
                 square.pinAttribute(.Left, toAttribute: .Left, ofItem: allRows[rowindex])
             } else if square.tag == 1 {
-                square.backgroundColor = UIColor.yellowColor()
                 square.centerInContainerOnAxis(.CenterY)
                 square.pinAttribute(.Left, toAttribute: .Right, ofItem: allSquares[0])
             } else if square.tag == 2 {
-                square.backgroundColor = UIColor.orangeColor()
                 square.centerInContainerOnAxis(.CenterY)
                 square.pinAttribute(.Left, toAttribute: .Right, ofItem: allSquares[1])
             } else if square.tag == 3 {
-                square.backgroundColor = UIColor.orangeColor()
                 square.centerInContainerOnAxis(.CenterY)
                 square.pinAttribute(.Left, toAttribute: .Right, ofItem: allSquares[2])
             } else if square.tag == 4 {
-                square.backgroundColor = UIColor.orangeColor()
                 square.centerInContainerOnAxis(.CenterY)
                 square.pinAttribute(.Left, toAttribute: .Right, ofItem: allSquares[3])
             }
@@ -188,6 +210,8 @@ class GameEngineController: UIViewController {
         for stripeIndex in buttonsPerSquare {
             var stripe = addStripe(stripeIndex, square: square)
             
+            allStripes += [stripe]
+            
             stripe.addTarget(self, action: "stripePressed:", forControlEvents: .TouchUpInside)
         }
         
@@ -197,6 +221,8 @@ class GameEngineController: UIViewController {
         let stripe = UIButton ()
         
         stripe.tag = stripeIndex
+        
+        stripe.selected = false
         stripe.layer.borderWidth = 1
         stripe.layer.borderColor = UIColor.blackColor().CGColor
         stripe.backgroundColor = UIColor.whiteColor()
@@ -232,21 +258,6 @@ class GameEngineController: UIViewController {
         }
     }
     
-    func stripePressed (stripe: UIButton!) {
-        println(stripe.tag)
-        
-        stripe.backgroundColor = UIColor.greenColor()
-        
-        stripe.userInteractionEnabled = false
-        
-//        stripe.hidden = true
-    }
-    
-    func findStripe (rowIndex : Int, squareIndex : Int, buttonIndex : Int) {
-        var button : AnyObject = allRows[0].subviews[0].subviews[0]
-
-    }
-    
     func hideDoubleStripes () {
         var squaresArrayToUseHere : [UIView] = allSquares
         
@@ -276,6 +287,64 @@ class GameEngineController: UIViewController {
         
         for button in buttonsToHide {
             button.hidden = true
+        }
+    }
+    
+    func stripePressed (stripe: UIButton!) {
+        stripe.backgroundColor = UIColor.greenColor()
+        stripe.selected = true
+        
+        // Find and select the hidden double stripe.
+        // function used for for detecting if square has 4 stripes selected.
+        selectDoubleHiddenStripe(stripe)
+        checkIfSquareIsFull(stripe)
+        
+//        for stripe in allStripes {
+//            stripe.userInteractionEnabled = false
+//        }
+        
+        stripe.userInteractionEnabled = true
+    }
+    
+    func selectDoubleHiddenStripe(stripe : UIButton) {
+        var squareOfStripeTag = stripe.superview!.tag
+        var rowOfStripe = stripe.superview!.superview!
+        
+        if squareOfStripeTag > 0 {
+            if stripe.tag == 3 {
+                var doubleStripe: UIButton = rowOfStripe.subviews[squareOfStripeTag - 1].subviews[1] as UIButton
+            
+                doubleStripe.selected = true
+                checkIfSquareIsFull(doubleStripe)
+            }
+        }
+        
+        if rowOfStripe.tag > 0 {
+            if stripe.tag == 0 {
+                var doubleStripe: UIButton = allRows[rowOfStripe.tag - 1].subviews[squareOfStripeTag].subviews[2] as UIButton
+
+                doubleStripe.selected = true
+                
+                checkIfSquareIsFull(doubleStripe)
+            }
+        }
+    }
+    
+    func checkIfSquareIsFull(stripe : UIButton) {Ç
+        var square = stripe.superview!
+        var selectedStripesInSquare = 0
+        var gameId = gameObject[0].objectId
+        
+        for stripe in square.subviews as [UIButton] {
+            if stripe.selected {
+                selectedStripesInSquare += 1
+            }
+        }
+        
+        if selectedStripesInSquare == 4 {
+            square.backgroundColor = UIColor.yellowColor()
+            
+            println()
         }
     }
     
