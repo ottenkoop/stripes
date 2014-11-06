@@ -21,6 +21,8 @@ class LoginViewController: UIViewController, UIAlertViewDelegate {
         addLogoView()
         addFacebookLogin()
         addRegisterBtn()
+        
+        navigationController!.navigationBarHidden = true
     }
     
     func addLogoView () {
@@ -34,12 +36,17 @@ class LoginViewController: UIViewController, UIAlertViewDelegate {
     
     func addFacebookLogin () {
         fbLoginView.addTarget(self, action: "fbButtonAction:", forControlEvents: UIControlEvents.TouchUpInside)
-        fbLoginView.setTitle("Register with faceBook", forState: .Normal)
+        fbLoginView.setTitle("Facebook", forState: .Normal)
         self.view.addSubview(fbLoginView)
 
         fbLoginView.setTranslatesAutoresizingMaskIntoConstraints(false)
         fbLoginView.centerInContainerOnAxis(NSLayoutAttribute.CenterX)
         fbLoginView.pinAttribute(NSLayoutAttribute.Bottom, toAttribute: NSLayoutAttribute.Bottom, ofItem: logoView, withConstant: 150)
+        fbLoginView.setTitleColor(UIColor.blueColor(), forState: UIControlState.Normal)
+        fbLoginView.constrainToSize(CGSizeMake(218, 50))
+        fbLoginView.layer.borderColor = UIColor.blueColor().CGColor
+        fbLoginView.layer.borderWidth = 2
+        fbLoginView.layer.cornerRadius = 23
         
     }
     
@@ -56,7 +63,7 @@ class LoginViewController: UIViewController, UIAlertViewDelegate {
         registerBtn.setTranslatesAutoresizingMaskIntoConstraints(false)
         registerBtn.backgroundColor = UIColor.grayColor()
         registerBtn.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
-        registerBtn.constrainToSize(CGSizeMake(218, 46))
+        registerBtn.constrainToSize(CGSizeMake(218, 50))
         registerBtn.layer.cornerRadius = 2
         registerBtn.centerInContainerOnAxis(NSLayoutAttribute.CenterX)
         registerBtn.pinAttribute(NSLayoutAttribute.Bottom, toAttribute: NSLayoutAttribute.Bottom, ofItem: fbLoginView, withConstant: 75)
@@ -89,16 +96,12 @@ class LoginViewController: UIViewController, UIAlertViewDelegate {
     }
     
     func openGameOverviewController() {
-        self.presentViewController(GameOverviewController(), animated: true, completion: nil)
+        navigationController!.pushViewController(GameOverviewController(), animated: true)
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
-    }
-    
-    override func prefersStatusBarHidden () -> Bool{
-        return true
     }
     
     override func shouldAutorotate() -> Bool {

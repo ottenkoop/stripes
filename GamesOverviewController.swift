@@ -10,26 +10,27 @@ import Foundation
 
 class GameOverviewController : UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    var gameTableView : UITableView = UITableView ()
+    var gameTableView : UITableView = UITableView()
     var cell : UITableViewCell?
     
     let screenWidth : CGFloat = UIScreen.mainScreen().bounds.size.width
     let screenHeight : CGFloat = UIScreen.mainScreen().bounds.size.height
     
-    var allGames : [AnyObject] = []
+    var gamesWithUserTurn : [AnyObject] = []
+    var gamesWithOpponentTurn : [AnyObject] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController!.navigationBarHidden = false
         view.backgroundColor = UIColor.whiteColor()
         gameTableView.delegate = self
         gameTableView.dataSource = self
 
 //        addNewGameBtn()
+        addRefreshTableDrag()
         addTableView()
-        loadTableViewContent()
+//        loadTableViewContent()
         addNavigationItems()
-        
-//        squareHandler.findSomething()
     }
     
     func addNewGameBtn() {
@@ -42,8 +43,22 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         
         self.view.addSubview(newGameBtn)
         newGameBtn.setTranslatesAutoresizingMaskIntoConstraints(false)
-        newGameBtn.constrainToSize(CGSizeMake(screenWidth, 60))
+
         newGameBtn.pinAttribute(.Top, toAttribute: .Bottom, ofItem: navBar, withConstant: 0)
+    }
+    
+    func addRefreshTableDrag () {
+        var refreshControl = UIRefreshControl()
+//        refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
+        refreshControl.addTarget(self, action: "refresh:", forControlEvents: UIControlEvents.ValueChanged)
+        
+        gameTableView.addSubview(refreshControl)
+    }
+    
+    func refresh (sender: UIRefreshControl) {
+        loadTableViewContent()
+        
+        sender.endRefreshing()
     }
     
     func addTableView() {
@@ -51,18 +66,35 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         self.view.addSubview(gameTableView)
         
         gameTableView.setTranslatesAutoresizingMaskIntoConstraints(false)
-        gameTableView.constrainToSize(CGSizeMake(screenWidth, screenHeight - 150))
+        gameTableView.constrainToSize(CGSizeMake(screenWidth, screenHeight))
         gameTableView.pinAttribute(.Top, toAttribute: .Top, ofItem: self.view)
-//        gameTableView.pinAttribute(.Left, toAttribute: .Left, ofItem: self.view)
+        gameTableView.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: self.view)
+        gameTableView.pinAttribute(.Left, toAttribute: .Left, ofItem: self.view)
+    }
+    
+    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+        return 2
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let count = allGames.count as Int
-        
-        if count > 0 {
-            return count
-        } else {
+        switch section {
+        case 0:
+            return Int(gamesWithUserTurn.count)
+        case 1:
+            return Int(gamesWithOpponentTurn.count)
+        default:
             return 0
+        }
+    }
+    
+    func tableView(tableView: UITableView!, titleForHeaderInSection section: Int) -> String! {
+        switch section {
+        case 0:
+            return "Your Turn"
+        case 1:
+            return "Their Turn"
+        default:
+            return ""
         }
     }
     
@@ -72,35 +104,46 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         if cell != nil {
             cell = UITableViewCell(style: UITableViewCellStyle.Value1, reuseIdentifier: "CELL")
         }
-
-        let game = allGames[Int(indexPath.row)] as PFObject
-        var userObjectId = ""
         
-        if game["user"].objectId == PFUser.currentUser().objectId {
-            userObjectId = game["user2"].objectId
-        } else {
-            userObjectId = game["user"].objectId
-        }
-
-        var opponentUserQuery = PFUser.query()
-        opponentUserQuery.getObjectInBackgroundWithId("\(userObjectId)") {
-            (opponentUser: PFObject!, error: NSError!) -> Void in
-            if error != nil {
-                NSLog("%@", error)
+        switch indexPath.section {
+        case 0:
+            let gameUserTurn = gamesWithUserTurn[Int(indexPath.row)] as PFObject
+            var attributedText = NSMutableAttributedString()
+            
+            if gameUserTurn["user"].objectId == PFUser.currentUser().objectId {
+                attributedText = NSMutableAttributedString(string: String(gameUserTurn["user2FullName"] as NSString))
             } else {
-                cell!.textLabel.text = String(opponentUser["fullName"] as NSString)
+                attributedText = NSMutableAttributedString(string: String(gameUserTurn["userFullName"] as NSString))
             }
+            
+            cell!.textLabel.attributedText = attributedText
+            
+        case 1:
+            let gameOpponentTurn = gamesWithOpponentTurn[Int(indexPath.row)] as PFObject
+            var attributedText = NSMutableAttributedString()
+            
+            if gameOpponentTurn["user"].objectId == PFUser.currentUser().objectId {
+                attributedText = NSMutableAttributedString(string: String(gameOpponentTurn["user2FullName"] as NSString))
+            } else {
+                attributedText = NSMutableAttributedString(string: String(gameOpponentTurn["userFullName"] as NSString))
+            }
+            cell!.textLabel.attributedText = attributedText
+        default:
+            fatalError("What the fuck did you think ??")
         }
-
-        cell!.detailTextLabel?.text = String(game.objectId as NSString)
-        
         return cell!
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        var game : PFObject = allGames[Int(indexPath.row)] as PFObject
-        
-        openGame(game)
+        switch indexPath.section {
+        case 0:
+            var game : PFObject = gamesWithUserTurn[Int(indexPath.row)] as PFObject
+            openGame(game)
+        case 1:
+            println("not your turn")
+        default:
+            fatalError("What the fuck did you think ??")
+        }
     }
     
     func loadTableViewContent() {
@@ -109,7 +152,16 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         gameQuery.findObjectsInBackgroundWithBlock {
             (objects: [AnyObject]!, error: NSError!) -> Void in
             if error == nil {
-                self.allGames = objects
+                
+                self.gamesWithUserTurn = []
+                self.gamesWithOpponentTurn = []
+                for object in objects as [PFObject] {
+                    if object["userOnTurn"].objectId == PFUser.currentUser().objectId {
+                        self.gamesWithUserTurn += [object]
+                    } else {
+                        self.gamesWithOpponentTurn += [object]
+                    }
+                }
                 
                 self.navigationItem.title = "Games"
                 self.gameTableView.reloadData()
@@ -123,27 +175,32 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func newGame() {
-        self.navigationController?.presentViewController(addNewGameController(), animated: true, completion: nil)
+        self.navigationController!.pushViewController(addNewGameController(), animated: true)
     }
     
     func openGame(game : PFObject) {
-        let gameController = GameEngineController()
+        let gameEngineController = GameEngineController()
         
-        gameController.gameObject = [game]
-        self.presentViewController(gameController, animated: true, completion: nil)
+        gameEngineController.gameObject = [game]
+        self.navigationController!.pushViewController(gameEngineController, animated: true)
     }
     
     func addNavigationItems() {
         navigationItem.title = "Connecting..."
         var addNewGameBtn = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "newGame") //Use a selector
         navigationItem.rightBarButtonItem = addNewGameBtn
+        
+        navigationItem.setHidesBackButton(true, animated: false)
     }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        loadTableViewContent()
+    }
+    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-    }
-    
-    override func shouldAutorotate() -> Bool {
-        return false
     }
 }

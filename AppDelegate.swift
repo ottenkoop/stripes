@@ -12,32 +12,29 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
-    var navController : UINavigationController?
+    var navigationController : navController?
     var loginController : LoginViewController?
-    var gameEngineController: GameEngineController?
     var gamesOverviewController : GameOverviewController?
-    
+    var gameEngineController: GameEngineController?
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         loginController = LoginViewController()
         gameEngineController = GameEngineController()
         gamesOverviewController = GameOverviewController()
-        navController = UINavigationController()
+        navigationController = navController()
         
         Parse.setApplicationId("Rfb6FpX2ewMytcvOLIHjsZs2faNMSTMBMZCz3BUo", clientKey: "Dk5u1t8oQwTUNyOKDPSSMtjjAB74g3TGkw6EJWyR")
         PFFacebookUtils.initializeFacebook()
         PFAnalytics.trackAppOpenedWithLaunchOptionsInBackground(launchOptions, block: nil)
         
         window = UIWindow (frame: UIScreen.mainScreen().bounds)
-        
+
+        window!.rootViewController = navigationController!
         if (PFUser.currentUser() != nil) {
-            self.navController?.pushViewController(GameOverviewController(), animated: false)
-            window!.rootViewController = navController!
+            self.navigationController?.pushViewController(gamesOverviewController!, animated: false)
         } else {
-            window!.rootViewController = loginController!
+            self.navigationController?.pushViewController(loginController!, animated: false)
         }
-        
-//        window!.rootViewController = gameEngineController!
         
         window!.makeKeyAndVisible()
         

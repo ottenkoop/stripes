@@ -28,14 +28,13 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
     }
     
     func addTableView() {
-        var navBar = navigationController?.navigationBar
         self.friendTableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "cell")
         self.view.addSubview(friendTableView)
         
         
         friendTableView.setTranslatesAutoresizingMaskIntoConstraints(false)
         friendTableView.constrainToSize(CGSizeMake(400, 400))
-        friendTableView.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: self.view)
+        friendTableView.pinAttribute(.Top, toAttribute: .Top, ofItem: self.view)
         friendTableView.pinAttribute(.Left, toAttribute: .Left, ofItem: self.view)
     }
     
@@ -80,11 +79,13 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         var cell = friendTableView.cellForRowAtIndexPath(indexPath)
-        var opponentName = cell?.textLabel.text
+        var opponentName = cell!.textLabel.text
         
-        var gameObjectId = Game.addGame("\(opponentName!)", grid: 5)
+        println(opponentName!)
         
-        self.presentViewController(GameOverviewController(), animated: true, completion: nil)
+        var gameObjectId = Game.addGame("\(opponentName!)", grid: 3)
+        
+        self.navigationController!.popViewControllerAnimated(true)
     }
     
     func addNavigationItems() {
