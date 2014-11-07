@@ -411,7 +411,7 @@ class GameEngineController: UIViewController {
             Game.addPointAndScoredSquareToUser(gameObject[0], rowIndex : square.superview!.tag, squareIndex: square.tag)
             
             userPoints += 1
-            userPointsView.text = PFUser.currentUser()["fullName"] as NSString + ":" + "\(userPoints)"
+            userPointsView.text = "You: " + "\(userPoints)"
             
             return true
         } else {

@@ -14,6 +14,9 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
     
     var allFriends : [AnyObject] = []
     
+    let screenWidth : CGFloat = UIScreen.mainScreen().bounds.size.width
+    let screenHeight : CGFloat = UIScreen.mainScreen().bounds.size.height
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,7 +36,7 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
         
         
         friendTableView.setTranslatesAutoresizingMaskIntoConstraints(false)
-        friendTableView.constrainToSize(CGSizeMake(400, 400))
+        friendTableView.constrainToSize(CGSizeMake(screenWidth, screenHeight))
         friendTableView.pinAttribute(.Top, toAttribute: .Top, ofItem: self.view)
         friendTableView.pinAttribute(.Left, toAttribute: .Left, ofItem: self.view)
     }

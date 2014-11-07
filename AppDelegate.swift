@@ -27,6 +27,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         PFFacebookUtils.initializeFacebook()
         PFAnalytics.trackAppOpenedWithLaunchOptionsInBackground(launchOptions, block: nil)
         
+        let notificationTypes:UIUserNotificationType = UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound
+        let notificationSettings:UIUserNotificationSettings = UIUserNotificationSettings(forTypes: notificationTypes, categories: nil)
+        
         window = UIWindow (frame: UIScreen.mainScreen().bounds)
 
         window!.rootViewController = navigationController!
@@ -41,8 +44,53 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         FBLoginView.self
         FBProfilePictureView.self
         
+        UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)
+        
         return true
     }
+    
+    func application(application: UIApplication!, didRegisterUserNotificationSettings notificationSettings: UIUserNotificationSettings!) {
+        UIApplication.sharedApplication().registerForRemoteNotifications()
+    }
+    
+    func application(application: UIApplication!, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData!) {
+        let currentInstallation:PFInstallation = PFInstallation.currentInstallation()
+        currentInstallation.setDeviceTokenFromData(deviceToken)
+        currentInstallation.channels = ["gameNotification"]
+        currentInstallation.saveInBackgroundWithBlock {
+            (success: Bool!, error: NSError!) -> Void in
+            println(success)
+        }
+        
+        if (PFUser.currentUser() != nil) {
+            currentInstallation["user"] = PFUser.currentUser()
+        }
+        
+        currentInstallation.saveInBackgroundWithBlock {
+            (success: Bool!, error: NSError!) -> Void in
+            println(success)
+        }
+    }
+    
+    func application(application: UIApplication!, didFailToRegisterForRemoteNotificationsWithError error: NSError!) {
+        println(error.localizedDescription)
+    }
+    
+    func application(application: UIApplication!, didReceiveRemoteNotification userInfo:NSDictionary!) {
+        
+        var notification:NSDictionary = userInfo.objectForKey("aps") as NSDictionary
+        
+        if (notification.objectForKey("content-available") != nil) {
+            if notification.objectForKey("content-available") as Int == 1 {
+                NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
+            }
+        } else {
+            PFPush.handlePush(userInfo)
+        }
+        
+        
+    }
+    
     
     func application(application: UIApplication, openURL url: NSURL, sourceApplication: NSString?, annotation: AnyObject) -> Bool {
         
@@ -67,7 +115,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func applicationDidBecomeActive(application: UIApplication) {
+        
+        var currentInstallation = PFInstallation.currentInstallation()
+        
+        if (currentInstallation.badge != 0) {
+
+            currentInstallation.badge = 0
+            currentInstallation.saveEventually()
+        }
+        
         FBAppCall.handleDidBecomeActiveWithSession(PFFacebookUtils.session())
+        println("hier")
+        NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
     }
     
     func applicationWillTerminate(application: UIApplication) {

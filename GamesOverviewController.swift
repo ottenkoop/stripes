@@ -31,6 +31,12 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         addTableView()
 //        loadTableViewContent()
         addNavigationItems()
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadData", name: "reloadGameTableView", object: nil)
+    }
+    
+    func reloadData () {
+        loadTableViewContent()
     }
     
     func addNewGameBtn() {

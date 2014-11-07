@@ -22,8 +22,10 @@ class Game: PFObject {
         game["userOnTurn"] = user.first
         game["allStripes"] = []
         game["allScoredSquares"] = []
-        
+
+        sendNewGameNotification(user[0] as PFUser)
         game.saveEventually()
+
         
         return game
     }
@@ -66,12 +68,41 @@ class Game: PFObject {
     }
     
     class func switchTurnToOtherUser(game : PFObject) -> PFObject {
+        var fullName: NSString = PFUser.currentUser()["fullName"] as NSString
+
+        var query = PFInstallation.query()
+        query.whereKey("channels", equalTo: "gameNotification")
+        
         if game["user"].objectId == PFUser.currentUser().objectId {
             game["userOnTurn"] = game["user2"]
+            query.whereKey("user", equalTo: game["user2"])
         } else {
             game["userOnTurn"] = game["user"]
+            query.whereKey("user", equalTo: game["user"])
         }
+        
+        var push = PFPush()
+        var data : NSDictionary = ["alert": "It's your turn against \(fullName)", "badge":"1", "content-available":"1"]
+        
+        push.setQuery(query)
+        push.setData(data)
+        push.sendPush(nil)
     
         return game
     }
+    
+    class func sendNewGameNotification(user : PFUser) {
+        var query = PFInstallation.query()
+        var push = PFPush()
+        var userFullName: NSString = PFUser.currentUser()["fullName"] as NSString
+        var data : NSDictionary = ["alert": "\(userFullName) has challenged you to play a game!", "badge":"1", "content-available":"1"]
+        
+        query.whereKey("channels", equalTo: "gameNotification")
+        query.whereKey("user", equalTo: user)
+        
+        push.setQuery(query)
+        push.setData(data)
+        push.sendPush(nil)
+    }
+    
 }

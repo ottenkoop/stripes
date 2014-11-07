@@ -97,6 +97,10 @@ class LoginViewController: UIViewController, UIAlertViewDelegate {
     
     func openGameOverviewController() {
         navigationController!.pushViewController(GameOverviewController(), animated: true)
+        
+        let currentInstallation:PFInstallation = PFInstallation.currentInstallation()
+        currentInstallation["user"] = PFUser.currentUser()
+        currentInstallation.saveInBackgroundWithTarget(nil, selector: nil)
     }
     
     override func didReceiveMemoryWarning() {
