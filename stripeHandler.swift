@@ -11,7 +11,7 @@ import Foundation
 
 class stripeHandler: PFObject {
     
-    class func addNewStripe(rowIndex : Int, squareIndex : Int, stripeIndex : Int, game : PFObject){
+    class func addNewStripe(rowIndex : Int, squareIndex : Int, stripeIndex : Int, game : PFObject) -> PFObject {
 
         var stripeObject = createStripeObject(rowIndex, squareIndex: squareIndex, stripeIndex: stripeIndex)
         var newArrayToSubmit : [AnyObject] = []
@@ -24,7 +24,7 @@ class stripeHandler: PFObject {
         
         game["allStripes"] = newArrayToSubmit
         
-        game.saveEventually()
+        return game
     }
     
     class func createStripeObject(rowIndex : Int, squareIndex : Int, stripeIndex : Int) -> NSObject {

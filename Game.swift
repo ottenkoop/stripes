@@ -67,8 +67,9 @@ class Game: PFObject {
         return objectToReturn
     }
     
-    class func switchTurnToOtherUser(game : PFObject) -> PFObject {
+    class func switchTurnToOtherUserAndSaveStripe(game : PFObject, rowIndex : Int, squareIndex : Int, stripeIndex : Int) -> PFObject {
         var fullName: NSString = PFUser.currentUser()["fullName"] as NSString
+        var stripeObject = stripeHandler.createStripeObject(rowIndex, squareIndex: squareIndex, stripeIndex: stripeIndex)
 
         var query = PFInstallation.query()
         query.whereKey("channels", equalTo: "gameNotification")
@@ -81,8 +82,18 @@ class Game: PFObject {
             query.whereKey("user", equalTo: game["user"])
         }
         
+        var newArrayToSubmit : [AnyObject] = []
+        
+        for alreadyPlayedStripe in game["allStripes"] as NSArray {
+            newArrayToSubmit += [alreadyPlayedStripe]
+        }
+        
+        newArrayToSubmit += [stripeObject]
+        
+        game["allStripes"] = newArrayToSubmit
+        
         var push = PFPush()
-        var data : NSDictionary = ["alert": "It's your turn against \(fullName)", "badge":"1", "content-available":"1"]
+        var data : NSDictionary = ["alert": "It's your turn against \(fullName)", "badge":"1", "content-available":"1", "sound":"default"]
         
         push.setQuery(query)
         push.setData(data)
@@ -95,7 +106,7 @@ class Game: PFObject {
         var query = PFInstallation.query()
         var push = PFPush()
         var userFullName: NSString = PFUser.currentUser()["fullName"] as NSString
-        var data : NSDictionary = ["alert": "\(userFullName) has challenged you to play a game!", "badge":"1", "content-available":"1"]
+        var data : NSDictionary = ["alert": "\(userFullName) has challenged you to play a game!", "badge":"1", "content-available":"1", "sound":"default"]
         
         query.whereKey("channels", equalTo: "gameNotification")
         query.whereKey("user", equalTo: user)

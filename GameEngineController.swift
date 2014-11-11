@@ -2,7 +2,9 @@ import UIKit
 
 class GameEngineController: UIViewController {
 
+    var gameViewController : GameViewController?
     var gameObject : [PFObject] = []
+    var userTurn : Bool = false
     private var playField = UIView (frame: CGRectZero)
     private var submitBtn = UIButton()
     
@@ -23,6 +25,7 @@ class GameEngineController: UIViewController {
     private var allRows : [UIView] = []
     private var allSquares : [UIView] = []
     private var allStripes : [UIButton] = []
+    private var openStripes : [UIButton] = []
     
     private var stripeToSubmit : UIButton = UIButton()
     
@@ -33,8 +36,8 @@ class GameEngineController: UIViewController {
         self.view.addSubview(playField)
         
         addPlayFieldPosition()
-        buildUpGame()
         setUserPoints()
+        buildUpGame()
     }
     
     func buildUpGame() {
@@ -79,12 +82,14 @@ class GameEngineController: UIViewController {
     func reloadPlayedStripes (container : UIView) {
         var game = gameObject[0]
         
-        container.removeFromSuperview()
-        self.navigationController!.navigationBarHidden = false
-        
         for stripe in game["allStripes"] as NSArray {
 //            setPlayedStripes(stripe)
         }
+        
+        submitBtn.hidden = true
+        stripeToSubmit.userInteractionEnabled = false
+        stripeToSubmit.backgroundColor = UIColor.greenColor()
+        stripeToSubmit = UIButton()
         
         container.removeFromSuperview()
         self.navigationController!.navigationBarHidden = false
@@ -209,8 +214,14 @@ class GameEngineController: UIViewController {
             
             allStripes += [stripe]
             
-            stripe.addTarget(self, action: "stripePressed:", forControlEvents: .TouchUpInside)
+            // MOET NOG GEOPTIMALISEERD WORDEN.
+            if userTurn == true {
+                stripe.addTarget(self, action: "stripePressed:", forControlEvents: .TouchUpInside)
+            }
+
         }
+        
+        openStripes = allStripes
         
     }
     
@@ -284,6 +295,7 @@ class GameEngineController: UIViewController {
         
         for button in buttonsToHide {
             button.hidden = true
+            openStripes.remove(button)
         }
     }
     
@@ -318,7 +330,9 @@ class GameEngineController: UIViewController {
     }
     
     func submitStripe() {
-
+        var container = loadingView().showActivityIndicator(self.view)
+        self.navigationController!.navigationBarHidden = true
+        
         var square = stripeToSubmit.superview!
         var doubleStripe = selectDoubleHiddenStripe(stripeToSubmit)
         var userScoredAPoint = checkIfUserScoredAPoint(stripeToSubmit)
@@ -329,36 +343,29 @@ class GameEngineController: UIViewController {
         } else {
             userScoredAnotherPoint = false
         }
-        
-        let gameOverviewController = GameOverviewController(nibName: "GameOverviewController", bundle: nil)
 
         // Find and select the hidden double stripe.
         selectDoubleHiddenStripe(stripeToSubmit)
 
-        stripeHandler.addNewStripe(square.superview!.tag, squareIndex: square.tag, stripeIndex: stripeToSubmit.tag, game: gameObject[0])
-
         if userScoredAPoint || userScoredAnotherPoint {
-            var container = loadingView().showActivityIndicator(self.view)
-            self.navigationController!.navigationBarHidden = true
-
-            println("vakje gemaakt")
-
             // User should get anothor set
+            var stripeToSaveQuery = stripeHandler.addNewStripe(square.superview!.tag, squareIndex: square.tag, stripeIndex: stripeToSubmit.tag, game: gameObject[0])
             
-            reloadPlayedStripes(container)
-            submitBtn.hidden = true
-            stripeToSubmit = UIButton()
+            stripeToSaveQuery.saveInBackgroundWithBlock({(succeeded: Bool!, err: NSError!) -> Void in
+                if succeeded != nil {
+                    self.reloadPlayedStripes(container)
+                    NSNotificationCenter.defaultCenter().postNotificationName("userScoredAPoint", object: nil)
+                }
+            })
+            
         } else {
-            loadingView().showActivityIndicator(self.view)
-            self.navigationController!.navigationBarHidden = true
-
-            var gameToUpdate = Game.switchTurnToOtherUser(gameObject[0])
+            var gameToUpdate = Game.switchTurnToOtherUserAndSaveStripe(gameObject[0], rowIndex: square.superview!.tag, squareIndex: square.tag, stripeIndex: stripeToSubmit.tag)
             
-            gameToUpdate.saveInBackgroundWithBlock ({(succeeded: Bool!, err: NSError!) -> Void in
-                if (succeeded != nil) {
+            gameToUpdate.saveInBackgroundWithBlock({(succeeded: Bool!, err: NSError!) -> Void in
+                if succeeded != nil {
                     self.navigationController!.popViewControllerAnimated(true)
                     loadingView().hideActivityIndicator(self.view)
-                    
+                            
                     self.navigationController!.navigationBarHidden = false
                 }
             })
@@ -407,7 +414,7 @@ class GameEngineController: UIViewController {
         if selectedStripesInSquare == 4 {
             square.backgroundColor = UIColor.greenColor()
 
-            println("PUNTEN +1!!")
+//            println("PUNTEN +1!!")
             Game.addPointAndScoredSquareToUser(gameObject[0], rowIndex : square.superview!.tag, squareIndex: square.tag)
             
             userPoints += 1
@@ -441,12 +448,9 @@ class GameEngineController: UIViewController {
         opponentPointsView.text = "Opponent: \(opponentPoints)"
         
         styleAndAddLabelPoints([userPointsView, opponentPointsView])
-
-
     }
     
     func styleAndAddLabelPoints(labelPointsViews : [UILabel]) {
-//        var navBar = navigationController?.navigationBar
         
         if (UIInterfaceOrientationIsPortrait(self.interfaceOrientation)) {
             for label in labelPointsViews {
@@ -477,16 +481,20 @@ class GameEngineController: UIViewController {
             }
             
             labelPointsViews[0].centerInContainerOnAxis(.CenterY)
-//            labelPointsViews[0].pinAttribute(.Top, toAttribute: .Top, ofItem: self.view, withConstant: 50)
             labelPointsViews[1].pinAttribute(.Top, toAttribute: .Top, ofItem: labelPointsViews[0], withConstant: 50)
         }
     }
     
+    func finishGame(uPoints : Int, oppPoints : Int) {
+        println("game Finished: \(uPoints) - \(oppPoints)")
+    }
+    
     func setupGameViewController() {
-        var gameViewController = GameViewController()
+        gameViewController = GameViewController()
         
-        gameViewController.buildView(gameObject, rows: allRows, stripes: allStripes)
+        gameViewController!.buildView(gameObject, rows: allRows, openStripes: openStripes.count, stripes: allStripes, userpoints: userPoints, oppPoints: opponentPoints)
         
+        println(userPoints)
     }
     
     override func didReceiveMemoryWarning() {

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import HockeySDK
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -26,9 +27,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Parse.setApplicationId("Rfb6FpX2ewMytcvOLIHjsZs2faNMSTMBMZCz3BUo", clientKey: "Dk5u1t8oQwTUNyOKDPSSMtjjAB74g3TGkw6EJWyR")
         PFFacebookUtils.initializeFacebook()
         PFAnalytics.trackAppOpenedWithLaunchOptionsInBackground(launchOptions, block: nil)
+
+        BITHockeyManager.sharedHockeyManager().configureWithIdentifier("0ca020e3c03e6f1f569fd4201ad5a1be")
+        BITHockeyManager.sharedHockeyManager().startManager()
+        BITHockeyManager.sharedHockeyManager().authenticator.authenticateInstallation()
+        BITHockeyManager.sharedHockeyManager().testIdentifier()
         
-        let notificationTypes:UIUserNotificationType = UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound
-        let notificationSettings:UIUserNotificationSettings = UIUserNotificationSettings(forTypes: notificationTypes, categories: nil)
+        registerForRemoteNotification()
         
         window = UIWindow (frame: UIScreen.mainScreen().bounds)
 
@@ -44,9 +49,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         FBLoginView.self
         FBProfilePictureView.self
         
-        UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)
-        
         return true
+    }
+    
+    func registerForRemoteNotification() {
+        if (UIDevice.currentDevice().systemVersion as NSString).floatValue >= 8.0 {
+            let notificationTypes : UIUserNotificationType = UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound
+            let notificationSettings : UIUserNotificationSettings = UIUserNotificationSettings(forTypes: notificationTypes, categories: nil)
+            
+            UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)
+        } else {
+            UIApplication.sharedApplication().registerForRemoteNotificationTypes(UIRemoteNotificationType.Badge | UIRemoteNotificationType.Sound | UIRemoteNotificationType.Alert)
+        }
     }
     
     func application(application: UIApplication!, didRegisterUserNotificationSettings notificationSettings: UIUserNotificationSettings!) {
@@ -54,21 +68,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(application: UIApplication!, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData!) {
-        let currentInstallation:PFInstallation = PFInstallation.currentInstallation()
+        let currentInstallation : PFInstallation = PFInstallation.currentInstallation()
+        
         currentInstallation.setDeviceTokenFromData(deviceToken)
         currentInstallation.channels = ["gameNotification"]
-        currentInstallation.saveInBackgroundWithBlock {
-            (success: Bool!, error: NSError!) -> Void in
-            println(success)
-        }
         
         if (PFUser.currentUser() != nil) {
             currentInstallation["user"] = PFUser.currentUser()
         }
         
+        println("hier")
+        
         currentInstallation.saveInBackgroundWithBlock {
             (success: Bool!, error: NSError!) -> Void in
-            println(success)
+            
+            println(error)
         }
     }
     
@@ -116,16 +130,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func applicationDidBecomeActive(application: UIApplication) {
         
-        var currentInstallation = PFInstallation.currentInstallation()
-        
-        if (currentInstallation.badge != 0) {
-
-            currentInstallation.badge = 0
-            currentInstallation.saveEventually()
-        }
-        
         FBAppCall.handleDidBecomeActiveWithSession(PFFacebookUtils.session())
-        println("hier")
         NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
     }
     

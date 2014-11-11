@@ -13,5 +13,6 @@
 #import "UIView+AutoLayout.h"
 #import <Parse/Parse.h>
 #import <ParseFacebookUtils/PFFacebookUtils.h>
+#import <HockeySDK/HockeySDK.h>
 
 #endif

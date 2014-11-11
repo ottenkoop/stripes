@@ -8,35 +8,62 @@
 
 import Foundation
 
-class GameViewController: GameEngineController {
+class GameViewController {
     private var gameViewObject : [AnyObject] = []
-    private var userPoints : Int = 0
-    private var user2Points : Int = 0
     
     private var allRowsArray : [UIView] = []
+    private var allSquaresArray : [UIView] = []
     private var allStripesArray : [UIButton] = []
     private var allOpenStripes : [UIButton] = []
+    private var openStripesCount : Int = 0
     
-    func buildView(game : [PFObject], rows : [UIView], stripes : [UIButton]) {
+    private var userPoints : Int = 0
+    private var opponentPoints : Int = 0
+    
+    func buildView(game : [PFObject], rows : [UIView], openStripes : Int, stripes : [UIButton], userpoints : Int, oppPoints : Int) {
         gameViewObject = game
+        userPoints = userpoints
+        opponentPoints = oppPoints
         
         allRowsArray = rows
+        openStripesCount = openStripes
         allStripesArray = stripes
         
         loadPlayedStripes()
         loadScoredSquares()
+        
+        checkIfGameIsFinished()
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateUserPoints", name: "userScoredAPoint", object: nil)
     }
     
-    override func setUserPoints() {
+    func checkIfGameIsFinished() {
+        if openStripesCount == 0 {
+            println("game Finished")
+            
+            super.finishGame(userPoints, oppPoints: opponentPoints)
+        }
+    }
+    
+    func updateUserPoints () {
+        userPoints += 1
+        openStripesCount -= 1
+        
+        checkIfGameIsFinished()
     }
     
     func loadPlayedStripes () {
         var game: PFObject = gameViewObject[0] as PFObject
+        var stripesArray = game["allStripes"] as NSArray
         
         allOpenStripes = allStripesArray
         
-        for stripe in game["allStripes"] as NSArray {
-            setPlayedStripes(stripe)
+        for stripe in stripesArray {
+            if stripe as NSObject == stripesArray.lastObject! as NSObject {
+                setPlayedStripes(stripe, lastObject: true)
+            } else {
+                setPlayedStripes(stripe, lastObject: false)
+            }
         }
     }
     
@@ -46,6 +73,7 @@ class GameViewController: GameEngineController {
         for squareObject in game["allScoredSquares"] as NSArray {
             
             var square: UIView = allRowsArray[squareObject["rowIndex"] as Int].subviews[squareObject["squareIndex"] as Int] as UIView
+            
             if squareObject["userId"] as NSString == PFUser.currentUser().objectId {
                 square.backgroundColor = UIColor.greenColor()
             } else {
@@ -54,7 +82,7 @@ class GameViewController: GameEngineController {
         }
     }
     
-    func setPlayedStripes (stripe : AnyObject) {
+    func setPlayedStripes (stripe : AnyObject, lastObject : Bool) {
         var rowIndex : Int = stripe["rowIndex"] as Int
         var squareIndex : Int = stripe["squareIndex"] as Int
         var stripeIndex : Int = stripe["stripeIndex"] as Int
@@ -64,16 +92,20 @@ class GameViewController: GameEngineController {
         
         if stripeBelongsToUser == PFUser.currentUser().objectId {
             playedStripe.backgroundColor = UIColor.greenColor()
+        } else if lastObject {
+            playedStripe.backgroundColor = UIColor.yellowColor()
         } else {
             playedStripe.backgroundColor = UIColor.redColor()
         }
         
-        duplicateOfSelectDoubleHiddenStripe(playedStripe)
+        var doublePlayedStripe = duplicateOfSelectDoubleHiddenStripe(playedStripe)
         
         playedStripe.selected = true
         playedStripe.userInteractionEnabled = false
         
+        openStripesCount -= 1
         allOpenStripes.remove(playedStripe)
+        allOpenStripes.remove(doublePlayedStripe)
     }
     
     func duplicateOfSelectDoubleHiddenStripe(stripe: UIButton) -> UIButton {

@@ -26,10 +26,8 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         gameTableView.delegate = self
         gameTableView.dataSource = self
 
-//        addNewGameBtn()
         addRefreshTableDrag()
         addTableView()
-//        loadTableViewContent()
         addNavigationItems()
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadData", name: "reloadGameTableView", object: nil)
@@ -144,9 +142,11 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         switch indexPath.section {
         case 0:
             var game : PFObject = gamesWithUserTurn[Int(indexPath.row)] as PFObject
-            openGame(game)
+            openGame(game, userTurn: true)
         case 1:
-            println("not your turn")
+            var game : PFObject = gamesWithOpponentTurn[Int(indexPath.row)] as PFObject
+        
+            openGame(game, userTurn: false)
         default:
             fatalError("What the fuck did you think ??")
         }
@@ -161,6 +161,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
                 
                 self.gamesWithUserTurn = []
                 self.gamesWithOpponentTurn = []
+                
                 for object in objects as [PFObject] {
                     if object["userOnTurn"].objectId == PFUser.currentUser().objectId {
                         self.gamesWithUserTurn += [object]
@@ -171,6 +172,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
                 
                 self.navigationItem.title = "Games"
                 self.gameTableView.reloadData()
+                self.setBadgeNumber()
             } else {
                 let alert = UIAlertView(title: "Connection Failed", message: "There seems to be an error with your internet connection.", delegate: self, cancelButtonTitle: "Try Again")
                 alert.show()
@@ -184,10 +186,11 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         self.navigationController!.pushViewController(addNewGameController(), animated: true)
     }
     
-    func openGame(game : PFObject) {
+    func openGame(game : PFObject, userTurn : Bool) {
         let gameEngineController = GameEngineController()
         
         gameEngineController.gameObject = [game]
+        gameEngineController.userTurn = userTurn
         self.navigationController!.pushViewController(gameEngineController, animated: true)
     }
     
@@ -205,6 +208,17 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         loadTableViewContent()
     }
     
+    func setBadgeNumber () {
+        var currentInstallation = PFInstallation.currentInstallation()
+        
+        if gamesWithUserTurn.count != 0 {
+            currentInstallation.badge = gamesWithUserTurn.count
+        } else {
+            currentInstallation.badge = 0
+        }
+        
+        currentInstallation.saveEventually()
+    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
