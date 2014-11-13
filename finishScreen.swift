@@ -11,53 +11,51 @@ import UIKit
 
 class finishScreen {
     
-    var container: UIView = UIView()
-    var textView: UILabel = UILabel()
-    var activityIndicator: UIActivityIndicatorView = UIActivityIndicatorView()
+    var container : UIViewController = UIViewController()
+    var textView: UITextView = UITextView()
+    var continuButton : UIButton = UIButton()
     
-    /*
-    Show customized activity indicator,
-    actually add activity indicator to passing view
-    
-    @param uiView - add activity indicator to this view
-    */
-    func gameDidFinishWithCurrentUserWinner(uiView: UIView) -> UIView {
-        defaultContainerSetup(uiView)
+    func gameDidFinishWithCurrentUserWinner(uiControl : UIViewController) {
+        defaultContainerSetup(uiControl.view)
         
-        textView.text = "Joepie! Je hebt gewonnen"
-        
-        return container
+        container.view.backgroundColor = UIColor.greenColor()
+        textView.backgroundColor = UIColor.greenColor()
+        textView.text = "Congratulations! You won."
     }
     
-    func gameDidFinishWithOpponentWinner(uiView: UIView) -> UIView {
+    func gameDidFinishWithOpponentWinner(uiControl : UIViewController) {
+        defaultContainerSetup(uiControl.view)
         
-        
-        
-        return container
+        container.view.backgroundColor = UIColor.redColor()
+        textView.backgroundColor = UIColor.redColor()
+        textView.text = "Uh oh! You've lost this time. Try again!"
     }
     
     func defaultContainerSetup(uiView: UIView) {
-        container.frame = uiView.frame
-        container.center = uiView.center
-        container.backgroundColor = UIColor.colorWithRGBHexWithAlpha(0x5AB103, alpha: 1.0)
+        container.view.frame = uiView.frame
+        container.view.center = uiView.center
         
-        textView.frame = CGRectMake(0, 0, container.bounds.width, 100)
+        textView.frame = CGRectMake(0, 0, container.view.bounds.width, 100)
+        textView.font = UIFont.systemFontOfSize(20)
         textView.center = uiView.center
         textView.textAlignment = .Center
 
-        uiView.addSubview(container)
-        container.addSubview(textView)
+        uiView.addSubview(container.view)
+        container.view.addSubview(textView)
     }
     
-    /*
-    Hide activity indicator
-    Actually remove activity indicator from its super view
-    
-    @param uiView - remove activity indicator from this view
-    */
-    func hideActivityIndicator(uiView: UIView) {
-        activityIndicator.stopAnimating()
-        container.removeFromSuperview()
+    func addContinuButton(uiView: UIView) -> UIButton {
+        continuButton.setTitle("Continu", forState: .Normal)
+        continuButton.backgroundColor = UIColor.blueColor()
+        
+        uiView.addSubview(continuButton)
+        
+        continuButton.setTranslatesAutoresizingMaskIntoConstraints(false)
+        continuButton.constrainToSize(CGSizeMake(uiView.bounds.width - 10, 50))
+        continuButton.centerInContainerOnAxis(.CenterX)
+        continuButton.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: uiView, withConstant: -10)
+        
+        return continuButton
     }
     
     /*

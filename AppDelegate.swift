@@ -77,8 +77,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             currentInstallation["user"] = PFUser.currentUser()
         }
         
-        println("hier")
-        
         currentInstallation.saveInBackgroundWithBlock {
             (success: Bool!, error: NSError!) -> Void in
             

@@ -90,6 +90,7 @@ class LoginViewController: UIViewController, UIAlertViewDelegate {
                 self.openGameOverviewController()
             } else {
                 NSLog("User logged in through Facebook!")
+                User.requestFaceBookLoggedInUserInfo()
                 self.openGameOverviewController()
             }
         })

@@ -1,12 +1,12 @@
 import UIKit
 
 class GameEngineController: UIViewController {
-
-    var gameViewController : GameViewController?
     var gameObject : [PFObject] = []
     var userTurn : Bool = false
+    
     private var playField = UIView (frame: CGRectZero)
     private var submitBtn = UIButton()
+    private var loadingViewContainer = UIView()
     
     let screenWidth : CGFloat = UIScreen.mainScreen().bounds.size.width
     let screenHeight : CGFloat = UIScreen.mainScreen().bounds.size.height
@@ -18,6 +18,7 @@ class GameEngineController: UIViewController {
     private var opponentPointsView = UILabel()
     private var userPoints : Int = 0
     private var opponentPoints : Int = 0
+    private var openStripes : [UIButton] = []
 
     private var rowsAmount: [Int] = []
     private var squaresAmount: [Int] = []
@@ -25,7 +26,6 @@ class GameEngineController: UIViewController {
     private var allRows : [UIView] = []
     private var allSquares : [UIView] = []
     private var allStripes : [UIButton] = []
-    private var openStripes : [UIButton] = []
     
     private var stripeToSubmit : UIButton = UIButton()
     
@@ -41,11 +41,13 @@ class GameEngineController: UIViewController {
     }
     
     func buildUpGame() {
-        setGrid()
+        determineGrid()
         addSubmitBtn()
         addGrid (rowsAmount, sqauresAmount: squaresAmount)
         
-        setupGameViewController()
+        loadPlayedStripes()
+        loadScoredSquares()
+        checkifGameIsFinished()
     }
     
     func addPlayFieldPosition() {
@@ -70,32 +72,26 @@ class GameEngineController: UIViewController {
         }
     }
 
-
-    
-    func setGrid() {
+    func determineGrid() {
         var gridInt : Int = gameObject[0]["grid"] as Int
         
         0.upTo(gridInt - 1, { self.rowsAmount += [$0] })
         0.upTo(gridInt - 1, { self.squaresAmount += [$0] })
     }
     
-    func reloadPlayedStripes (container : UIView) {
+    func reloadPlayedStripes () {
         var game = gameObject[0]
-        
-        for stripe in game["allStripes"] as NSArray {
-//            setPlayedStripes(stripe)
-        }
+
+        openStripes.remove(stripeToSubmit)
         
         submitBtn.hidden = true
         stripeToSubmit.userInteractionEnabled = false
         stripeToSubmit.backgroundColor = UIColor.greenColor()
         stripeToSubmit = UIButton()
         
-        container.removeFromSuperview()
+        loadingView().hideActivityIndicator(loadingViewContainer)
         self.navigationController!.navigationBarHidden = false
     }
-    
-
     
     func addSubmitBtn() {
         submitBtn.setTitle("Play", forState: .Normal)
@@ -218,11 +214,9 @@ class GameEngineController: UIViewController {
             if userTurn == true {
                 stripe.addTarget(self, action: "stripePressed:", forControlEvents: .TouchUpInside)
             }
-
         }
         
         openStripes = allStripes
-        
     }
     
     func addStripe (stripeIndex : Int, square : UIView) -> UIButton {
@@ -295,6 +289,7 @@ class GameEngineController: UIViewController {
         
         for button in buttonsToHide {
             button.hidden = true
+            
             openStripes.remove(button)
         }
     }
@@ -330,9 +325,14 @@ class GameEngineController: UIViewController {
     }
     
     func submitStripe() {
-        var container = loadingView().showActivityIndicator(self.view)
+        submitBtn.hidden = true
+        loadingViewContainer = loadingView().showActivityIndicator(self.view)
         self.navigationController!.navigationBarHidden = true
         
+        NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: "startSavingStuff", userInfo: nil, repeats: false)
+    }
+    
+    func startSavingStuff() {
         var square = stripeToSubmit.superview!
         var doubleStripe = selectDoubleHiddenStripe(stripeToSubmit)
         var userScoredAPoint = checkIfUserScoredAPoint(stripeToSubmit)
@@ -343,18 +343,15 @@ class GameEngineController: UIViewController {
         } else {
             userScoredAnotherPoint = false
         }
-
-        // Find and select the hidden double stripe.
-        selectDoubleHiddenStripe(stripeToSubmit)
-
+        
         if userScoredAPoint || userScoredAnotherPoint {
-            // User should get anothor set
             var stripeToSaveQuery = stripeHandler.addNewStripe(square.superview!.tag, squareIndex: square.tag, stripeIndex: stripeToSubmit.tag, game: gameObject[0])
             
             stripeToSaveQuery.saveInBackgroundWithBlock({(succeeded: Bool!, err: NSError!) -> Void in
                 if succeeded != nil {
-                    self.reloadPlayedStripes(container)
-                    NSNotificationCenter.defaultCenter().postNotificationName("userScoredAPoint", object: nil)
+                    self.reloadPlayedStripes()
+                    
+                    self.checkifGameIsFinished()
                 }
             })
             
@@ -363,6 +360,7 @@ class GameEngineController: UIViewController {
             
             gameToUpdate.saveInBackgroundWithBlock({(succeeded: Bool!, err: NSError!) -> Void in
                 if succeeded != nil {
+                    NSNotificationCenter.defaultCenter().postNotificationName("deleteObjectFromYourTurnSection", object: nil)
                     self.navigationController!.popViewControllerAnimated(true)
                     loadingView().hideActivityIndicator(self.view)
                             
@@ -370,34 +368,6 @@ class GameEngineController: UIViewController {
                 }
             })
         }
-    }
-    
-    func selectDoubleHiddenStripe(stripe : UIButton) -> UIButton {
-        var squareOfStripeTag = stripe.superview!.tag
-        var rowOfStripe = stripe.superview!.superview!
-        var doubleStripe = UIButton()
-        
-        if squareOfStripeTag > 0 {
-            if stripe.tag == 3 {
-                var doubleStripe: UIButton = rowOfStripe.subviews[squareOfStripeTag - 1].subviews[1] as UIButton
-                doubleStripe.backgroundColor = UIColor.greenColor()
-                doubleStripe.selected = true
-                
-                return doubleStripe
-            }
-        }
-        
-        if rowOfStripe.tag > 0 {
-            if stripe.tag == 0 {
-                var doubleStripe: UIButton = allRows[rowOfStripe.tag - 1].subviews[squareOfStripeTag].subviews[2] as UIButton
-                doubleStripe.backgroundColor = UIColor.greenColor()
-                doubleStripe.selected = true
-                
-                return doubleStripe
-            }
-        }
-        
-        return UIButton()
     }
     
     func checkIfUserScoredAPoint(stripe : UIButton) -> Bool {
@@ -414,7 +384,7 @@ class GameEngineController: UIViewController {
         if selectedStripesInSquare == 4 {
             square.backgroundColor = UIColor.greenColor()
 
-//            println("PUNTEN +1!!")
+            println("PUNTEN +1!!")
             Game.addPointAndScoredSquareToUser(gameObject[0], rowIndex : square.superview!.tag, squareIndex: square.tag)
             
             userPoints += 1
@@ -485,16 +455,113 @@ class GameEngineController: UIViewController {
         }
     }
     
-    func finishGame(uPoints : Int, oppPoints : Int) {
-        println("game Finished: \(uPoints) - \(oppPoints)")
+    func loadPlayedStripes () {
+        var game: PFObject = gameObject[0] as PFObject
+        var stripesArray = game["allStripes"] as NSArray
+    
+        for stripe in stripesArray {
+            if stripe as NSObject == stripesArray.lastObject! as NSObject {
+                setPlayedStripe(stripe, lastObject: true)
+            } else {
+                setPlayedStripe(stripe, lastObject: false)
+            }
+        }
     }
     
-    func setupGameViewController() {
-        gameViewController = GameViewController()
+    func setPlayedStripe(stripe : AnyObject, lastObject : Bool) {
+        var rowIndex : Int = stripe["rowIndex"] as Int
+        var squareIndex : Int = stripe["squareIndex"] as Int
+        var stripeIndex : Int = stripe["stripeIndex"] as Int
+        var stripeBelongsToUser : NSString = stripe["userId"] as NSString
+    
+        var playedStripe : UIButton = allRows[rowIndex].subviews[squareIndex].subviews[stripeIndex] as UIButton
+    
+        if stripeBelongsToUser == PFUser.currentUser().objectId {
+            playedStripe.backgroundColor = UIColor.greenColor()
+        } else if lastObject {
+            playedStripe.backgroundColor = UIColor.yellowColor()
+        } else {
+            playedStripe.backgroundColor = UIColor.redColor()
+        }
+    
+        var doublePlayedStripe = selectDoubleHiddenStripe(playedStripe)
+
+        playedStripe.selected = true
+        playedStripe.userInteractionEnabled = false
+
+        openStripes.remove(playedStripe)
+    }
+    
+    func selectDoubleHiddenStripe(stripe: UIButton) -> UIButton {
+        var squareOfStripeTag = stripe.superview!.tag
+        var rowOfStripe = stripe.superview!.superview!
+        var doubleStripe = UIButton()
+
+        if squareOfStripeTag > 0 {
+            if stripe.tag == 3 {
+                var doubleStripe: UIButton = rowOfStripe.subviews[squareOfStripeTag - 1].subviews[1] as UIButton
+                doubleStripe.selected = true
+                
+                return doubleStripe
+            }
+        }
+
+        if rowOfStripe.tag > 0 {
+            if stripe.tag == 0 {
+                var doubleStripe: UIButton = allRows[rowOfStripe.tag - 1].subviews[squareOfStripeTag].subviews[2] as UIButton
+                doubleStripe.selected = true
+                
+                return doubleStripe
+            }
+        }
         
-        gameViewController!.buildView(gameObject, rows: allRows, openStripes: openStripes.count, stripes: allStripes, userpoints: userPoints, oppPoints: opponentPoints)
+        return UIButton()
+    }
+    
+    func loadScoredSquares () {
+        var game: PFObject = gameObject[0] as PFObject
+
+        for squareObject in game["allScoredSquares"] as NSArray {
+
+            var square: UIView = allRows[squareObject["rowIndex"] as Int].subviews[squareObject["squareIndex"] as Int] as UIView
+
+            if squareObject["userId"] as NSString == PFUser.currentUser().objectId {
+                square.backgroundColor = UIColor.greenColor()
+            } else {
+                square.backgroundColor = UIColor.redColor()
+            }
+        }
+    }
+
+    func checkifGameIsFinished() {
+        println(openStripes.count)
         
-        println(userPoints)
+        if openStripes.count == 0 {
+            finishGame()
+        }
+    }
+    
+    func finishGame() {
+        println("game Finished: \(userPoints) - \(opponentPoints)")
+        
+        if userPoints > opponentPoints {
+            finishScreen().gameDidFinishWithCurrentUserWinner(self)
+        } else if userPoints > opponentPoints {
+            finishScreen().gameDidFinishWithOpponentWinner(self)
+        } else {
+            println("DRAW")
+        }
+        
+        var button = finishScreen().addContinuButton(self.view)
+        button.addTarget(self, action: "continuToGamesScreen", forControlEvents: .TouchUpInside)
+    }
+    
+    func continuToGamesScreen() {
+        self.navigationController?.popViewControllerAnimated(true)
+        
+        // SAVE STATISTICS HERE
+        Game.deleteGameAndSendNotification(gameObject[0])
+        NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
     }
     
     override func didReceiveMemoryWarning() {

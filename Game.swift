@@ -26,7 +26,6 @@ class Game: PFObject {
         sendNewGameNotification(user[0] as PFUser)
         game.saveEventually()
 
-        
         return game
     }
     
@@ -37,7 +36,6 @@ class Game: PFObject {
         if game["user"].objectId == PFUser.currentUser().objectId {
             var userPoints : Int = game["userPoints"] as Int
             userPoints += 1
-            
             game["userPoints"] = userPoints
         } else {
             var user2Points : Int = game["user2Points"] as Int
@@ -54,7 +52,7 @@ class Game: PFObject {
         
         game["allScoredSquares"] = newArrayToSubmit
         
-        game.saveEventually()
+        game.saveInBackgroundWithBlock(nil)
     }
     
     class func createSquareObject(rowIndex : Int, squareIndex : Int) -> NSObject {
@@ -114,6 +112,27 @@ class Game: PFObject {
         push.setQuery(query)
         push.setData(data)
         push.sendPush(nil)
+    }
+    
+    class func deleteGameAndSendNotification(game : PFObject) {
+        var query = PFInstallation.query()
+        var push = PFPush()
+        var userFullName: NSString = PFUser.currentUser()["fullName"] as NSString
+        var data : NSDictionary = ["alert": "You lost against \(userFullName)! :( Try again!", "badge":"0", "content-available":"1", "sound":"default"]
+
+        query.whereKey("channels", equalTo: "gameNotification")
+        
+        if game["user"].objectId == PFUser.currentUser().objectId {
+            query.whereKey("user", equalTo: game["user2"])
+        } else {
+            query.whereKey("user", equalTo: game["user"])
+        }
+
+        push.setQuery(query)
+        push.setData(data)
+        push.sendPush(nil)
+        
+        game.deleteInBackgroundWithBlock(nil)
     }
     
 }
