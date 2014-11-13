@@ -16,25 +16,35 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     let screenWidth : CGFloat = UIScreen.mainScreen().bounds.size.width
     let screenHeight : CGFloat = UIScreen.mainScreen().bounds.size.height
     
-    var gamesWithUserTurn : [AnyObject] = []
-    var gamesWithOpponentTurn : [AnyObject] = []
+    var gamesWithUserTurn : [PFObject] = []
+    var gamesWithOpponentTurn : [PFObject] = []
+    var currentGameIndex : Int = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController!.navigationBarHidden = false
-        view.backgroundColor = UIColor.whiteColor()
+//        self.gameTableView.backgroundColor = UIColor(patternImage: UIImage(named: "gameScreenBackground")!)
+        
         gameTableView.delegate = self
         gameTableView.dataSource = self
 
         addRefreshTableDrag()
         addTableView()
+        loadTableViewContent()
         addNavigationItems()
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadData", name: "reloadGameTableView", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadTableViewContent", name: "reloadGameTableView", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "deleteObjectFromSection", name: "deleteObjectFromYourTurnSection", object: nil)
     }
     
-    func reloadData () {
-        loadTableViewContent()
+    func deleteObjectFromSection() {
+
+        println(currentGameIndex)
+        
+        var game : PFObject = gamesWithUserTurn[currentGameIndex] as PFObject
+        
+        gamesWithUserTurn.removeAtIndex(currentGameIndex)
+        gamesWithOpponentTurn += [game]
     }
     
     func addNewGameBtn() {
@@ -150,6 +160,8 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         default:
             fatalError("What the fuck did you think ??")
         }
+        
+        currentGameIndex = indexPath.row
     }
     
     func loadTableViewContent() {
@@ -205,7 +217,40 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        loadTableViewContent()
+        gameTableView.reloadData()
+        setBadgeNumber()
+    }
+    
+    func tableView(tableView: UITableView!, editActionsForRowAtIndexPath indexPath: NSIndexPath!) -> [AnyObject]! {
+        var deleteAction = UITableViewRowAction(style: .Default, title: "Resign") { (action, indexPath) -> Void in
+            tableView.editing = true
+            
+            switch indexPath.section {
+            case 0:
+                var game : PFObject = self.gamesWithUserTurn.at(indexPath.row)[0] as PFObject
+                User.userResignedGame(game)
+                self.gamesWithUserTurn.removeAtIndex(indexPath.self.row)
+                self.gameTableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Automatic)
+                
+                game.deleteEventually()
+                
+            case 1:
+                var game : PFObject = self.gamesWithOpponentTurn.at(indexPath.row)[0] as PFObject
+                User.userResignedGame(game)
+                self.gamesWithOpponentTurn.removeAtIndex(indexPath.row)
+                self.gameTableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Automatic)
+                
+                game.deleteEventually()
+                
+            default:
+                fatalError("What the fuck did you think ??")
+            }
+        }
+        
+        return [deleteAction]
+    }
+    
+    func tableView(tableView: UITableView!, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath!) {
     }
     
     func setBadgeNumber () {

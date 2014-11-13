@@ -24,7 +24,7 @@ class loadingView {
     func showActivityIndicator(uiView: UIView) -> UIView {
         container.frame = uiView.frame
         container.center = uiView.center
-        container.backgroundColor = UIColor.colorWithRGBHexWithAlpha(0x444444, alpha: 0.3)
+        container.backgroundColor = UIColor.colorWithRGBHexWithAlpha(0x444444, alpha: 0.6)
         
         loadingView.frame = CGRectMake(0, 0, 80, 80)
         loadingView.center = uiView.center
@@ -52,7 +52,7 @@ class loadingView {
     */
     func hideActivityIndicator(uiView: UIView) {
         activityIndicator.stopAnimating()
-        container.removeFromSuperview()
+        uiView.removeFromSuperview()
     }
     
     /*

@@ -51,7 +51,7 @@ class User: PFObject {
                 })
             }
 
-            } as FBRequestHandler;
+            } as FBRequestHandler
         
         FBRequestConnection.startWithGraphPath(
             "me", completionHandler: completionHandler
@@ -63,5 +63,25 @@ class User: PFObject {
         opponentUser.whereKey("fullName", equalTo: "\(opponentName)")
         
         return opponentUser
+    }
+    
+    class func userResignedGame(game : PFObject) {
+        var query = PFInstallation.query()
+        var push = PFPush()
+        var userFullName: NSString = PFUser.currentUser()["fullName"] as NSString
+        
+        var data : NSDictionary = ["alert": "\(userFullName) resigned!", "badge":"0", "content-available":"1", "sound":"default"]
+        
+        query.whereKey("channels", equalTo: "gameNotification")
+        
+        if game["user"].objectId == PFUser.currentUser().objectId {
+            query.whereKey("user", equalTo: game["user2"])
+        } else {
+            query.whereKey("user", equalTo: game["user"])
+        }
+        
+        push.setQuery(query)
+        push.setData(data)
+        push.sendPush(nil)
     }
 }

@@ -8,7 +8,7 @@
 
 import Foundation
 
-class addNewGameController : UIViewController, UITableViewDelegate, UITableViewDataSource {
+class addNewGameController : UIViewController, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate {
     var friendTableView : UITableView = UITableView()
     var cell : UITableViewCell?
     
@@ -16,6 +16,8 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
     
     let screenWidth : CGFloat = UIScreen.mainScreen().bounds.size.width
     let screenHeight : CGFloat = UIScreen.mainScreen().bounds.size.height
+    
+    var opponentName : String = ""
     
     
     override func viewDidLoad() {
@@ -82,13 +84,38 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         var cell = friendTableView.cellForRowAtIndexPath(indexPath)
-        var opponentName = cell!.textLabel.text
+        var oppName = cell!.textLabel.text
         
-        println(opponentName!)
+        opponentName = oppName!
         
-        var gameObjectId = Game.addGame("\(opponentName!)", grid: 3)
+        var sheet : UIActionSheet = UIActionSheet()
+        let title = "Select a grid"
         
-        self.navigationController!.popViewControllerAnimated(true)
+        sheet.title = title
+        sheet.delegate = self
+        sheet.addButtonWithTitle("3x3")
+        sheet.addButtonWithTitle("4x4")
+        sheet.addButtonWithTitle("5x5")
+        sheet.addButtonWithTitle("Cancel")
+        sheet.cancelButtonIndex = 3
+
+        sheet.showInView(self.view)
+    }
+    
+    func actionSheet(sheet: UIActionSheet!, clickedButtonAtIndex buttonIndex: Int) {
+        println(sheet.buttonTitleAtIndex(buttonIndex))
+        if buttonIndex == 0 {
+            Game.addGame("\(opponentName)", grid: 3)
+            self.navigationController!.popViewControllerAnimated(true)
+        } else if buttonIndex == 1 {
+            Game.addGame("\(opponentName)", grid: 4)
+            self.navigationController!.popViewControllerAnimated(true)
+        } else if buttonIndex == 2 {
+            Game.addGame("\(opponentName)", grid: 5)
+            self.navigationController!.popViewControllerAnimated(true)
+        } else {
+            sheet.dismissWithClickedButtonIndex(3, animated: true)
+        }
     }
     
     func addNavigationItems() {
