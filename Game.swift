@@ -7,6 +7,7 @@ class Game: PFObject {
     
     class func addGame(opponentName : String, grid : Int) -> PFObject {
         var game = PFObject(className:"Game")
+        var board = Board(dimension: grid)
         
         var opponentUser = PFUser.query()
         opponentUser.whereKey("fullName", equalTo: "\(opponentName)")
@@ -14,16 +15,16 @@ class Game: PFObject {
         
         game["user"] = PFUser.currentUser()
         game["user2"] = user.first
-        game["grid"] = grid
         game["userPoints"] = 0
         game["user2Points"] = 0
         game["userFullName"] = PFUser.currentUser()["fullName"]
         game["user2FullName"] = opponentName
         game["userOnTurn"] = user.first
+        game["grid"] = grid
         game["allStripes"] = []
         game["allScoredSquares"] = []
 
-        sendNewGameNotification(user[0] as PFUser)
+        pushNotificationHandler.sendNewGameNotification(user[0] as PFUser)
         game.saveEventually()
 
         return game
@@ -96,23 +97,30 @@ class Game: PFObject {
         push.setQuery(query)
         push.setData(data)
         push.sendPush(nil)
-    
+        
         return game
     }
     
-    class func sendNewGameNotification(user : PFUser) {
-        var query = PFInstallation.query()
-        var push = PFPush()
-        var userFullName: NSString = PFUser.currentUser()["fullName"] as NSString
-        var data : NSDictionary = ["alert": "\(userFullName) has challenged you to play a game!", "badge":"1", "content-available":"1", "sound":"default"]
+    class func updateUserGameBoard(game : PFObject, userBoard : Board) -> Bool {
+        var userBoardArray = userBoard.toString(userBoard.board)
         
-        query.whereKey("channels", equalTo: "gameNotification")
-        query.whereKey("user", equalTo: user)
-        
-        push.setQuery(query)
-        push.setData(data)
-        push.sendPush(nil)
+        if game["user"].objectId == PFUser.currentUser().objectId {
+            game["userBoard"] = userBoardArray as [[Int]]
+        } else {
+            game["opponentBoard"] = userBoardArray as [[Int]]
+        }
+
+        game.saveInBackgroundWithBlock(nil)
+//        game.saveInBackgroundWithBlock({(succeeded: Bool!, err: NSError!) -> Void in
+//            if succeeded != nil {
+//                return true
+//            } else {
+//                return false
+//            }
+//        })
+        return true
     }
+
     
     class func deleteGameAndSendNotification(game : PFObject) {
         var query = PFInstallation.query()

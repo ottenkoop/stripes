@@ -22,8 +22,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationController!.navigationBarHidden = false
-//        self.gameTableView.backgroundColor = UIColor(patternImage: UIImage(named: "gameScreenBackground")!)
+        self.gameTableView.backgroundColor = UIColor(patternImage: UIImage(named: "gameScreenBackground")!)
         
         gameTableView.delegate = self
         gameTableView.dataSource = self
@@ -80,10 +79,14 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         self.view.addSubview(gameTableView)
         
         gameTableView.setTranslatesAutoresizingMaskIntoConstraints(false)
-        gameTableView.constrainToSize(CGSizeMake(screenWidth, screenHeight))
+        
+//        gameTableView.constrainToSize(CGSizeMake(screenWidth, screenHeight))
+        
         gameTableView.pinAttribute(.Top, toAttribute: .Top, ofItem: self.view)
         gameTableView.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: self.view)
+        gameTableView.pinAttribute(.Right, toAttribute: .Right, ofItem: self.view)
         gameTableView.pinAttribute(.Left, toAttribute: .Left, ofItem: self.view)
+        
     }
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -112,11 +115,37 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
+    func tableView(tableView: UITableView!, heightForHeaderInSection section: Int) -> CGFloat {
+        return 30
+    }
+    
+    func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView! {
+        let label = UILabel(frame: CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 50))
+        label.textAlignment = NSTextAlignment.Center
+
+        label.backgroundColor = UIColor.colorWithRGBHex(0x5CA9FE)
+        label.textColor = UIColor.whiteColor()
+        
+        switch section {
+
+        case 0:
+            label.text = "Your Turn"
+        case 1:
+            label.text = "Their Turn"
+        default:
+            label.text = ""
+        }
+
+        return label
+    }
+    
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         var cell = gameTableView.dequeueReusableCellWithIdentifier("cell") as? UITableViewCell
         
+
         if cell != nil {
             cell = UITableViewCell(style: UITableViewCellStyle.Value1, reuseIdentifier: "CELL")
+            cell!.backgroundColor = UIColor.clearColor()
         }
         
         switch indexPath.section {
@@ -199,10 +228,10 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func openGame(game : PFObject, userTurn : Bool) {
-        let gameEngineController = GameEngineController()
-        
+        let gameEngineController = newGameController()
+//        
         gameEngineController.gameObject = [game]
-        gameEngineController.userTurn = userTurn
+//        gameEngineController.userTurn = userTurn
         self.navigationController!.pushViewController(gameEngineController, animated: true)
     }
     
@@ -212,6 +241,10 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         navigationItem.rightBarButtonItem = addNewGameBtn
         
         navigationItem.setHidesBackButton(true, animated: false)
+        
+        navigationController?.navigationBar.setBackgroundImage(UIImage(named: "gameScreenBackground"), forBarMetrics: UIBarMetrics.Default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.translucent = true
     }
     
     override func viewWillAppear(animated: Bool) {

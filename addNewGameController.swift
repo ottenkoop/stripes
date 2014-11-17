@@ -103,7 +103,6 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
     }
     
     func actionSheet(sheet: UIActionSheet!, clickedButtonAtIndex buttonIndex: Int) {
-        println(sheet.buttonTitleAtIndex(buttonIndex))
         if buttonIndex == 0 {
             Game.addGame("\(opponentName)", grid: 3)
             self.navigationController!.popViewControllerAnimated(true)

@@ -63,11 +63,22 @@ class GameEngineController: UIViewController {
             playField.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: self.view, withConstant: -75)
             
         } else {
-            playFieldHeight = screenHeight - 150
-            playFieldWidth = (screenWidth / 2) + 100
+            println(screenHeight)
+            println(screenWidth)
+            
+            if (UIDevice.currentDevice().systemVersion as NSString).floatValue >= 8.0 {
+                playFieldHeight = screenHeight - 150
+                playFieldWidth = (screenWidth / 2) + 100
+            } else {
+                playFieldHeight = screenWidth - 150
+                playFieldWidth = (screenHeight / 2) + 100
+            }
+        
+            playFieldWidth = (screenWidth / 2) + 150
 
             playField.centerInContainerOnAxis(.CenterY)
             playField.constrainToSize(CGSizeMake(playFieldWidth, playFieldHeight))
+            
             playField.pinAttribute(.Left, toAttribute: .Left, ofItem: self.view, withConstant: 10)
         }
     }
