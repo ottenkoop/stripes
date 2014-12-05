@@ -21,9 +21,19 @@ class Square {
     func placeStripe (stripe: StripeType) {
         content = content | stripe.rawValue
     }
-    
-    func isSelected (stripe: StripeType) -> Bool {
+
+    func isStripeSelected (stripe: StripeType) -> Bool {
         return content & stripe.rawValue > 0
+    }
+    
+    func isSquareSelected () -> Bool {
+        return content == 15
+    }
+    
+    func isSquareGettingSelected(stripe : StripeType) -> Bool {
+        var newContent = content | stripe.rawValue
+        
+        return newContent == 15
     }
     
     func loadSquareFromBackend(stripe: UInt8) {
@@ -34,7 +44,7 @@ class Square {
 class Board {
     var board : [[Square]] = []
     
-    init (dimension:Int) {
+    init (dimension : Int) {
         for index in 0..<dimension {
             var row : [Square] = []
             
@@ -63,8 +73,27 @@ class Board {
         }
     }
     
-    func toString (board : [[Square]]) -> [[Int]] {
+    func isGameFinished(uBoard : Board, opBoard : Board, dimension : Int) -> Bool {
+        let b = Board(dimension: dimension)
+        b.loadSquareFromBackend(uBoard.toString(uBoard.board))
+        b.loadSquareFromBackend(opBoard.toString(opBoard.board))
         
+        var values : [Int] = []
+
+        for row in b.board {
+            for s in row {
+                values += [Int(s.content)]
+            }
+        }
+
+        if values.min() < 15 {
+            return false
+        } else {
+            return true
+        }
+    }
+
+    func toString (board : [[Square]]) -> [[Int]] {
         var newArray : [[Int]] = [[Int]]()
         
         for (index, b) in enumerate(board) {

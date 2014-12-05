@@ -19,7 +19,6 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
     
     var opponentName : String = ""
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor.whiteColor()
@@ -35,7 +34,6 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
     func addTableView() {
         self.friendTableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "cell")
         self.view.addSubview(friendTableView)
-        
         
         friendTableView.setTranslatesAutoresizingMaskIntoConstraints(false)
         friendTableView.constrainToSize(CGSizeMake(screenWidth, screenHeight))
@@ -77,14 +75,14 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
         
         let user : AnyObject = allFriends[Int(indexPath.row)]
       
-        cell!.textLabel.text = String(user.name as NSString)
+        cell!.textLabel?.text = String(user.name as NSString)
         
         return cell!
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         var cell = friendTableView.cellForRowAtIndexPath(indexPath)
-        var oppName = cell!.textLabel.text
+        var oppName = cell!.textLabel?.text
         
         opponentName = oppName!
         
@@ -95,9 +93,8 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
         sheet.delegate = self
         sheet.addButtonWithTitle("3x3")
         sheet.addButtonWithTitle("4x4")
-        sheet.addButtonWithTitle("5x5")
         sheet.addButtonWithTitle("Cancel")
-        sheet.cancelButtonIndex = 3
+        sheet.cancelButtonIndex = 2
 
         sheet.showInView(self.view)
     }
@@ -109,11 +106,8 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
         } else if buttonIndex == 1 {
             Game.addGame("\(opponentName)", grid: 4)
             self.navigationController!.popViewControllerAnimated(true)
-        } else if buttonIndex == 2 {
-            Game.addGame("\(opponentName)", grid: 5)
-            self.navigationController!.popViewControllerAnimated(true)
         } else {
-            sheet.dismissWithClickedButtonIndex(3, animated: true)
+            sheet.dismissWithClickedButtonIndex(2, animated: true)
         }
     }
     

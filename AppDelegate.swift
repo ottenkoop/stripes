@@ -16,11 +16,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var navigationController : navController?
     var loginController : LoginViewController?
     var gamesOverviewController : GameOverviewController?
-    var gameEngineController: GameEngineController?
+//    var gameEngineController: GameEngineController?
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         loginController = LoginViewController()
-        gameEngineController = GameEngineController()
+//        gameEngineController = GameEngineController()
         gamesOverviewController = GameOverviewController()
         navigationController = navController()
         
@@ -99,8 +99,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } else {
             PFPush.handlePush(userInfo)
         }
-        
-        
     }
     
     

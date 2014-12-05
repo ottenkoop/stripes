@@ -7,9 +7,11 @@
 //
 
 import Foundation
+import iAd
 
-class GameOverviewController : UIViewController, UITableViewDelegate, UITableViewDataSource {
+class GameOverviewController : UIViewController, UITableViewDelegate, UITableViewDataSource, ADBannerViewDelegate {
     
+    let bannerView = ADBannerView()
     var gameTableView : UITableView = UITableView()
     var cell : UITableViewCell?
     
@@ -22,32 +24,28 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.gameTableView.backgroundColor = UIColor(patternImage: UIImage(named: "gameScreenBackground")!)
-        
-        gameTableView.delegate = self
-        gameTableView.dataSource = self
+        self.gameTableView.backgroundColor = UIColor(patternImage: UIImage(named: "gameBackground")!)
 
         addRefreshTableDrag()
         addTableView()
         loadTableViewContent()
         addNavigationItems()
         
+        // addBannerView()
+        
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadTableViewContent", name: "reloadGameTableView", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "deleteObjectFromSection", name: "deleteObjectFromYourTurnSection", object: nil)
     }
     
     func deleteObjectFromSection() {
-
-        println(currentGameIndex)
-        
         var game : PFObject = gamesWithUserTurn[currentGameIndex] as PFObject
-        
+
         gamesWithUserTurn.removeAtIndex(currentGameIndex)
-        gamesWithOpponentTurn += [game]
+        loadTableViewContent()
     }
     
     func addNewGameBtn() {
-        let newGameBtn = UIButton ()
+        let newGameBtn = UIButton()
         var navBar = navigationController?.navigationBar
         
         newGameBtn.backgroundColor = UIColor.colorWithRGBHex(0x5AB103)
@@ -62,7 +60,6 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     
     func addRefreshTableDrag () {
         var refreshControl = UIRefreshControl()
-//        refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
         refreshControl.addTarget(self, action: "refresh:", forControlEvents: UIControlEvents.ValueChanged)
         
         gameTableView.addSubview(refreshControl)
@@ -75,12 +72,15 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func addTableView() {
+        gameTableView.delegate = self
+        gameTableView.dataSource = self
+        
         self.gameTableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "cell")
         self.view.addSubview(gameTableView)
         
         gameTableView.setTranslatesAutoresizingMaskIntoConstraints(false)
         
-//        gameTableView.constrainToSize(CGSizeMake(screenWidth, screenHeight))
+        gameTableView.separatorColor = UIColor.colorWithRGBHex(0xD2D2D2, alpha: 0.5)
         
         gameTableView.pinAttribute(.Top, toAttribute: .Top, ofItem: self.view)
         gameTableView.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: self.view)
@@ -123,8 +123,9 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         let label = UILabel(frame: CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 50))
         label.textAlignment = NSTextAlignment.Center
 
-        label.backgroundColor = UIColor.colorWithRGBHex(0x5CA9FE)
+        label.backgroundColor = UIColor.colorWithRGBHex(0x0079FF, alpha: 0.7)
         label.textColor = UIColor.whiteColor()
+        label.font = UIFont (name: "HanziPen", size: 14)
         
         switch section {
 
@@ -141,36 +142,41 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         var cell = gameTableView.dequeueReusableCellWithIdentifier("cell") as? UITableViewCell
-        
 
         if cell != nil {
             cell = UITableViewCell(style: UITableViewCellStyle.Value1, reuseIdentifier: "CELL")
             cell!.backgroundColor = UIColor.clearColor()
+
+            var aView = UIImageView(image: UIImage(named: "disclosureIndicator"))
+            aView.frame = CGRectMake(0, 0, 10, 20)
+            cell!.accessoryView = aView
+            cell!.selectionStyle = UITableViewCellSelectionStyle.Blue
         }
         
         switch indexPath.section {
         case 0:
             let gameUserTurn = gamesWithUserTurn[Int(indexPath.row)] as PFObject
-            var attributedText = NSMutableAttributedString()
+            var attributedText = ""
             
             if gameUserTurn["user"].objectId == PFUser.currentUser().objectId {
-                attributedText = NSMutableAttributedString(string: String(gameUserTurn["user2FullName"] as NSString))
+                attributedText = String(gameUserTurn["user2FullName"] as NSString)
             } else {
-                attributedText = NSMutableAttributedString(string: String(gameUserTurn["userFullName"] as NSString))
+                attributedText = String(gameUserTurn["userFullName"] as NSString)
             }
             
-            cell!.textLabel.attributedText = attributedText
+            cell!.textLabel?.text = attributedText
             
         case 1:
             let gameOpponentTurn = gamesWithOpponentTurn[Int(indexPath.row)] as PFObject
-            var attributedText = NSMutableAttributedString()
+            var attributedText = ""
             
             if gameOpponentTurn["user"].objectId == PFUser.currentUser().objectId {
-                attributedText = NSMutableAttributedString(string: String(gameOpponentTurn["user2FullName"] as NSString))
+                attributedText = String(gameOpponentTurn["user2FullName"] as NSString)
             } else {
-                attributedText = NSMutableAttributedString(string: String(gameOpponentTurn["userFullName"] as NSString))
+                attributedText = String(gameOpponentTurn["userFullName"] as NSString)
             }
-            cell!.textLabel.attributedText = attributedText
+            
+            cell!.textLabel?.text = attributedText
         default:
             fatalError("What the fuck did you think ??")
         }
@@ -229,9 +235,9 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     
     func openGame(game : PFObject, userTurn : Bool) {
         let gameEngineController = newGameController()
-//        
+
         gameEngineController.gameObject = [game]
-//        gameEngineController.userTurn = userTurn
+        gameEngineController.userTurn = userTurn
         self.navigationController!.pushViewController(gameEngineController, animated: true)
     }
     
@@ -242,8 +248,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         
         navigationItem.setHidesBackButton(true, animated: false)
         
-        navigationController?.navigationBar.setBackgroundImage(UIImage(named: "gameScreenBackground"), forBarMetrics: UIBarMetrics.Default)
-        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.setBackgroundImage(UIImage(named: "gameBackground"), forBarMetrics: UIBarMetrics.Default)
         navigationController?.navigationBar.translucent = true
     }
     
@@ -261,7 +266,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
             switch indexPath.section {
             case 0:
                 var game : PFObject = self.gamesWithUserTurn.at(indexPath.row)[0] as PFObject
-                User.userResignedGame(game)
+                pushNotificationHandler.userResignedGame(game)
                 self.gamesWithUserTurn.removeAtIndex(indexPath.self.row)
                 self.gameTableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Automatic)
                 
@@ -269,14 +274,14 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
                 
             case 1:
                 var game : PFObject = self.gamesWithOpponentTurn.at(indexPath.row)[0] as PFObject
-                User.userResignedGame(game)
+                pushNotificationHandler.userResignedGame(game)
                 self.gamesWithOpponentTurn.removeAtIndex(indexPath.row)
                 self.gameTableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Automatic)
                 
                 game.deleteEventually()
                 
             default:
-                fatalError("What the fuck did you think ??")
+                fatalError("What did you think ??")
             }
         }
         
@@ -296,6 +301,14 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         }
         
         currentInstallation.saveEventually()
+    }
+    
+    func addBannerView() {
+        self.view.addSubview(bannerView)
+        bannerView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        bannerView.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: self.view)
+        bannerView.pinAttribute(.Left, toAttribute: .Left, ofItem: self.view)
+        bannerView.pinAttribute(.Right, toAttribute: .Right, ofItem: self.view)
     }
     
     override func didReceiveMemoryWarning() {

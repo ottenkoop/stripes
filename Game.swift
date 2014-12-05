@@ -16,44 +16,49 @@ class Game: PFObject {
         game["user"] = PFUser.currentUser()
         game["user2"] = user.first
         game["userPoints"] = 0
-        game["user2Points"] = 0
+        game["opponentPoints"] = 0
         game["userFullName"] = PFUser.currentUser()["fullName"]
         game["user2FullName"] = opponentName
-        game["userOnTurn"] = user.first
+        game["userOnTurn"] = PFUser.currentUser()
         game["grid"] = grid
-        game["allStripes"] = []
         game["allScoredSquares"] = []
+        game["userBoard"] = []
+        game["opponentBoard"] = []
+        game["lastStripe"] = []
+        game["finished"] = false
 
-        pushNotificationHandler.sendNewGameNotification(user[0] as PFUser)
-        game.saveEventually()
-
+        game.saveInBackgroundWithBlock({(succeeded: Bool!, err: NSError!) -> Void in
+            if succeeded != nil {
+                NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
+            }
+        })
+        
         return game
     }
     
-    class func addPointAndScoredSquareToUser(game : PFObject, rowIndex : Int, squareIndex : Int) {
-        var squareObject = createSquareObject(rowIndex, squareIndex: squareIndex)
-        var newArrayToSubmit : [AnyObject] = []
-        
+    class func saveSquare(game : PFObject, squaresArray : NSArray, userPoints : Int, userBoard : Board) -> PFObject {
+        var newArrayToSave : [AnyObject] = []
+        var userBoardArray = userBoard.toString(userBoard.board)
+    
         if game["user"].objectId == PFUser.currentUser().objectId {
-            var userPoints : Int = game["userPoints"] as Int
-            userPoints += 1
             game["userPoints"] = userPoints
+            game["userBoard"] = userBoardArray as [[Int]]
         } else {
-            var user2Points : Int = game["user2Points"] as Int
-            user2Points += 1
-            
-            game["user2Points"] = user2Points
+            game["opponentPoints"] = userPoints
+            game["opponentBoard"] = userBoardArray as [[Int]]
         }
         
-        for alreadyScoredSquares in game["allScoredSquares"] as NSArray {
-            newArrayToSubmit += [alreadyScoredSquares]
+        for square in game["allScoredSquares"] as NSArray {
+            newArrayToSave += [square]
         }
         
-        newArrayToSubmit += [squareObject]
+        for newSquare in squaresArray as NSArray {
+            newArrayToSave += [newSquare]
+        }
         
-        game["allScoredSquares"] = newArrayToSubmit
+        game["allScoredSquares"] = newArrayToSave
         
-        game.saveInBackgroundWithBlock(nil)
+        return game
     }
     
     class func createSquareObject(rowIndex : Int, squareIndex : Int) -> NSObject {
@@ -66,81 +71,51 @@ class Game: PFObject {
         return objectToReturn
     }
     
-    class func switchTurnToOtherUserAndSaveStripe(game : PFObject, rowIndex : Int, squareIndex : Int, stripeIndex : Int) -> PFObject {
-        var fullName: NSString = PFUser.currentUser()["fullName"] as NSString
-        var stripeObject = stripeHandler.createStripeObject(rowIndex, squareIndex: squareIndex, stripeIndex: stripeIndex)
-
-        var query = PFInstallation.query()
-        query.whereKey("channels", equalTo: "gameNotification")
+    class func updateUserGameBoardAndSwitchUserTurn(game : PFObject, userBoard : Board, lastStripe : UIButton) -> PFObject {
+        var lastStripeObject = stripeHandler.createStripeObject(lastStripe.superview!.superview!.tag, squareIndex: lastStripe.superview!.tag, stripeIndex: lastStripe.tag)
         
-        if game["user"].objectId == PFUser.currentUser().objectId {
-            game["userOnTurn"] = game["user2"]
-            query.whereKey("user", equalTo: game["user2"])
-        } else {
-            game["userOnTurn"] = game["user"]
-            query.whereKey("user", equalTo: game["user"])
-        }
-        
-        var newArrayToSubmit : [AnyObject] = []
-        
-        for alreadyPlayedStripe in game["allStripes"] as NSArray {
-            newArrayToSubmit += [alreadyPlayedStripe]
-        }
-        
-        newArrayToSubmit += [stripeObject]
-        
-        game["allStripes"] = newArrayToSubmit
-        
-        var push = PFPush()
-        var data : NSDictionary = ["alert": "It's your turn against \(fullName)", "badge":"1", "content-available":"1", "sound":"default"]
-        
-        push.setQuery(query)
-        push.setData(data)
-        push.sendPush(nil)
-        
-        return game
-    }
-    
-    class func updateUserGameBoard(game : PFObject, userBoard : Board) -> Bool {
         var userBoardArray = userBoard.toString(userBoard.board)
+        var opponentUser = PFUser()
+        var firstStripe = Bool()
+
+        if game["userBoard"] as NSObject == [] {
+            firstStripe = true
+        } else {
+            firstStripe = false
+        }
+
         
         if game["user"].objectId == PFUser.currentUser().objectId {
             game["userBoard"] = userBoardArray as [[Int]]
+            opponentUser = game["user2"] as PFUser
         } else {
             game["opponentBoard"] = userBoardArray as [[Int]]
+            opponentUser = game["user"] as PFUser
         }
-
-        game.saveInBackgroundWithBlock(nil)
-//        game.saveInBackgroundWithBlock({(succeeded: Bool!, err: NSError!) -> Void in
-//            if succeeded != nil {
-//                return true
-//            } else {
-//                return false
-//            }
-//        })
-        return true
-    }
-
-    
-    class func deleteGameAndSendNotification(game : PFObject) {
-        var query = PFInstallation.query()
-        var push = PFPush()
-        var userFullName: NSString = PFUser.currentUser()["fullName"] as NSString
-        var data : NSDictionary = ["alert": "You lost against \(userFullName)! :( Try again!", "badge":"0", "content-available":"1", "sound":"default"]
-
-        query.whereKey("channels", equalTo: "gameNotification")
         
-        if game["user"].objectId == PFUser.currentUser().objectId {
-            query.whereKey("user", equalTo: game["user2"])
+        game["lastStripe"] = [lastStripeObject]
+        game["userOnTurn"] = opponentUser
+        
+        if firstStripe {
+            pushNotificationHandler.sendNewGameNotification(opponentUser as PFUser)
         } else {
-            query.whereKey("user", equalTo: game["user"])
+            pushNotificationHandler.sendUserTurnNotification(opponentUser as PFUser)
         }
 
-        push.setQuery(query)
-        push.setData(data)
-        push.sendPush(nil)
-        
-        game.deleteInBackgroundWithBlock(nil)
+        return game
     }
     
+    class func gameFinished(game : PFObject) -> PFObject {
+        if game["user"].objectId == PFUser.currentUser().objectId {
+            game["userOnTurn"] = game["user2"]
+            game["finished"] = true
+            game["lastStripe"] = []
+        } else {
+            game["userOnTurn"] = game["user"]
+            game["finished"] = true
+            game["lastStripe"] = []
+        }
+        
+        return game
+    }
 }
