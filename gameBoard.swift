@@ -21,10 +21,6 @@ class Square {
     func placeStripe (stripe: StripeType) {
         content = content | stripe.rawValue
     }
-    
-    func removeStripe (stripe : StripeType) {
-        content = content - stripe.rawValue
-    }
 
     func isStripeSelected (stripe: StripeType) -> Bool {
         return content & stripe.rawValue > 0
@@ -67,10 +63,6 @@ class Board {
         
         // verstuur notificatie met veranderde square
         NSNotificationCenter.defaultCenter().postNotificationName("", object: nil)
-    }
-    
-    func removeStripe(x:Int, y:Int, stripe: StripeType) {
-        board[x][y].removeStripe(stripe)
     }
     
     func loadSquareFromBackend(boardArray : [[Int]]) {

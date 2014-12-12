@@ -32,102 +32,50 @@ class gameHandler {
         submitBtn = submitButton
     }
     
-    func placeStripeAndSavePoint(stripeToSubmit : UIButton, doubleStripeToSubmit : UIButton, scoredSquares : [UIView], specialUsed : Bool) {
+    func placeStripeAndSavePoint(stripeToSubmit : UIButton, doubleStripeToSubmit : UIButton, scoredSquares : [UIView]) {
         var rowIndex = stripeToSubmit.superview!.superview!.tag
         var squareIndex = stripeToSubmit.superview!.tag
-        var userIsTakingOverOpponentSquare = false
+        var userPointsToSave : Int = gameBoardView.updateUserPoints(scoredSquares.count)
         
         userBoard.placeStripe(rowIndex, y: squareIndex, stripe: gameBoardView.position[stripeToSubmit]!)
         localGameBoard.placeStripe(rowIndex, y: squareIndex, stripe: gameBoardView.position[stripeToSubmit]!)
-
-        // save new userBoard and square
-        var squareObjects : [NSObject] = []
-        
-        for square in scoredSquares {
-            if specialUsed {
-                square.subviews[4].removeFromSuperview()
-
-                var squaresBackend = gameObject[0]["allScoredSquares"] as [[String:AnyObject]]
-                
-                for (index,scoredSquare) in enumerate(squaresBackend) {
-                    if scoredSquare["rowIndex"] as Int == square.superview!.tag && scoredSquare["squareIndex"] as Int == square.tag {
-                        squaresBackend.removeAtIndex(index)
-                    }
-                }
-             
-                gameObject[0]["allScoredSquares"] = squaresBackend
-            }
-            
-            gameBoardView.addSquareBackgroundImage(square, content: "fullSquareBlue")
-            
-            var squareObjectToSave = Game.createSquareObject(square.superview!.tag, squareIndex: square.tag)
-            squareObjects += [squareObjectToSave]
-        }
         
         if doubleStripeToSubmit.superview != nil {
-            if specialUsed && userIsTakingOverOpponentSquare {
-                opponentBoard.removeStripe(doubleStripeToSubmit.superview!.superview!.tag, y: doubleStripeToSubmit.superview!.tag, stripe: gameBoardView.position[doubleStripeToSubmit]!)
-            }
-            
             userBoard.placeStripe(doubleStripeToSubmit.superview!.superview!.tag, y: doubleStripeToSubmit.superview!.tag, stripe: gameBoardView.position[doubleStripeToSubmit]!)
             localGameBoard.placeStripe(doubleStripeToSubmit.superview!.superview!.tag, y: doubleStripeToSubmit.superview!.tag, stripe: gameBoardView.position[doubleStripeToSubmit]!)
         }
         
         gameBoardView.colorSelectedStripes(rowIndex, squareIdx: squareIndex, stripe: stripeToSubmit, boardObject: userBoard, userBoard: true)
         
-        if specialUsed {
-            opponentBoard.removeStripe(rowIndex, y: squareIndex, stripe: gameBoardView.position[stripeToSubmit]!)
+        // save new userBoard and square
+        var squareObjects : [NSObject] = []
+        
+        for square in scoredSquares {
+            gameBoardView.addSquareBackgroundImage(square, content: "fullSquareBlue")
+            var squareObjectToSave = Game.createSquareObject(square.superview!.tag, squareIndex: square.tag)
             
-            if (gameObject[0]["user"] as PFUser).objectId == PFUser.currentUser().objectId {
-                var specialsLeft = gameObject[0]["userSpecialsLeft"] as Int
-                specialsLeft -= 1
-                gameObject[0]["userSpecialsLeft"] = specialsLeft
-            } else {
-                var specialsLeft = gameObject[0]["opponentSpecialsLeft"] as Int
-                specialsLeft -= 1
-                gameObject[0]["opponentSpecialsLeft"] = specialsLeft
-            }
+            squareObjects += [squareObjectToSave]
         }
         
-        var pointsArray = gameBoardView.updateGameBoardPoints(gameObject[0]["allScoredSquares"] as NSArray, newScoredSquaresArray: squareObjects)
-        
-        var gameToSave = Game.saveSquare(gameObject[0], squaresArray: squareObjects, userPoints: pointsArray[0], oppPoints: pointsArray[1], userBoard: userBoard, oppBoard: opponentBoard)
+        var gameToSave = Game.saveSquare(gameObject[0], squaresArray: squareObjects, userPoints: userPointsToSave, userBoard: userBoard)
         
         gameToSave.saveInBackgroundWithBlock({(succeeded: Bool!, err: NSError!) -> Void in
             if succeeded != nil {
-                self.gameBoardView.removeStylingWhenSubmit(stripeToSubmit, points: squareObjects.count)
+                self.gameBoardView.removeStylingWhenSubmit(stripeToSubmit)
                 
                 self.checkifGameIsFinished()
-                
             }
         })
     }
     
-    func placeStripeAndSwitchUserTurn(stripeToSubmit : UIButton, doubleStripeToSubmit : UIButton, specialUsed : Bool) {
+    func placeStripeAndSwitchUserTurn(stripeToSubmit : UIButton, doubleStripeToSubmit : UIButton) {
         userBoard.placeStripe(stripeToSubmit.superview!.superview!.tag, y: stripeToSubmit.superview!.tag, stripe: gameBoardView.position[stripeToSubmit]!)
         
         if doubleStripeToSubmit.superview != nil {
             userBoard.placeStripe(doubleStripeToSubmit.superview!.superview!.tag, y: doubleStripeToSubmit.superview!.tag, stripe: gameBoardView.position[doubleStripeToSubmit]!)
         }
         
-        if specialUsed {
-            opponentBoard.removeStripe(stripeToSubmit.superview!.superview!.tag, y: stripeToSubmit.superview!.tag, stripe: gameBoardView.position[stripeToSubmit]!)
-            if doubleStripeToSubmit.superview != nil {
-                opponentBoard.removeStripe(doubleStripeToSubmit.superview!.superview!.tag, y: doubleStripeToSubmit.superview!.tag, stripe: gameBoardView.position[doubleStripeToSubmit]!)
-            }
-            
-            if (gameObject[0]["user"] as PFUser).objectId == PFUser.currentUser().objectId {
-                var specialsLeft = gameObject[0]["userSpecialsLeft"] as Int
-                specialsLeft -= 1
-                gameObject[0]["userSpecialsLeft"] = specialsLeft
-            } else {
-                var specialsLeft = gameObject[0]["opponentSpecialsLeft"] as Int
-                specialsLeft -= 1
-                gameObject[0]["opponentSpecialsLeft"] = specialsLeft
-            }
-        }
-        
-        var gameToSave = Game.updateUserGameBoardAndSwitchUserTurn(gameObject[0], userBoard: userBoard, oppBoard: opponentBoard, lastStripe: stripeToSubmit)
+        var gameToSave = Game.updateUserGameBoardAndSwitchUserTurn(gameObject[0], userBoard: userBoard, lastStripe: stripeToSubmit)
         
         gameToSave.saveInBackgroundWithBlock({(succeeded: Bool!, err: NSError!) -> Void in
             if succeeded != nil {

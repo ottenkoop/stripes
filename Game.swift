@@ -17,8 +17,6 @@ class Game: PFObject {
         game["user2"] = user.first
         game["userPoints"] = 0
         game["opponentPoints"] = 0
-        game["userSpecialsLeft"] = 2
-        game["opponentSpecialsLeft"] = 2
         game["userFullName"] = PFUser.currentUser()["fullName"]
         game["user2FullName"] = opponentName
         game["userOnTurn"] = PFUser.currentUser()
@@ -38,23 +36,16 @@ class Game: PFObject {
         return game
     }
     
-    class func saveSquare(game : PFObject, squaresArray : NSArray, userPoints : Int, oppPoints : Int, userBoard : Board, oppBoard : Board) -> PFObject {
+    class func saveSquare(game : PFObject, squaresArray : NSArray, userPoints : Int, userBoard : Board) -> PFObject {
         var newArrayToSave : [AnyObject] = []
         var userBoardArray = userBoard.toString(userBoard.board)
-        var opponentBoardArray = oppBoard.toString(oppBoard.board)
     
         if game["user"].objectId == PFUser.currentUser().objectId {
             game["userPoints"] = userPoints
-            game["opponentPoints"] = oppPoints
-            
             game["userBoard"] = userBoardArray as [[Int]]
-            game["opponentBoard"] = opponentBoardArray as [[Int]]
         } else {
             game["opponentPoints"] = userPoints
-            game["userPoints"] = oppPoints
-            
             game["opponentBoard"] = userBoardArray as [[Int]]
-            game["userBoard"] = opponentBoardArray as [[Int]]
         }
         
         for square in game["allScoredSquares"] as NSArray {
@@ -80,11 +71,10 @@ class Game: PFObject {
         return objectToReturn
     }
     
-    class func updateUserGameBoardAndSwitchUserTurn(game : PFObject, userBoard : Board, oppBoard : Board, lastStripe : UIButton) -> PFObject {
+    class func updateUserGameBoardAndSwitchUserTurn(game : PFObject, userBoard : Board, lastStripe : UIButton) -> PFObject {
         var lastStripeObject = stripeHandler.createStripeObject(lastStripe.superview!.superview!.tag, squareIndex: lastStripe.superview!.tag, stripeIndex: lastStripe.tag)
         
         var userBoardArray = userBoard.toString(userBoard.board)
-        var oppBoardArray = oppBoard.toString(oppBoard.board)
         var opponentUser = PFUser()
         var firstStripe = Bool()
 
@@ -94,13 +84,12 @@ class Game: PFObject {
             firstStripe = false
         }
 
+        
         if game["user"].objectId == PFUser.currentUser().objectId {
             game["userBoard"] = userBoardArray as [[Int]]
-            game["opponentBoard"] = oppBoardArray as [[Int]]
             opponentUser = game["user2"] as PFUser
         } else {
             game["opponentBoard"] = userBoardArray as [[Int]]
-            game["userBoard"] = oppBoardArray as [[Int]]
             opponentUser = game["user"] as PFUser
         }
         

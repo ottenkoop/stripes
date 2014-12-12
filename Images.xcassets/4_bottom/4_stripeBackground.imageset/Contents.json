@@ -3,17 +3,17 @@
     {
       "idiom" : "universal",
       "scale" : "1x",
-      "filename" : "verticalBackground.png"
+      "filename" : "horizontalStripeBackground.png"
     },
     {
       "idiom" : "universal",
       "scale" : "2x",
-      "filename" : "verticalBackground@2x.png"
+      "filename" : "horizontalStripeBackground@2x.png"
     },
     {
       "idiom" : "universal",
       "scale" : "3x",
-      "filename" : "verticalBackground@3x.png"
+      "filename" : "horizontalStripeBackground@3x.png"
     }
   ],
   "info" : {
