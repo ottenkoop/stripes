@@ -11,6 +11,8 @@
 
 #import <FacebookSDK/FacebookSDK.h>
 #import "UIView+AutoLayout.h"
+#import "UIView+AnimationExtensions.h"
+#import "SVProgressHUD.h"
 #import <Parse/Parse.h>
 #import <ParseFacebookUtils/PFFacebookUtils.h>
 #import <HockeySDK/HockeySDK.h>

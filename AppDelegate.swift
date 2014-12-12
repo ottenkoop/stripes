@@ -24,7 +24,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         gamesOverviewController = GameOverviewController()
         navigationController = navController()
         
+        
         Parse.setApplicationId("Rfb6FpX2ewMytcvOLIHjsZs2faNMSTMBMZCz3BUo", clientKey: "Dk5u1t8oQwTUNyOKDPSSMtjjAB74g3TGkw6EJWyR")
+//        ParseCrashReporting.enable()
         PFFacebookUtils.initializeFacebook()
         PFAnalytics.trackAppOpenedWithLaunchOptionsInBackground(launchOptions, block: nil)
 

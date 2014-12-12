@@ -21,7 +21,7 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor.whiteColor()
+        self.friendTableView.backgroundColor = UIColor(patternImage: UIImage(named: "gameBackground")!)
         
         friendTableView.delegate = self
         friendTableView.dataSource = self
@@ -71,8 +71,9 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
         
         if cell != nil {
             cell = UITableViewCell(style: UITableViewCellStyle.Value1, reuseIdentifier: "CELL")
+            cell!.backgroundColor = UIColor.clearColor()
         }
-        
+
         let user : AnyObject = allFriends[Int(indexPath.row)]
       
         cell!.textLabel?.text = String(user.name as NSString)
@@ -100,6 +101,7 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
     }
     
     func actionSheet(sheet: UIActionSheet!, clickedButtonAtIndex buttonIndex: Int) {
+        SVProgressHUD.show()
         if buttonIndex == 0 {
             Game.addGame("\(opponentName)", grid: 3)
             self.navigationController!.popViewControllerAnimated(true)

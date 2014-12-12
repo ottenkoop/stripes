@@ -3,17 +3,17 @@
     {
       "idiom" : "universal",
       "scale" : "1x",
-      "filename" : "PlayBtn.png"
+      "filename" : "PlayBtniPhone.png"
     },
     {
       "idiom" : "universal",
       "scale" : "2x",
-      "filename" : "PlayBtn@2x.png"
+      "filename" : "PlayBtniPhone@2x.png"
     },
     {
       "idiom" : "universal",
       "scale" : "3x",
-      "filename" : "PlayBtn@3x.png"
+      "filename" : "PlayBtniPhone@3x.png"
     }
   ],
   "info" : {

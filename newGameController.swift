@@ -21,6 +21,8 @@ class newGameController: UIViewController {
     var opponentBoard = Board(dimension: 0)
     
     var submitBtn = UIButton()
+    var specialsBtn = UIButton()
+    var specialUsed : Bool = false
     
     var stripeToSubmit : UIButton = UIButton()
     var doubleStripeToSubmit : UIButton = UIButton()
@@ -35,6 +37,7 @@ class newGameController: UIViewController {
         
         buildGame()
         addSubmitBtn()
+        addSpecialsBtn()
         GameHandler.checkifGameIsFinished()
     }
     
@@ -95,6 +98,7 @@ class newGameController: UIViewController {
             
             if userTurn == false {
                 stripe.userInteractionEnabled = false
+                specialsBtn.hidden = true
             }
             
             gameBoardView.colorSelectedStripes(rowIndex, squareIdx: squareIndex, stripe: stripe, boardObject: userBoard, userBoard: true)
@@ -109,16 +113,26 @@ class newGameController: UIViewController {
     }
     
     func stripePressed(stripe : UIButton!) {
+        if specialUsed {
+            gameBoardView.removeSpecialAnimation()
+        }
+        
         var oldStripe = stripeToSubmit
         var oldDoubleStripe = doubleStripeToSubmit
-        
+
+        scoredSquaresArray = []
         doubleStripeToSubmit = UIButton()
         stripeToSubmit = stripe
-        scoredSquaresArray = []
         
         var doubleStripe = gameBoardView.selectDoubleStripe(stripeToSubmit)
         
-        gameBoardView.selectCurrentStripe(stripe, oldStripe: oldStripe, doubleStripe: doubleStripe, oldDoubleStripe: oldDoubleStripe, submitBtn: submitBtn)
+        gameBoardView.selectCurrentStripe(stripe, oldStripe: oldStripe, doubleStripe: doubleStripe, oldDoubleStripe: oldDoubleStripe, submitBtn: submitBtn, specialUsed: specialUsed)
+        
+        if oldStripe.superview != nil {
+            if opponentBoard.board[oldStripe.superview!.superview!.tag][oldStripe.superview!.tag].isStripeSelected(gameBoardView.position[oldStripe]!) != true && specialUsed {
+                oldStripe.setImage(UIImage(named: "\(gameBoardView.position[oldStripe]!.rawValue)_stripeBackground"), forState: .Normal)
+            }
+        }
         
         checkIfUserIsAboutToScoreAPoint(stripeToSubmit)
         
@@ -138,7 +152,7 @@ class newGameController: UIViewController {
         gameBoardView.addSubmitBtn(submitBtn)
         submitBtn.addTarget(self, action: "submitStripe", forControlEvents: .TouchUpInside)
     }
-    
+
     func submitStripe() {
         gameBoardView.stylingWhenSubmittingStripe(submitBtn)
         
@@ -147,39 +161,74 @@ class newGameController: UIViewController {
         } else {
             NSTimer.scheduledTimerWithTimeInterval(0.01, target: self, selector: "placeStripeAndSwitchUserTurn", userInfo: nil, repeats: false)
         }
+
+    }
+    
+    func addSpecialsBtn() {
+        
+        gameBoardView.addSpecialsBtn(specialsBtn)
+        specialsBtn.addTarget(self, action: "openSpecials:", forControlEvents: .TouchUpInside)
+    }
+    
+    func openSpecials(button : UIButton!) {
+        var specialsBtns = specialsPopup().openPopup(self.view)
+        
+        specialsBtns[0].addTarget(self, action: "special1Clicked:", forControlEvents: .TouchUpInside)
+        specialsBtns[1].addTarget(self, action: "special2Clicked:", forControlEvents: .TouchUpInside)
+        specialsBtns[2].addTarget(self, action: "cancelBtnClicked:", forControlEvents: .TouchUpInside)
+    }
+    
+    func special1Clicked(button : UIButton!) {
+        specialUsed = true
+        specialsPopup().hidePopup(button)
+        gameBoardView.special1BtnClicked(opponentBoard)
+    }
+    
+    func special2Clicked(button : UIButton!) {
+        println("henk2")
+    }
+    
+    func cancelBtnClicked(button : UIButton!) {
+        specialsPopup().hidePopup(button)
     }
     
     func placeStripeAndSavePoint() {
-        GameHandler.placeStripeAndSavePoint(stripeToSubmit, doubleStripeToSubmit: doubleStripeToSubmit, scoredSquares : scoredSquaresArray)
+        specialsBtn.removeFromSuperview()
+        GameHandler.placeStripeAndSavePoint(stripeToSubmit, doubleStripeToSubmit: doubleStripeToSubmit, scoredSquares : scoredSquaresArray, specialUsed: specialUsed)
         stripeToSubmit = UIButton()
         doubleStripeToSubmit = UIButton()
+        gameBoardView.addSpecialsBtn(specialsBtn)
+        specialUsed = false
     }
     
     func placeStripeAndSwitchUserTurn() {
-        GameHandler.placeStripeAndSwitchUserTurn(stripeToSubmit, doubleStripeToSubmit: doubleStripeToSubmit)
+        GameHandler.placeStripeAndSwitchUserTurn(stripeToSubmit, doubleStripeToSubmit: doubleStripeToSubmit, specialUsed: specialUsed)
+        specialUsed = false
     }
     
     func popViewController() {        
         self.navigationController?.popViewControllerAnimated(true)
-        loadingView().hideActivityIndicator(self.view)
+        loadingView().hideActivityIndicatorWhenReturning(self.view)
 
         self.navigationController?.navigationBarHidden = false
     }
     
     func gameHasFinished() {
-        if gameBoardView.userPoints > gameBoardView.opponentPoints {
-            var winBtn = finishScreen().gameDidFinishWithCurrentUserWinner(self, userTurn: userTurn)
-            winBtn.tag = 1
-            winBtn.addTarget(self, action: "gameFinished:", forControlEvents: .TouchUpInside)
-        } else if gameBoardView.userPoints < gameBoardView.opponentPoints {
-            var lostBtn = finishScreen().gameDidFinishWithOpponentWinner(self, userTurn: userTurn)
-            lostBtn.tag = 2
-            lostBtn.addTarget(self, action: "gameFinished:", forControlEvents: .TouchUpInside)
-        } else {
-            var drawBtn = finishScreen().gameDidFinishDraw(self, userTurn: userTurn)
-            drawBtn.tag = 3
-            drawBtn.addTarget(self, action: "gameFinished:", forControlEvents: .TouchUpInside)
-        }
+        2.0.waitSecondsAndDo({
+            if self.gameBoardView.userPoints > self.gameBoardView.opponentPoints {
+                var winBtn = finishScreen().gameDidFinishWithCurrentUserWinner(self, userTurn: self.userTurn)
+                winBtn.tag = 1
+                winBtn.addTarget(self, action: "gameFinished:", forControlEvents: .TouchUpInside)
+            } else if self.gameBoardView.userPoints < self.gameBoardView.opponentPoints {
+                var lostBtn = finishScreen().gameDidFinishWithOpponentWinner(self, userTurn: self.userTurn)
+                lostBtn.tag = 2
+                lostBtn.addTarget(self, action: "gameFinished:", forControlEvents: .TouchUpInside)
+            } else {
+                var drawBtn = finishScreen().gameDidFinishDraw(self, userTurn: self.userTurn)
+                drawBtn.tag = 3
+                drawBtn.addTarget(self, action: "gameFinished:", forControlEvents: .TouchUpInside)
+            }
+        })
     }
     
     func gameFinished(button : UIButton!) {
