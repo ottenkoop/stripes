@@ -257,6 +257,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         
         gameTableView.reloadData()
         setBadgeNumber()
+        SVProgressHUD.dismiss()
     }
     
     func tableView(tableView: UITableView!, editActionsForRowAtIndexPath indexPath: NSIndexPath!) -> [AnyObject]! {
