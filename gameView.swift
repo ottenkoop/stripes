@@ -185,10 +185,9 @@ class gameView {
     }
     
     func addSquarePosition(square : UIView, squareIndex : Int, rowIndex : Int, margin : CGFloat) {
-        
         if squareIndex == 0 {
             square.centerInContainerOnAxis(.CenterY)
-            square.pinAttribute(.Left, toAttribute: .Left, ofItem: allRows[rowIndex], withConstant: 0)
+            square.pinAttribute(.Left, toAttribute: .Left, ofItem: allRows[rowIndex], withConstant: 5)
         } else if squareIndex == 1 {
             square.centerInContainerOnAxis(.CenterY)
             square.pinAttribute(.Left, toAttribute: .Right, ofItem: allSquares[0], withConstant: -(margin + 6))
@@ -231,7 +230,7 @@ class gameView {
             position[stripe] = .Top
         } else if stripeIndex == 1 {
             stripe.constrainToWidth(stripeWidth)
-            stripe.pinAttribute(.Right, toAttribute: .Right, ofItem: square, withConstant: -10)
+            stripe.pinAttribute(.Right, toAttribute: .Right, ofItem: square, withConstant: -15)
             stripe.pinAttribute(.Top, toAttribute: .Top, ofItem: square, withConstant: 10)
             stripe.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: square, withConstant: -20)
             position[stripe] = .Right

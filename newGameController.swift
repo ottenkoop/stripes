@@ -179,13 +179,18 @@ class newGameController: UIViewController {
     }
     
     func special1Clicked(button : UIButton!) {
+        if stripeToSubmit.superview != nil {
+            stripePressed(stripeToSubmit)
+        }
+        
         specialUsed = true
         specialsPopup().hidePopup(button)
         gameBoardView.special1BtnClicked(opponentBoard)
     }
     
     func special2Clicked(button : UIButton!) {
-        println("henk2")
+        let alert = UIAlertView(title: "", message: "Heb jij een leuk idee voor een special? Laat het me weten!", delegate: self, cancelButtonTitle: "Ok")
+        alert.show()
     }
     
     func cancelBtnClicked(button : UIButton!) {

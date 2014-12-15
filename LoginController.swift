@@ -10,9 +10,10 @@ import UIKit
 
 class LoginViewController: UIViewController, UIAlertViewDelegate {
     
-    private var fbLoginView = UIButton.buttonWithType(UIButtonType.System) as UIButton
+    private var fbLoginView = UIButton()
     private var logoView = UIImageView(image: UIImage(named: "logo"))
-    private var registerBtn = UIButton.buttonWithType(UIButtonType.System) as UIButton
+    private var loginBtn = UIButton()
+    private var registerBtn = UIButton()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,6 +21,7 @@ class LoginViewController: UIViewController, UIAlertViewDelegate {
         
         addLogoView()
         addFacebookLogin()
+        addLoginBtn()
         addRegisterBtn()
         
         navigationController!.navigationBarHidden = true
@@ -29,43 +31,41 @@ class LoginViewController: UIViewController, UIAlertViewDelegate {
         self.view.addSubview(logoView)
         
         logoView.setTranslatesAutoresizingMaskIntoConstraints(false)
-        logoView.constrainToSize(CGSizeMake(150, 200))
+        logoView.constrainToSize(CGSizeMake(175, 225))
         logoView.centerInContainerOnAxis(NSLayoutAttribute.CenterX)
-        logoView.pinAttribute(.Top, toAttribute: .Top, ofItem: self.view, withConstant: 50)
+        logoView.pinAttribute(.Top, toAttribute: .Top, ofItem: self.view, withConstant: 40)
     }
     
     func addFacebookLogin () {
-        fbLoginView.addTarget(self, action: "fbButtonAction:", forControlEvents: UIControlEvents.TouchUpInside)
-        fbLoginView.setTitle("Facebook", forState: .Normal)
         self.view.addSubview(fbLoginView)
 
+        fbLoginView.addTarget(self, action: "fbButtonAction:", forControlEvents: UIControlEvents.TouchUpInside)
         fbLoginView.setTranslatesAutoresizingMaskIntoConstraints(false)
         fbLoginView.centerInContainerOnAxis(NSLayoutAttribute.CenterX)
-        fbLoginView.pinAttribute(NSLayoutAttribute.Bottom, toAttribute: NSLayoutAttribute.Bottom, ofItem: logoView, withConstant: 150)
-        fbLoginView.setTitleColor(UIColor.blueColor(), forState: UIControlState.Normal)
-        fbLoginView.constrainToSize(CGSizeMake(218, 50))
-        fbLoginView.layer.borderColor = UIColor.blueColor().CGColor
-        fbLoginView.layer.borderWidth = 2
-        fbLoginView.layer.cornerRadius = 23
-        
+        fbLoginView.setImage(UIImage(named: "faceBookLogin"), forState: .Normal)
+        fbLoginView.pinAttribute(NSLayoutAttribute.Bottom, toAttribute: NSLayoutAttribute.Bottom, ofItem: logoView, withConstant: 75)
+        fbLoginView.constrainToSize(CGSizeMake(280, 50))
     }
     
-    func addRegisterBtn () {
-        registerBtn.setTitle("Register", forState: UIControlState.Normal)
-        registerBtn.addTarget(self, action: "buttonAction:", forControlEvents: UIControlEvents.TouchUpInside)
+    func addLoginBtn() {
+        self.view.addSubview(loginBtn)
         
+        loginBtn.addTarget(self, action: "buttonAction:", forControlEvents: UIControlEvents.TouchUpInside)
+        loginBtn.setImage(UIImage(named: "loginButton"), forState: .Normal)
+        loginBtn.setTranslatesAutoresizingMaskIntoConstraints(false)
+        loginBtn.constrainToSize(CGSizeMake(280, 50))
+        loginBtn.centerInContainerOnAxis(.CenterX)
+        loginBtn.pinAttribute(NSLayoutAttribute.Bottom, toAttribute: NSLayoutAttribute.Bottom, ofItem: fbLoginView, withConstant: 75)
+    }
+    
+    func addRegisterBtn() {
         self.view.addSubview(registerBtn)
         
-        addStyleAndPositionToRegisterBtn()
-    }
-    
-    func addStyleAndPositionToRegisterBtn () {
+        registerBtn.addTarget(self, action: "buttonAction:", forControlEvents: UIControlEvents.TouchUpInside)
+        registerBtn.setImage(UIImage(named: "registerButton"), forState: .Normal)
         registerBtn.setTranslatesAutoresizingMaskIntoConstraints(false)
-        registerBtn.backgroundColor = UIColor.grayColor()
-        registerBtn.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
-        registerBtn.constrainToSize(CGSizeMake(218, 50))
-        registerBtn.layer.cornerRadius = 2
-        registerBtn.centerInContainerOnAxis(NSLayoutAttribute.CenterX)
+        registerBtn.constrainToSize(CGSizeMake(280, 50))
+        registerBtn.centerInContainerOnAxis(.CenterX)
         registerBtn.pinAttribute(NSLayoutAttribute.Bottom, toAttribute: NSLayoutAttribute.Bottom, ofItem: fbLoginView, withConstant: 75)
     }
     

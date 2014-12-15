@@ -112,6 +112,7 @@ class gameHandler {
         
         if specialUsed {
             opponentBoard.removeStripe(stripeToSubmit.superview!.superview!.tag, y: stripeToSubmit.superview!.tag, stripe: gameBoardView.position[stripeToSubmit]!)
+            
             if doubleStripeToSubmit.superview != nil {
                 opponentBoard.removeStripe(doubleStripeToSubmit.superview!.superview!.tag, y: doubleStripeToSubmit.superview!.tag, stripe: gameBoardView.position[doubleStripeToSubmit]!)
             }
@@ -152,6 +153,7 @@ class gameHandler {
                     NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
                 }
             })
+            
         } else {
             var name: AnyObject! = PFUser.currentUser()["fullName"]
 

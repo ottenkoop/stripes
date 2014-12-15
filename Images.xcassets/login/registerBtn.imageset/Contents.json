@@ -3,17 +3,17 @@
     {
       "idiom" : "universal",
       "scale" : "1x",
-      "filename" : "Logo 5.png"
+      "filename" : "createAccountBtn.png"
     },
     {
       "idiom" : "universal",
       "scale" : "2x",
-      "filename" : "Logo 5@2x.png"
+      "filename" : "createAccountBtn@2x.png"
     },
     {
       "idiom" : "universal",
       "scale" : "3x",
-      "filename" : "Logo 5@3x.png"
+      "filename" : "createAccountBtn@3x.png"
     }
   ],
   "info" : {
