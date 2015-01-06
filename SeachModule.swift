@@ -17,4 +17,12 @@ class searchModule: PFObject {
         
         return playedStripesQuery
     }
+    
+    class func findUsers(searchString : String) -> PFQuery {
+        var usersQuery = PFUser.query()
+        
+        usersQuery.whereKey("fullName", hasPrefix: searchString)
+        
+        return usersQuery
+    }
 }

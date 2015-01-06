@@ -32,7 +32,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>37</string>
+	<string>39</string>
 	<key>FacebookAppID</key>
 	<string>704333279644550</string>
 	<key>FacebookDisplayName</key>
@@ -42,7 +42,7 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>AmaticSC-Bold.ttf</string>
-		<string>Schoolbell.ttf</string>
+		<string>HanziPenSC.ttf</string>
 	</array>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>

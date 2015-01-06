@@ -8,11 +8,14 @@
 
 import Foundation
 
-class addNewGameController : UIViewController, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate {
+class addNewGameController : UIViewController, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate, UISearchBarDelegate, UISearchDisplayDelegate {
     var friendTableView : UITableView = UITableView()
     var cell : UITableViewCell?
+    var searchBar : UISearchBar = UISearchBar()
+    var searchController : UISearchDisplayController!
     
     var allFriends : [AnyObject] = []
+    var showFaceBookFriends : Bool = false
     
     let screenWidth : CGFloat = UIScreen.mainScreen().bounds.size.width
     let screenHeight : CGFloat = UIScreen.mainScreen().bounds.size.height
@@ -26,6 +29,7 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
         friendTableView.delegate = self
         friendTableView.dataSource = self
         
+        SVProgressHUD.show()
         addTableView()
         loadTableViewContent()
         addNavigationItems()
@@ -37,22 +41,57 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
         
         friendTableView.setTranslatesAutoresizingMaskIntoConstraints(false)
         friendTableView.constrainToSize(CGSizeMake(screenWidth, screenHeight))
-        friendTableView.pinAttribute(.Top, toAttribute: .Top, ofItem: self.view)
         friendTableView.pinAttribute(.Left, toAttribute: .Left, ofItem: self.view)
     }
     
-    func loadTableViewContent () {
-        var friendsRequest : FBRequest = FBRequest.requestForMyFriends()
+    func addSearchBar() {
+        SVProgressHUD.dismiss()
         
-        friendsRequest.startWithCompletionHandler {
-            (connection : FBRequestConnection!, result : AnyObject!, error : NSError!) -> Void in
-            
+//        searchBar.setTranslatesAutoresizingMaskIntoConstraints(false)
+        searchBar.backgroundColor = UIColor.whiteColor()
+        searchBar.delegate = self
+        searchBar.sizeToFit()
+        
+        friendTableView.tableHeaderView = searchBar
+        
+        searchController = UISearchDisplayController(searchBar: searchBar, contentsController: self)
+        searchController.searchResultsDataSource = self
+        searchController.searchResultsDelegate = self
+        searchController.searchResultsTableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "cell")
+    }
+    
+    func searchBarSearchButtonClicked(searchBar: UISearchBar) {
+        var userQuery = searchModule.findUsers(searchBar.text)
+        
+        userQuery.findObjectsInBackgroundWithBlock({
+            (objects: [AnyObject]!, error: NSError!) -> Void in
             if error == nil {
-                var resultdict = result as NSDictionary
-                self.allFriends = resultdict.objectForKey("data") as NSArray
+                println(objects)
+                self.allFriends = objects
                 
-                self.friendTableView.reloadData()
+                self.searchDisplayController?.searchResultsTableView.reloadData()
             }
+        })
+    }
+    
+    func loadTableViewContent () {
+        if showFaceBookFriends {
+            var friendsRequest : FBRequest = FBRequest.requestForMyFriends()
+            
+            friendsRequest.startWithCompletionHandler {
+                (connection : FBRequestConnection!, result : AnyObject!, error : NSError!) -> Void in
+                
+                if error == nil {
+                    var resultdict = result as NSDictionary
+                    self.allFriends = resultdict.objectForKey("data") as NSArray
+                    
+                    self.friendTableView.reloadData()
+                    SVProgressHUD.dismiss()
+                }
+            }
+        } else {
+            // show search btn
+            addSearchBar()
         }
     }
     
@@ -73,16 +112,26 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
             cell = UITableViewCell(style: UITableViewCellStyle.Value1, reuseIdentifier: "CELL")
             cell!.backgroundColor = UIColor.clearColor()
         }
-
-        let user : AnyObject = allFriends[Int(indexPath.row)]
-      
-        cell!.textLabel?.text = String(user.name as NSString)
+        
+        if showFaceBookFriends {
+            var user : AnyObject = allFriends[Int(indexPath.row)]
+            cell!.textLabel?.text = String(user.name as NSString)
+        } else {
+            var user : AnyObject = allFriends[Int(indexPath.row)]
+            cell!.textLabel?.text = String(user["fullName"] as NSString)
+        }
         
         return cell!
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        var cell = friendTableView.cellForRowAtIndexPath(indexPath)
+        
+        if showFaceBookFriends {
+            cell = friendTableView.cellForRowAtIndexPath(indexPath)
+        } else {
+            cell = searchDisplayController?.searchResultsTableView.cellForRowAtIndexPath(indexPath)
+        }
+
         var oppName = cell!.textLabel?.text
         
         opponentName = oppName!
@@ -110,11 +159,13 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
             self.navigationController!.popViewControllerAnimated(true)
         } else {
             sheet.dismissWithClickedButtonIndex(2, animated: true)
+            SVProgressHUD.dismiss()
         }
     }
     
     func addNavigationItems() {
-       navigationItem.title = "New Game" 
+        navigationItem.title = "New Game"
+        navigationController!.navigationBar.barTintColor = UIColor.whiteColor()
     }
 }
 

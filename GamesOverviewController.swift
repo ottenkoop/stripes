@@ -28,10 +28,9 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
 
         addRefreshTableDrag()
         addTableView()
-        loadTableViewContent()
         addNavigationItems()
         
-        // addBannerView()
+        addBannerView()
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadTableViewContent", name: "reloadGameTableView", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "deleteObjectFromSection", name: "deleteObjectFromYourTurnSection", object: nil)
@@ -79,14 +78,12 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         self.view.addSubview(gameTableView)
         
         gameTableView.setTranslatesAutoresizingMaskIntoConstraints(false)
-        
-        gameTableView.separatorColor = UIColor.colorWithRGBHex(0xD2D2D2, alpha: 0.5)
+        gameTableView.separatorColor = UIColor.colorWithRGBHex(0xD2D2D2, alpha: 0.4)
         
         gameTableView.pinAttribute(.Top, toAttribute: .Top, ofItem: self.view)
         gameTableView.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: self.view)
         gameTableView.pinAttribute(.Right, toAttribute: .Right, ofItem: self.view)
         gameTableView.pinAttribute(.Left, toAttribute: .Left, ofItem: self.view)
-        
     }
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -125,7 +122,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
 
         label.backgroundColor = UIColor.colorWithRGBHex(0x0079FF, alpha: 0.7)
         label.textColor = UIColor.whiteColor()
-        label.font = UIFont (name: "HanziPen", size: 14)
+        label.font = UIFont (name: "", size: 14)
         
         switch section {
 
@@ -178,7 +175,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
             
             cell!.textLabel?.text = attributedText
         default:
-            fatalError("What the fuck did you think ??")
+            fatalError("What did you think ??")
         }
         return cell!
     }
@@ -193,7 +190,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         
             openGame(game, userTurn: false)
         default:
-            fatalError("What the fuck did you think ??")
+            fatalError("What did you think ??")
         }
         
         currentGameIndex = indexPath.row
@@ -212,6 +209,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
                 for object in objects as [PFObject] {
                     if object["userOnTurn"].objectId == PFUser.currentUser().objectId {
                         self.gamesWithUserTurn += [object]
+                        
                     } else {
                         self.gamesWithOpponentTurn += [object]
                     }
@@ -229,10 +227,6 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
-    func newGame() {
-        self.navigationController!.pushViewController(addNewGameController(), animated: true)
-    }
-    
     func openGame(game : PFObject, userTurn : Bool) {
         let gameEngineController = newGameController()
 
@@ -241,23 +235,15 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         self.navigationController!.pushViewController(gameEngineController, animated: true)
     }
     
-    func addNavigationItems() {
-        navigationItem.title = "Connecting..."
-        var addNewGameBtn = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "newGame") //Use a selector
-        navigationItem.rightBarButtonItem = addNewGameBtn
-        
-        navigationItem.setHidesBackButton(true, animated: false)
-        
-        navigationController?.navigationBar.setBackgroundImage(UIImage(named: "gameBackground"), forBarMetrics: UIBarMetrics.Default)
-        navigationController?.navigationBar.translucent = true
-    }
-    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
         gameTableView.reloadData()
         setBadgeNumber()
         SVProgressHUD.dismiss()
+        
+        navigationItem.leftBarButtonItem?.enabled = true
+        navigationItem.rightBarButtonItem?.enabled = true
     }
     
     func tableView(tableView: UITableView!, editActionsForRowAtIndexPath indexPath: NSIndexPath!) -> [AnyObject]! {
@@ -304,12 +290,101 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         currentInstallation.saveEventually()
     }
     
+    func addNavigationItems() {
+        navigationItem.title = "Connecting..."
+        var addNewGameBtn = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "newGame")
+        var settingsMenu = UIBarButtonItem(image: UIImage(named: "settingsIcon"), style: .Plain, target: self, action: "openSettings")
+        
+        navigationItem.rightBarButtonItem = addNewGameBtn
+        navigationItem.leftBarButtonItem = settingsMenu
+        
+        navigationItem.setHidesBackButton(true, animated: false)
+        
+        navigationController?.navigationBar.setBackgroundImage(UIImage(named: "gameBackground"), forBarMetrics: UIBarMetrics.Default)
+        navigationController?.navigationBar.translucent = true
+    }
+    
+    func openSettings() {
+        let settingsV = settingsView()
+        
+        navigationController!.pushViewController(settingsV, animated: true)
+    }
+    
+    func newGame() {
+        var btns = newGamePopup().openPopup(self)
+        
+        btns[0].addTarget(self, action: "faceBookFriendGame:", forControlEvents: .TouchUpInside)
+        btns[1].addTarget(self, action: "searchingForUsername:", forControlEvents: .TouchUpInside)
+        
+        btns[3].addTarget(self, action: "cancelBtnPressed:", forControlEvents: .TouchUpInside)
+        
+        navigationItem.leftBarButtonItem?.enabled = false
+        navigationItem.rightBarButtonItem?.enabled = false
+    }
+    
+    func faceBookFriendGame(fButton : UIButton!) {
+        var newGame = addNewGameController()
+        
+        newGame.showFaceBookFriends = true
+        
+        navigationController!.pushViewController(newGame, animated: true)
+        newGamePopup().removePopup(fButton)
+    }
+    
+    func searchingForUsername(uButton : UIButton!) {
+        var newGame = addNewGameController()
+        
+        newGame.showFaceBookFriends = false
+        
+        navigationController!.pushViewController(newGame, animated: true)
+        newGamePopup().removePopup(uButton)
+    }
+    
+    func cancelBtnPressed(cButton : UIButton!) {
+        newGamePopup().cancelPopup(cButton)
+        
+        var addNewGameBtn = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "newGame")
+        var settingsMenu = UIBarButtonItem(image: UIImage(named: "settingsIcon"), style: .Plain, target: self, action: "openSettings")
+        
+        navigationItem.leftBarButtonItem?.enabled = true
+        navigationItem.rightBarButtonItem?.enabled = true
+    }
+    
+    //iAd
+    func bannerViewWillLoadAd(banner: ADBannerView!) {
+        println("start")
+    }
+    
+    func bannerViewDidLoadAd(banner: ADBannerView!) {
+        // self.bannerView.alpha = 1.0
+        println("goed!")
+    }
+    
+    func bannerViewActionDidFinish(banner: ADBannerView!) {
+        println("gefinished")
+    }
+    
+    func bannerViewActionShouldBegin(banner: ADBannerView!, willLeaveApplication willLeave: Bool) -> Bool {
+        println("...")
+        return true 
+    }
+    
+    func bannerView(banner: ADBannerView!, didFailToReceiveAdWithError error: NSError!) {
+        println("ging iets Fout")
+        self.bannerView.alpha = 0.0
+    }
+    
     func addBannerView() {
         self.view.addSubview(bannerView)
+        self.bannerView.delegate = self
+        
         bannerView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        bannerView.constrainToHeight(bannerView.bounds.height)
         bannerView.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: self.view)
         bannerView.pinAttribute(.Left, toAttribute: .Left, ofItem: self.view)
         bannerView.pinAttribute(.Right, toAttribute: .Right, ofItem: self.view)
+        
+        bannerView.alpha = 0.0
     }
     
     override func didReceiveMemoryWarning() {

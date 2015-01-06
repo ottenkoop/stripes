@@ -181,6 +181,7 @@ class newGameController: UIViewController {
     func special1Clicked(button : UIButton!) {
         if stripeToSubmit.superview != nil {
             stripePressed(stripeToSubmit)
+            stripeToSubmit = UIButton()
         }
         
         specialUsed = true

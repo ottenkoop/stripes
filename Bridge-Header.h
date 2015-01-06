@@ -14,7 +14,10 @@
 #import "UIView+AnimationExtensions.h"
 #import "SVProgressHUD.h"
 #import <Parse/Parse.h>
+#import <ParseUI/ParseUI.h>
+#import <ParseCrashReporting/ParseCrashReporting.h>
 #import <ParseFacebookUtils/PFFacebookUtils.h>
 #import <HockeySDK/HockeySDK.h>
+#import <QuickDialog/QuickDialog.h>
 
 #endif

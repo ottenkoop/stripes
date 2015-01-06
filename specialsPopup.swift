@@ -38,6 +38,7 @@ class specialsPopup {
         container.layer.cornerRadius = 8
         
         uiView.addSubview(container)
+        container.pulseToSize(1.1, duration: 0.2, repeat: false)
         
         container.pinAttribute(.Top, toAttribute: .Top, ofItem: uiView, withConstant: 70)
         container.centerInContainerOnAxis(.CenterX)
@@ -50,7 +51,7 @@ class specialsPopup {
         
         titleLabel.text = "Specials"
         titleLabel.textColor = UIColor.colorWithRGBHex(0x0079FF, alpha: 1.0)
-        titleLabel.font = UIFont(name: "SchoolBell", size: 28)
+        titleLabel.font = UIFont(name: "HanziPen SC", size: 36)
         
         container.addSubview(titleLabel)
         
@@ -65,10 +66,9 @@ class specialsPopup {
         
         container.addSubview(special1Btn)
         
-        special1Btn.constrainToHeight(150)
-        special1Btn.pinAttribute(.Top, toAttribute: .Top, ofItem: container, withConstant: 60)
-        special1Btn.pinAttribute(.Left, toAttribute: .Left, ofItem: container, withConstant: 20)
-        special1Btn.pinAttribute(.Right, toAttribute: .Right, ofItem: container, withConstant: -20)
+        special1Btn.constrainToSize(CGSizeMake(217, 150))
+        special1Btn.pinAttribute(.Top, toAttribute: .Top, ofItem: container, withConstant: 70)
+        special1Btn.centerInContainerOnAxis(.CenterX)
     }
     
     func addSpecial2Btn() {
@@ -81,10 +81,10 @@ class specialsPopup {
         
         container.addSubview(special2Btn)
         
-        special2Btn.constrainToHeight(150)
+        special2Btn.constrainToSize(CGSizeMake(217, 150))
         special2Btn.pinAttribute(.Top, toAttribute: .Bottom, ofItem: special1Btn, withConstant: 20)
-        special2Btn.pinAttribute(.Left, toAttribute: .Left, ofItem: container, withConstant: 20)
-        special2Btn.pinAttribute(.Right, toAttribute: .Right, ofItem: container, withConstant: -20)
+        special2Btn.centerInContainerOnAxis(.CenterX)
+//        special2Btn.pinAttribute(.Right, toAttribute: .Right, ofItem: container, withConstant: -20)
     }
     
     func addCancelBtn() {

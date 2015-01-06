@@ -24,9 +24,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         gamesOverviewController = GameOverviewController()
         navigationController = navController()
         
-        
+        ParseCrashReporting.enable()
         Parse.setApplicationId("Rfb6FpX2ewMytcvOLIHjsZs2faNMSTMBMZCz3BUo", clientKey: "Dk5u1t8oQwTUNyOKDPSSMtjjAB74g3TGkw6EJWyR")
-//        ParseCrashReporting.enable()
+        
         PFFacebookUtils.initializeFacebook()
         PFAnalytics.trackAppOpenedWithLaunchOptionsInBackground(launchOptions, block: nil)
 
@@ -40,6 +40,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow (frame: UIScreen.mainScreen().bounds)
 
         window!.rootViewController = navigationController!
+        
         if (PFUser.currentUser() != nil) {
             self.navigationController?.pushViewController(gamesOverviewController!, animated: false)
         } else {

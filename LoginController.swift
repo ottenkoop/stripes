@@ -8,7 +8,7 @@
 
 import UIKit
 
-class LoginViewController: UIViewController, UIAlertViewDelegate {
+class LoginViewController: UIViewController, UIAlertViewDelegate, PFLogInViewControllerDelegate, PFSignUpViewControllerDelegate {
     
     private var fbLoginView = UIButton()
     private var logoView = UIImageView(image: UIImage(named: "logo"))
@@ -40,37 +40,87 @@ class LoginViewController: UIViewController, UIAlertViewDelegate {
         self.view.addSubview(fbLoginView)
 
         fbLoginView.addTarget(self, action: "fbButtonAction:", forControlEvents: UIControlEvents.TouchUpInside)
-        fbLoginView.setTranslatesAutoresizingMaskIntoConstraints(false)
-        fbLoginView.centerInContainerOnAxis(NSLayoutAttribute.CenterX)
         fbLoginView.setImage(UIImage(named: "faceBookLogin"), forState: .Normal)
-        fbLoginView.pinAttribute(NSLayoutAttribute.Bottom, toAttribute: NSLayoutAttribute.Bottom, ofItem: logoView, withConstant: 75)
+        fbLoginView.setTranslatesAutoresizingMaskIntoConstraints(false)
         fbLoginView.constrainToSize(CGSizeMake(280, 50))
+        fbLoginView.centerInContainerOnAxis(.CenterX)
+        fbLoginView.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: logoView, withConstant: 75)
     }
     
     func addLoginBtn() {
         self.view.addSubview(loginBtn)
         
-        loginBtn.addTarget(self, action: "buttonAction:", forControlEvents: UIControlEvents.TouchUpInside)
-        loginBtn.setImage(UIImage(named: "loginButton"), forState: .Normal)
+        loginBtn.addTarget(self, action: "loginButtonTapped:", forControlEvents: UIControlEvents.TouchUpInside)
+        loginBtn.setImage(UIImage(named: "stripesLoginButton"), forState: .Normal)
         loginBtn.setTranslatesAutoresizingMaskIntoConstraints(false)
         loginBtn.constrainToSize(CGSizeMake(280, 50))
         loginBtn.centerInContainerOnAxis(.CenterX)
-        loginBtn.pinAttribute(NSLayoutAttribute.Bottom, toAttribute: NSLayoutAttribute.Bottom, ofItem: fbLoginView, withConstant: 75)
+        loginBtn.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: fbLoginView, withConstant: 75)
     }
     
     func addRegisterBtn() {
         self.view.addSubview(registerBtn)
         
-        registerBtn.addTarget(self, action: "buttonAction:", forControlEvents: UIControlEvents.TouchUpInside)
         registerBtn.setImage(UIImage(named: "registerButton"), forState: .Normal)
+        registerBtn.addTarget(self, action: "registerButtonTapped:", forControlEvents: UIControlEvents.TouchUpInside)
         registerBtn.setTranslatesAutoresizingMaskIntoConstraints(false)
-        registerBtn.constrainToSize(CGSizeMake(280, 50))
         registerBtn.centerInContainerOnAxis(.CenterX)
-        registerBtn.pinAttribute(NSLayoutAttribute.Bottom, toAttribute: NSLayoutAttribute.Bottom, ofItem: fbLoginView, withConstant: 75)
+        registerBtn.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: self.view, withConstant: -10)
+        registerBtn.pinAttribute(.Left, toAttribute: .Left, ofItem: self.view, withConstant: 10)
+        registerBtn.pinAttribute(.Right, toAttribute: .Right, ofItem: self.view, withConstant: -10)
     }
     
-    func buttonAction(sender:UIButton!){
-        println("HENK tapped")
+    func loginButtonTapped(sender:UIButton!) {
+        var logInController = PFLogInViewController()
+        logInController.delegate = self
+        logInController.fields = PFLogInFields.DismissButton | PFLogInFields.UsernameAndPassword | PFLogInFields.PasswordForgotten | PFLogInFields.LogInButton
+        logInController.logInView.logo = nil
+        
+        styleLoginAndSignupField(logInController.logInView.logInButton, image: "loginBtn")
+
+        if (UIDevice.currentDevice().systemVersion as NSString).floatValue >= 8.0 {
+            logInController.logInView.logInButton.pinAttribute(.Top, toAttribute: .Bottom, ofItem: logInController.logInView.passwordField, withConstant: 10)
+        }
+        
+        self.presentViewController(logInController, animated:true, completion: nil)
+    }
+    
+    func registerButtonTapped(sender:UIButton!) {
+        var signupController = PFSignUpViewController()
+        signupController.delegate = self
+        signupController.fields = PFSignUpFields.DismissButton | PFSignUpFields.UsernameAndPassword | PFSignUpFields.Email | PFSignUpFields.SignUpButton
+        signupController.signUpView.logo = nil
+
+        styleLoginAndSignupField(signupController.signUpView.signUpButton, image: "registerButton")
+        
+        if (UIDevice.currentDevice().systemVersion as NSString).floatValue >= 8.0 {
+            signupController.signUpView.signUpButton.pinAttribute(.Top, toAttribute: .Bottom, ofItem: signupController.signUpView.emailField, withConstant: 10)
+        }
+
+        self.presentViewController(signupController, animated:true, completion: nil)
+    }
+    
+    func logInViewController(logInController: PFLogInViewController!, didLogInUser user: PFUser!) {
+        self.dismissViewControllerAnimated(true, completion: nil)
+        
+        loadingView().showActivityIndicator(self.view)
+        openGameOverviewController()
+    }
+    
+    func signUpViewController(signUpController: PFSignUpViewController!, didSignUpUser user: PFUser!) {
+        self.dismissViewControllerAnimated(true, completion: nil)
+        
+        loadingView().showActivityIndicator(self.view)
+        User.updateUserFullName()
+        openGameOverviewController()
+    }
+    
+    func styleLoginAndSignupField(button : UIButton, image : NSString) {
+        button.setTranslatesAutoresizingMaskIntoConstraints(false)
+        button.setTitle("", forState: .Normal)
+        button.centerInContainerOnAxis(.CenterX)
+        button.constrainToWidth(280)
+        button.setBackgroundImage(UIImage(named: "\(image)"), forState: .Normal)
     }
 
 //--FacebookLogin Handlers
@@ -97,7 +147,8 @@ class LoginViewController: UIViewController, UIAlertViewDelegate {
     }
     
     func openGameOverviewController() {
-        navigationController!.pushViewController(GameOverviewController(), animated: true)
+        self.navigationController!.pushViewController(GameOverviewController(), animated: true)
+        self.navigationController!.navigationBarHidden = false
         
         let currentInstallation:PFInstallation = PFInstallation.currentInstallation()
         currentInstallation["user"] = PFUser.currentUser()

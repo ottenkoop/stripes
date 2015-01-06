@@ -99,7 +99,7 @@ class gameView {
                 gameController.view.addSubview(label)
                 label.setTranslatesAutoresizingMaskIntoConstraints(false)
                 label.textAlignment = .Center
-                label.font = UIFont(name: "SchoolBell", size: 32)
+                label.font = UIFont(name: "HanziPen SC", size: 28)
                 
                 label.constrainToSize(CGSizeMake(screenWidth / 2 - 25, 50))
             }
@@ -115,7 +115,7 @@ class gameView {
                 label.setTranslatesAutoresizingMaskIntoConstraints(false)
                 label.textAlignment = .Center
                 
-                label.font = UIFont(name: "SchoolBell", size: 40)
+                label.font = UIFont(name: "HanziPen SC", size: 40)
                 
                 label.constrainToSize(CGSizeMake(screenWidth / 2, 100))
                 label.pinAttribute(.Right, toAttribute: .Right, ofItem: gameController.view, withConstant: 20)

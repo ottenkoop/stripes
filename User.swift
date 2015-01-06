@@ -10,35 +10,6 @@ import Foundation
 
 class User: PFObject {
     
-    class func addUserToParse(user : FBGraphUser) {
-        
-        var newUser = PFUser()
-        
-        newUser.username = "\(user.name)"
-        newUser.password = "facebook"
-        newUser["userId"] = "\(user.objectID)"
-        newUser["faceBookLogin"] = true
-        
-        newUser.signUpInBackgroundWithBlock {
-            (succeeded: Bool!, error: NSError!) -> Void in
-            if error == nil {
-                // Hooray! Let them use the app now.
-                
-            } else if error.code == 202 {
-                PFUser.logInWithUsernameInBackground("\(user.name)", password:"facebook") {
-                    (user: PFUser!, error: NSError!) -> Void in
-                    if user != nil {
-                        // Do stuff after successful login.
-                    } else {
-                        // The login failed. Check error to see why.
-                    }
-                }
-            } else {
-                println(error)
-            }
-        }
-    }
-    
     class func requestFaceBookLoggedInUserInfo() {
         var completionHandler = {
             connection, result, error in
@@ -56,6 +27,14 @@ class User: PFObject {
         FBRequestConnection.startWithGraphPath(
             "me", completionHandler: completionHandler
         );
+    }
+    
+    class func updateUserFullName() {
+        var user = PFUser.currentUser()
+        
+        user["fullName"] = user["username"]
+        
+        user.saveEventually()
     }
     
     class func findUser (opponentName : String) -> PFQuery {
