@@ -19,7 +19,7 @@ class navController: UINavigationController {
             return Int(UIInterfaceOrientationMask.Portrait.rawValue)
             
         } else {
-            return Int(UIInterfaceOrientationMask.LandscapeRight.rawValue)
+            return UIInterfaceOrientationMask.LandscapeRight.rawValue.hashValue | UIInterfaceOrientationMask.LandscapeLeft.rawValue.hashValue
         }
     }
 }

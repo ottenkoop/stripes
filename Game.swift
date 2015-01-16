@@ -5,7 +5,7 @@
 
 class Game: PFObject {
     
-    class func addGame(opponentName : String, grid : Int) -> PFObject {
+    class func addGame(opponentName : String, grid : Int) {
         var game = PFObject(className:"Game")
         var board = Board(dimension: grid)
         
@@ -31,11 +31,9 @@ class Game: PFObject {
 
         game.saveInBackgroundWithBlock({(succeeded: Bool!, err: NSError!) -> Void in
             if succeeded != nil {
-                NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
+                weekBattle.newBattle(game)
             }
         })
-        
-        return game
     }
     
     class func saveSquare(game : PFObject, squaresArray : NSArray, userPoints : Int, oppPoints : Int, userBoard : Board, oppBoard : Board) -> PFObject {
@@ -80,7 +78,7 @@ class Game: PFObject {
         return objectToReturn
     }
     
-    class func updateUserGameBoardAndSwitchUserTurn(game : PFObject, userBoard : Board, oppBoard : Board, lastStripe : UIButton) -> PFObject {
+    class func updateUserGameBoardAndSwitchUserTurn(game : PFObject, weekBattle : PFObject, userBoard : Board, oppBoard : Board, lastStripe : UIButton) -> PFObject {
         var lastStripeObject = stripeHandler.createStripeObject(lastStripe.superview!.superview!.tag, squareIndex: lastStripe.superview!.tag, stripeIndex: lastStripe.tag)
         
         var userBoardArray = userBoard.toString(userBoard.board)
@@ -105,15 +103,17 @@ class Game: PFObject {
         }
         
         game["lastStripe"] = [lastStripeObject]
-        game["userOnTurn"] = opponentUser
+        weekBattle["userOnTurn"] = opponentUser
         
         if firstStripe {
             pushNotificationHandler.sendNewGameNotification(opponentUser as PFUser)
         } else {
             pushNotificationHandler.sendUserTurnNotification(opponentUser as PFUser)
         }
-
-        return game
+        
+        game.saveInBackgroundWithBlock(nil)
+        
+        return weekBattle
     }
     
     class func gameFinished(game : PFObject) -> PFObject {

@@ -39,7 +39,7 @@ class LoginViewController: UIViewController, UIAlertViewDelegate, PFLogInViewCon
     func addFacebookLogin () {
         self.view.addSubview(fbLoginView)
 
-        fbLoginView.addTarget(self, action: "fbButtonAction:", forControlEvents: UIControlEvents.TouchUpInside)
+        fbLoginView.addTarget(self, action: "fbButtonAction:", forControlEvents: .TouchUpInside)
         fbLoginView.setImage(UIImage(named: "faceBookLogin"), forState: .Normal)
         fbLoginView.setTranslatesAutoresizingMaskIntoConstraints(false)
         fbLoginView.constrainToSize(CGSizeMake(280, 50))
@@ -130,10 +130,12 @@ class LoginViewController: UIViewController, UIAlertViewDelegate, PFLogInViewCon
         
         PFFacebookUtils.logInWithPermissions(permissions, {
             (user: PFUser!, error: NSError!) -> Void in
-            
+            println("HIER")
+//            println(error)
             if user == nil {
                 let alert = UIAlertView(title: "Facebook login failed", message: "Please check your Facebook settings on your phone.", delegate: self, cancelButtonTitle: "Ok")
                 alert.show()
+        
             } else if user.isNew {
                 NSLog("User signed up and logged in through Facebook!")
                 User.requestFaceBookLoggedInUserInfo()

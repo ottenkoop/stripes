@@ -14,6 +14,12 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     let bannerView = ADBannerView()
     var gameTableView : UITableView = UITableView()
     var cell : UITableViewCell?
+    var timerView : UIView = UIView()
+    
+    var dayTimer = UILabel()
+    var hourTimer = UILabel()
+    var minuteTimer = UILabel()
+    var secondsTimer = UILabel()
     
     let screenWidth : CGFloat = UIScreen.mainScreen().bounds.size.width
     let screenHeight : CGFloat = UIScreen.mainScreen().bounds.size.height
@@ -26,6 +32,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         super.viewDidLoad()
         self.gameTableView.backgroundColor = UIColor(patternImage: UIImage(named: "gameBackground")!)
 
+        addTimer()
         addRefreshTableDrag()
         addTableView()
         addNavigationItems()
@@ -34,6 +41,130 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadTableViewContent", name: "reloadGameTableView", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "deleteObjectFromSection", name: "deleteObjectFromYourTurnSection", object: nil)
+    }
+    
+    func addTimer() {
+        var titleView = UILabel()
+        
+        var dayText = UILabel()
+        var hourText = UILabel()
+        var minuteText = UILabel()
+        var secondsText = UILabel()
+        
+        var margin = (navigationController!.navigationBar.bounds.height) + (UIApplication.sharedApplication().statusBarFrame.size.height)
+        
+        self.view.addSubview(timerView)
+        
+        timerView.addSubview(titleView)
+        timerView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        timerView.constrainToHeight(60)
+        timerView.backgroundColor = UIColor.whiteColor()
+        
+        titleView.text = "Time left this round:"
+        titleView.font = UIFont(name: "HanziPen SC", size: 12)
+        titleView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        titleView.centerInContainerOnAxis(.CenterX)
+        titleView.pinAttribute(.Top, toAttribute: .Top, ofItem: timerView, withConstant: 5)
+        
+        timerView.pinAttribute(.Top, toAttribute: .Top, ofItem: self.view, withConstant: margin)
+        timerView.pinAttribute(.Left, toAttribute: .Left, ofItem: self.view)
+        timerView.pinAttribute(.Right, toAttribute: .Right, ofItem: self.view)
+        
+        addTimerViews()
+        
+        var timer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "updateCountdown", userInfo: nil, repeats: true)
+    }
+    
+    func addTimerViews() {
+        var dayTimerView = UIView()
+        var hourTimerView = UIView()
+        var minuteTimerView = UIView()
+        var secondsTimerView = UIView()
+        
+        timerView.addSubview(dayTimerView)
+        timerView.addSubview(hourTimerView)
+        timerView.addSubview(minuteTimerView)
+        timerView.addSubview(secondsTimerView)
+        
+        styleTimerViews([dayTimerView, hourTimerView, minuteTimerView, secondsTimerView])
+    }
+    
+    func styleTimerViews(views : [UIView]) {
+        for (index, view) in enumerate(views) {
+            
+            view.setTranslatesAutoresizingMaskIntoConstraints(false)
+            view.constrainToSize(CGSizeMake((screenWidth / 4) - 3, 40))
+            view.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: timerView)
+            
+            if index == 0 {
+                view.pinAttribute(.Left, toAttribute: .Left, ofItem: timerView, withConstant: 10)
+            } else {
+                view.pinAttribute(.Left, toAttribute: .Right, ofItem: views[index - 1], withConstant: 2)
+            }
+        }
+        
+        views[0].addSubview(dayTimer)
+        views[1].addSubview(hourTimer)
+        views[2].addSubview(minuteTimer)
+        views[3].addSubview(secondsTimer)
+
+        styleTimerLabels([dayTimer, hourTimer, minuteTimer, secondsTimer])
+        
+        dayTimer.centerInView(views[0])
+        hourTimer.centerInView(views[1])
+        minuteTimer.centerInView(views[2])
+        secondsTimer.centerInView(views[3])
+        
+        updateCountdown()
+    }
+    
+    func styleTimerLabels(views : [UILabel]) {
+        for view in views {
+            view.font = UIFont(name: "HanziPen SC", size: 30)
+            view.textColor = UIColor.colorWithRGBHex(0x0079FF, alpha: 1.0)
+            view.setTranslatesAutoresizingMaskIntoConstraints(false)
+            view.constrainToSize(CGSizeMake(75, 50))
+        }
+    }
+
+    func updateCountdown() {
+        var date = NSDate()
+        var monday = NSDate().dateAtStartOfWeek().dateByAddingDays(1)
+        
+        var dayString:NSString = "\(date.daysBeforeDate(monday)) days"
+        var hourString:NSString = "\(date.hoursBeforeDate(date.dateAtEndOfDay())) hours"
+        var minuteString:NSString = "\(59 - date.minute()) min"
+        var secondsString:NSString = "\(59 - date.seconds()) sec"
+        
+        var dayTimerString = NSMutableAttributedString()
+        var hourTimerString = NSMutableAttributedString()
+        var minuteTimerString = NSMutableAttributedString()
+        var secondsTimerString = NSMutableAttributedString()
+        
+        dayTimerString = NSMutableAttributedString(string: dayString, attributes: [NSFontAttributeName:UIFont(name: "HanziPen SC", size: 18.0)!])
+        hourTimerString = NSMutableAttributedString(string: hourString, attributes: [NSFontAttributeName:UIFont(name: "HanziPen SC", size: 18.0)!])
+        minuteTimerString = NSMutableAttributedString(string: minuteString, attributes: [NSFontAttributeName:UIFont(name: "HanziPen SC", size: 18.0)!])
+        secondsTimerString = NSMutableAttributedString(string: secondsString, attributes: [NSFontAttributeName:UIFont(name: "HanziPen SC", size: 18.0)!])
+
+        // style the label.
+        styleTimerString(dayTimerString, stringLength: dayString.length, attributeLength: 4)
+        styleTimerString(hourTimerString, stringLength: hourString.length, attributeLength: 5)
+        styleTimerString(minuteTimerString, stringLength: minuteString.length, attributeLength: 3)
+        styleTimerString(secondsTimerString, stringLength: secondsString.length, attributeLength: 3)
+
+        //Apply to the label
+        dayTimer.attributedText = dayTimerString
+        hourTimer.attributedText = hourTimerString
+        minuteTimer.attributedText = minuteTimerString
+        secondsTimer.attributedText = secondsTimerString
+
+    }
+    
+    func styleTimerString(MuString: NSMutableAttributedString, stringLength: Int, attributeLength: Int) {
+        MuString.addAttribute(NSFontAttributeName, value: UIFont(name: "HanziPen SC", size: 30.0)!, range: NSRange(location: 0,length: 2))
+        MuString.addAttribute(NSForegroundColorAttributeName, value: UIColor.colorWithRGBHex(0x0079FF, alpha: 1.0), range: NSRange(location:0,length:2))
+        MuString.addAttribute(NSFontAttributeName, value: UIFont(name: "HanziPen SC", size: 14.0)!, range: NSRange(location: (stringLength - attributeLength), length: attributeLength))
+        MuString.addAttribute(NSForegroundColorAttributeName, value: UIColor.blackColor(), range: NSRange(location: (stringLength - attributeLength),length:attributeLength))
     }
     
     func deleteObjectFromSection() {
@@ -79,8 +210,9 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         
         gameTableView.setTranslatesAutoresizingMaskIntoConstraints(false)
         gameTableView.separatorColor = UIColor.colorWithRGBHex(0xD2D2D2, alpha: 0.4)
+        gameTableView.rowHeight = 60.0
         
-        gameTableView.pinAttribute(.Top, toAttribute: .Top, ofItem: self.view)
+        gameTableView.pinAttribute(.Top, toAttribute: .Bottom, ofItem: timerView)
         gameTableView.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: self.view)
         gameTableView.pinAttribute(.Right, toAttribute: .Right, ofItem: self.view)
         gameTableView.pinAttribute(.Left, toAttribute: .Left, ofItem: self.view)
@@ -144,40 +276,78 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
             cell = UITableViewCell(style: UITableViewCellStyle.Value1, reuseIdentifier: "CELL")
             cell!.backgroundColor = UIColor.clearColor()
 
-            var aView = UIImageView(image: UIImage(named: "disclosureIndicator"))
-            aView.frame = CGRectMake(0, 0, 10, 20)
-            cell!.accessoryView = aView
-            cell!.selectionStyle = UITableViewCellSelectionStyle.Blue
+//            var aView = UIImageView(image: UIImage(named: "disclosureIndicator"))
+//            aView.frame = CGRectMake(0, 0, 10, 20)
+////            cell!.accessoryView = aView
+//            cell!.selectionStyle = UITableViewCellSelectionStyle.Blue
         }
         
         switch indexPath.section {
         case 0:
             let gameUserTurn = gamesWithUserTurn[Int(indexPath.row)] as PFObject
-            var attributedText = ""
             
-            if gameUserTurn["user"].objectId == PFUser.currentUser().objectId {
-                attributedText = String(gameUserTurn["user2FullName"] as NSString)
-            } else {
-                attributedText = String(gameUserTurn["userFullName"] as NSString)
-            }
-            
-            cell!.textLabel?.text = attributedText
-            
+            addCustomCellContent(cell!, weekBattle: gameUserTurn)
         case 1:
             let gameOpponentTurn = gamesWithOpponentTurn[Int(indexPath.row)] as PFObject
-            var attributedText = ""
             
-            if gameOpponentTurn["user"].objectId == PFUser.currentUser().objectId {
-                attributedText = String(gameOpponentTurn["user2FullName"] as NSString)
-            } else {
-                attributedText = String(gameOpponentTurn["userFullName"] as NSString)
-            }
-            
-            cell!.textLabel?.text = attributedText
+            addCustomCellContent(cell!, weekBattle: gameOpponentTurn)
         default:
             fatalError("What did you think ??")
         }
+        
         return cell!
+    }
+    
+    func addCustomCellContent(cell : UITableViewCell, weekBattle : PFObject ) {
+        var oppName = UILabel()
+        var pointsView = UILabel()
+        var userName = UILabel()
+        var oppPoints : Int = 0
+        var uPoints : Int = 0
+        var oppFullName = []
+        
+        if weekBattle["user"].objectId == PFUser.currentUser().objectId {
+            uPoints = weekBattle["userPoints"] as Int
+            oppPoints = weekBattle["user2Points"] as Int
+            oppFullName = (weekBattle["user2FullName"] as NSString).componentsSeparatedByString(" ")
+        } else {
+            oppPoints = weekBattle["userPoints"] as Int
+            uPoints = weekBattle["user2Points"] as Int
+            oppFullName = (weekBattle["userFullName"] as NSString).componentsSeparatedByString(" ")
+        }
+
+        if oppFullName.count > 1 {
+            var lastName = oppFullName.lastObject as String
+            var lastLetter = lastName[lastName.startIndex]
+            
+            oppName.text = "\(oppFullName[0]) \(lastLetter)."
+        } else {
+            oppName.text = "\(oppFullName[0])"
+        }
+
+        userName.text = "Me"
+        pointsView.text = "\(oppPoints)  :  \(uPoints)"
+        
+        cell.contentView.addSubview(oppName)
+        cell.contentView.addSubview(pointsView)
+        cell.contentView.addSubview(userName)
+        
+        oppName.setTranslatesAutoresizingMaskIntoConstraints(false)
+        userName.setTranslatesAutoresizingMaskIntoConstraints(false)
+        pointsView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        
+        oppName.font = UIFont (name: "HanziPen SC", size: 16)
+        oppName.pinAttribute(.Left, toAttribute: .Left, ofItem: cell, withConstant: 20)
+        oppName.centerInContainerOnAxis(.CenterY)
+
+        userName.font = UIFont (name: "HanziPen SC", size: 16)
+        userName.pinAttribute(.Right, toAttribute: .Right, ofItem: cell, withConstant: -20)
+        userName.centerInContainerOnAxis(.CenterY)
+        
+        pointsView.font = UIFont (name: "HanziPen SC", size: 30)
+        pointsView.textColor = UIColor.colorWithRGBHex(0x0079FF, alpha: 1.0)
+        pointsView.centerInView(cell)
+//        pointsView.centerInContainerOnAxis(.CenterY)
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
@@ -197,25 +367,23 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func loadTableViewContent() {
-        var gameQuery = searchModule.findGame()
+        var weekBattlesQuery = searchModule.findWeekBattles()
         
-        gameQuery.findObjectsInBackgroundWithBlock {
+        weekBattlesQuery.findObjectsInBackgroundWithBlock {
             (objects: [AnyObject]!, error: NSError!) -> Void in
             if error == nil {
-                
                 self.gamesWithUserTurn = []
                 self.gamesWithOpponentTurn = []
                 
                 for object in objects as [PFObject] {
                     if object["userOnTurn"].objectId == PFUser.currentUser().objectId {
                         self.gamesWithUserTurn += [object]
-                        
                     } else {
                         self.gamesWithOpponentTurn += [object]
                     }
                 }
                 
-                self.navigationItem.title = "Games"
+                self.navigationItem.title = "Battles"
                 self.gameTableView.reloadData()
                 self.setBadgeNumber()
             } else {
@@ -227,12 +395,23 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
-    func openGame(game : PFObject, userTurn : Bool) {
-        let gameEngineController = newGameController()
+    func openGame(weekBattle : PFObject, userTurn : Bool) {
+        SVProgressHUD.show()
+        
+        var gameQuery = searchModule.findGame(weekBattle["currentGame"].objectId)
 
-        gameEngineController.gameObject = [game]
-        gameEngineController.userTurn = userTurn
-        self.navigationController!.pushViewController(gameEngineController, animated: true)
+        gameQuery.findObjectsInBackgroundWithBlock {
+            (objects: [AnyObject]!, error: NSError!) -> Void in
+            if error == nil {
+                let gameEngineController = newGameController()
+                var game : PFObject = objects[0] as PFObject
+                
+                gameEngineController.gameObject = [game]
+                gameEngineController.weekBattle = [weekBattle]
+                gameEngineController.userTurn = userTurn
+                self.navigationController!.pushViewController(gameEngineController, animated: true)
+            }
+        }
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -300,7 +479,8 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         
         navigationItem.setHidesBackButton(true, animated: false)
         
-        navigationController?.navigationBar.setBackgroundImage(UIImage(named: "gameBackground"), forBarMetrics: UIBarMetrics.Default)
+//        navigationController?.navigationBar.setBackgroundImage(UIImage(named: "gameBackground"), forBarMetrics: UIBarMetrics.Default)
+        navigationController?.navigationBar.barTintColor = UIColor.whiteColor()
         navigationController?.navigationBar.translucent = true
     }
     

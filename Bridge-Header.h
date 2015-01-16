@@ -19,5 +19,7 @@
 #import <ParseFacebookUtils/PFFacebookUtils.h>
 #import <HockeySDK/HockeySDK.h>
 #import <QuickDialog/QuickDialog.h>
+#import "MGSwipeTableCell.h"
+#import "MGSwipeButton.h"
 
 #endif

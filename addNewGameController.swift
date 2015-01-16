@@ -152,14 +152,39 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
     func actionSheet(sheet: UIActionSheet!, clickedButtonAtIndex buttonIndex: Int) {
         SVProgressHUD.show()
         if buttonIndex == 0 {
-            Game.addGame("\(opponentName)", grid: 3)
-            self.navigationController!.popViewControllerAnimated(true)
+            var battleExists = checkIfBattleExists(opponentName)
+            
+            if battleExists {
+                let alert = UIAlertView(title: "Uh oh!", message: "This battle already exists.", delegate: self, cancelButtonTitle: "Return")
+                alert.show()
+                SVProgressHUD.dismiss()
+            } else {
+                Game.addGame("\(opponentName)", grid: 3)
+                self.navigationController!.popViewControllerAnimated(true)
+            }
+            
         } else if buttonIndex == 1 {
             Game.addGame("\(opponentName)", grid: 4)
             self.navigationController!.popViewControllerAnimated(true)
         } else {
             sheet.dismissWithClickedButtonIndex(2, animated: true)
             SVProgressHUD.dismiss()
+        }
+    }
+    
+    func checkIfBattleExists(oppName: NSString) -> Bool {
+        var query = PFQuery(className:"weekBattle")
+        
+        println(oppName)
+        
+        let predicate = NSPredicate(format: "userFullName = %@ AND user2FullName = %@ OR user2FullName = %@ AND user2FullName = %@", PFUser.currentUser()["fullName"] as NSString, oppName, PFUser.currentUser()["fullName"] as NSString, oppName)
+        
+        var weekBattle = query.findObjects()
+        
+        if weekBattle.isEmpty {
+            return false
+        } else {
+            return true
         }
     }
     

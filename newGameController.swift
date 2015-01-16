@@ -10,10 +10,11 @@ import Foundation
 
 class newGameController: UIViewController {
     private var gameBoardView = gameView(gameControl: UIViewController(), dimension: 0, gameObj: [AnyObject]())
-    private var GameHandler = gameHandler(gameBoardV: gameView(gameControl: UIViewController(), dimension: 0, gameObj: [AnyObject]()), localBoard: Board(dimension: 0), uBoard: Board(dimension: 0), oppBoard: Board(dimension: 0), gameObj: [AnyObject](), dimension: 0, submitButton: UIButton())
+    private var GameHandler = gameHandler(gameBoardV: gameView(gameControl: UIViewController(), dimension: 0, gameObj: [AnyObject]()), localBoard: Board(dimension: 0), uBoard: Board(dimension: 0), oppBoard: Board(dimension: 0), gameObj: [AnyObject](), weekB: [AnyObject](), dimension: 0, submitButton: UIButton())
 
     var userTurn : Bool = false
     var gameObject : [PFObject] = []
+    var weekBattle : [PFObject] = []
     
     var gridDimension : Int = 0
     internal var localGameBoard = Board(dimension: 0)
@@ -49,7 +50,7 @@ class newGameController: UIViewController {
         userBoard = Board(dimension: gridDimension)
         opponentBoard = Board(dimension: gridDimension)
         
-        GameHandler = gameHandler(gameBoardV: gameBoardView, localBoard: localGameBoard, uBoard: userBoard, oppBoard: opponentBoard, gameObj: gameObject, dimension: gridDimension, submitButton: submitBtn)
+        GameHandler = gameHandler(gameBoardV: gameBoardView, localBoard: localGameBoard, uBoard: userBoard, oppBoard: opponentBoard, gameObj: gameObject, weekB: weekBattle, dimension: gridDimension, submitButton: submitBtn)
         
         loadSquaresFromBackEnd()
 
@@ -244,5 +245,10 @@ class newGameController: UIViewController {
     func addObservers() {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "gameHasFinished", name: "gameHasFinished", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "popViewController", name: "popViewController", object: nil)
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(true)
+        SVProgressHUD.dismiss()
     }
 }

@@ -128,7 +128,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func applicationDidBecomeActive(application: UIApplication) {
-        
         FBAppCall.handleDidBecomeActiveWithSession(PFFacebookUtils.session())
         NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
     }

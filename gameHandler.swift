@@ -18,15 +18,17 @@ class gameHandler {
     var opponentBoard = Board(dimension: 0)
     
     var gameObject : [PFObject] = []
+    var weekBattle : [PFObject] = []
     var gridDimension : Int = 0
     
-    init (gameBoardV: gameView, localBoard : Board, uBoard : Board, oppBoard : Board, gameObj : [AnyObject], dimension : Int, submitButton : UIButton) {
+    init (gameBoardV: gameView, localBoard : Board, uBoard : Board, oppBoard : Board, gameObj : [AnyObject], weekB : [AnyObject], dimension : Int, submitButton : UIButton) {
         gameBoardView = gameBoardV
         
         localGameBoard = localBoard
         userBoard = uBoard
         opponentBoard = oppBoard
         gameObject = gameObj as [PFObject]
+        weekBattle = weekB as [PFObject]
         
         gridDimension = dimension
         submitBtn = submitButton
@@ -128,7 +130,7 @@ class gameHandler {
             }
         }
         
-        var gameToSave = Game.updateUserGameBoardAndSwitchUserTurn(gameObject[0], userBoard: userBoard, oppBoard: opponentBoard, lastStripe: stripeToSubmit)
+        var gameToSave = Game.updateUserGameBoardAndSwitchUserTurn(gameObject[0], weekBattle: weekBattle[0], userBoard: userBoard, oppBoard: opponentBoard, lastStripe: stripeToSubmit)
         
         gameToSave.saveInBackgroundWithBlock({(succeeded: Bool!, err: NSError!) -> Void in
             if succeeded != nil {
