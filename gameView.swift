@@ -99,15 +99,15 @@ class gameView {
                 gameController.view.addSubview(label)
                 label.setTranslatesAutoresizingMaskIntoConstraints(false)
                 label.textAlignment = .Center
-                label.font = UIFont(name: "HanziPen SC", size: 28)
+                label.font = UIFont(name: "HanziPen SC", size: 22)
                 
-                label.constrainToSize(CGSizeMake(screenWidth / 2 - 25, 50))
+                label.constrainToSize(CGSizeMake(screenWidth / 2, 50))
             }
             
             labelPointsViews[0].pinAttribute(.Bottom, toAttribute: .Top, ofItem: gameBoardView, withConstant: 0)
-            labelPointsViews[0].pinAttribute(.Left, toAttribute: .Left, ofItem: gameBoardView, withConstant: 15)
+            labelPointsViews[0].pinAttribute(.Left, toAttribute: .Left, ofItem: gameBoardView, withConstant: 10)
             labelPointsViews[1].pinAttribute(.Bottom, toAttribute: .Top, ofItem: gameBoardView, withConstant: 0)
-            labelPointsViews[1].pinAttribute(.Right, toAttribute: .Right, ofItem: gameBoardView, withConstant: -15)
+            labelPointsViews[1].pinAttribute(.Right, toAttribute: .Right, ofItem: gameBoardView, withConstant: -10)
             
         } else {
             for label in labelPointsViews {

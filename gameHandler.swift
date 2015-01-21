@@ -18,7 +18,7 @@ class gameHandler {
     var opponentBoard = Board(dimension: 0)
     
     var gameObject : [PFObject] = []
-    var weekBattle : [PFObject] = []
+    var weekBattleObject : [PFObject] = []
     var gridDimension : Int = 0
     
     init (gameBoardV: gameView, localBoard : Board, uBoard : Board, oppBoard : Board, gameObj : [AnyObject], weekB : [AnyObject], dimension : Int, submitButton : UIButton) {
@@ -28,7 +28,7 @@ class gameHandler {
         userBoard = uBoard
         opponentBoard = oppBoard
         gameObject = gameObj as [PFObject]
-        weekBattle = weekB as [PFObject]
+        weekBattleObject = weekB as [PFObject]
         
         gridDimension = dimension
         submitBtn = submitButton
@@ -130,7 +130,7 @@ class gameHandler {
             }
         }
         
-        var gameToSave = Game.updateUserGameBoardAndSwitchUserTurn(gameObject[0], weekBattle: weekBattle[0], userBoard: userBoard, oppBoard: opponentBoard, lastStripe: stripeToSubmit)
+        var gameToSave = Game.updateUserGameBoardAndSwitchUserTurn(gameObject[0], weekBattle: weekBattleObject[0], userBoard: userBoard, oppBoard: opponentBoard, lastStripe: stripeToSubmit)
         
         gameToSave.saveInBackgroundWithBlock({(succeeded: Bool!, err: NSError!) -> Void in
             if succeeded != nil {
@@ -149,7 +149,12 @@ class gameHandler {
     
     func gameFinished(button : UIButton!) {
         if gameObject[0]["finished"] as Bool == true {
-            gameObject[0].deleteInBackgroundWithBlock({(succeeded: Bool!, err: NSError!) -> Void in
+            var nextGrid = [3, 4]
+            nextGrid.remove(gameObject[0]["grid"] as Int)
+
+            weekBattle.resetGame(nextGrid[0] as Int, game: gameObject[0])
+            
+            gameObject[0].saveInBackgroundWithBlock({(succeeded: Bool!, err: NSError!) -> Void in
                 if succeeded != nil {
                     NSNotificationCenter.defaultCenter().postNotificationName("popViewController", object: nil)
                     NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
@@ -158,16 +163,20 @@ class gameHandler {
             
         } else {
             var name: AnyObject! = PFUser.currentUser()["fullName"]
+            var userWonGame : Bool = false
 
             if button.tag == 1 {
                 pushNotificationHandler.gameFinishedNotification(gameObject[0], content: "You lost against \(name)! :( Try again.")
+                userWonGame = true
             } else if button.tag == 2 {
                 pushNotificationHandler.gameFinishedNotification(gameObject[0], content: "You won against \(name)! Good job!")
+                userWonGame = false
             } else {
                 pushNotificationHandler.gameFinishedNotification(gameObject[0], content: "It's a draw against \(name)! At least you didn't lose.")
             }
             
-            var gameToSave = Game.gameFinished(gameObject[0])
+            weekBattleObject[0].saveInBackgroundWithBlock(nil)
+            var gameToSave = Game.gameFinished(gameObject[0], weekBattle: weekBattleObject[0], uWonGame: userWonGame)
             
             gameToSave.saveInBackgroundWithBlock({(succeeded: Bool!, err: NSError!) -> Void in
                 if succeeded != nil {

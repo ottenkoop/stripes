@@ -5,22 +5,22 @@
 
 class Game: PFObject {
     
-    class func addGame(opponentName : String, grid : Int) {
+    class func addGame(opponent : PFUser, grid : Int) {
         var game = PFObject(className:"Game")
         var board = Board(dimension: grid)
         
-        var opponentUser = PFUser.query()
-        opponentUser.whereKey("fullName", equalTo: "\(opponentName)")
-        var user = opponentUser.findObjects()
+//        var opponentUser = PFUser.query()
+//        opponentUser.whereKey("fullName", equalTo: "\(opponentName)")
+//        var user = opponentUser.findObjects()
         
         game["user"] = PFUser.currentUser()
-        game["user2"] = user.first
+        game["user2"] = opponent
         game["userPoints"] = 0
         game["opponentPoints"] = 0
         game["userSpecialsLeft"] = 2
         game["opponentSpecialsLeft"] = 2
         game["userFullName"] = PFUser.currentUser()["fullName"]
-        game["user2FullName"] = opponentName
+        game["user2FullName"] = opponent["fullName"]
         game["userOnTurn"] = PFUser.currentUser()
         game["grid"] = grid
         game["allScoredSquares"] = []
@@ -116,17 +116,38 @@ class Game: PFObject {
         return weekBattle
     }
     
-    class func gameFinished(game : PFObject) -> PFObject {
-        if game["user"].objectId == PFUser.currentUser().objectId {
-            game["userOnTurn"] = game["user2"]
+    class func gameFinished(game : PFObject, weekBattle : PFObject, uWonGame : Bool) -> PFObject {
+        if weekBattle["user"].objectId == PFUser.currentUser().objectId {
+            weekBattle["userOnTurn"] = weekBattle["user2"]
             game["finished"] = true
             game["lastStripe"] = []
+            
+            if uWonGame {
+                var points = weekBattle["userPoints"] as Int
+                points += 1
+                weekBattle["userPoints"] = points
+            } else {
+                var points = weekBattle["user2Points"] as Int
+                points += 1
+                weekBattle["user2Points"] = points
+            }
         } else {
-            game["userOnTurn"] = game["user"]
+            weekBattle["userOnTurn"] = weekBattle["user"]
             game["finished"] = true
             game["lastStripe"] = []
+            
+            if uWonGame {
+                var points = weekBattle["user2Points"] as Int
+                points += 1
+                weekBattle["user2Points"] = points
+            } else {
+                var points = weekBattle["userPoints"] as Int
+                points += 1
+                weekBattle["userPoints"] = points
+            }
         }
         
-        return game
+        game.saveInBackgroundWithBlock(nil)
+        return weekBattle
     }
 }

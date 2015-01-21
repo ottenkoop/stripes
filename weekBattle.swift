@@ -26,6 +26,53 @@ class weekBattle: PFObject {
                 NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
             }
         })
-
+    }
+    
+    class func resetGame(grid : Int, game : PFObject) {
+        var board = Board(dimension: grid)
+        
+        game["userBoard"] = []
+        game["opponentBoard"] = []
+        game["grid"] = grid
+        game["lastStripe"] = []
+        game["finished"] = false
+        game["userPoints"] = 0
+        game["opponentPoints"] = 0
+        game["userOnTurn"] = PFUser.currentUser()
+        game["userSpecialsLeft"] = 2
+        game["opponentSpecialsLeft"] = 2
+        game["allScoredSquares"] = []
+        
+//        var game = PFObject(className:"Game")
+//        var board = Board(dimension: grid)
+//        var opponentUser = PFUser()
+//        
+//        if weekBattle["user"] as PFUser == PFUser.currentUser() {
+//            var opponentUser = weekBattle["user2"] as PFUser
+//        } else {
+//            var opponentUser = weekBattle["user"] as PFUser
+//        }
+//
+//        game["user"] = PFUser.currentUser()
+//        game["user2"] = opponentUser
+//        game["userPoints"] = 0
+//        game["opponentPoints"] = 0
+//        game["userSpecialsLeft"] = 2
+//        game["opponentSpecialsLeft"] = 2
+//        game["userFullName"] = PFUser.currentUser()["fullName"]
+//        game["user2FullName"] = opponentUser["fullName"]
+//        game["userOnTurn"] = PFUser.currentUser()
+//        game["grid"] = grid
+//        game["allScoredSquares"] = []
+//        game["userBoard"] = []
+//        game["opponentBoard"] = []
+//        game["lastStripe"] = []
+//        game["finished"] = false
+//        
+//        
+//        game.saveInBackgroundWithBlock(nil)
+//        
+//        weekBattle["currentGame"] = game
+//        weekBattle.saveInBackgroundWithBlock(nil)
     }
 }

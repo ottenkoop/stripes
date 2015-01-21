@@ -39,6 +39,8 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         
         addBannerView()
         
+        println(PFUser.currentUser()["fullName"])
+        
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadTableViewContent", name: "reloadGameTableView", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "deleteObjectFromSection", name: "deleteObjectFromYourTurnSection", object: nil)
     }
@@ -336,18 +338,17 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         userName.setTranslatesAutoresizingMaskIntoConstraints(false)
         pointsView.setTranslatesAutoresizingMaskIntoConstraints(false)
         
-        oppName.font = UIFont (name: "HanziPen SC", size: 16)
+        oppName.font = UIFont (name: "HanziPen SC", size: 20)
         oppName.pinAttribute(.Left, toAttribute: .Left, ofItem: cell, withConstant: 20)
         oppName.centerInContainerOnAxis(.CenterY)
 
-        userName.font = UIFont (name: "HanziPen SC", size: 16)
+        userName.font = UIFont (name: "HanziPen SC", size: 20)
         userName.pinAttribute(.Right, toAttribute: .Right, ofItem: cell, withConstant: -20)
         userName.centerInContainerOnAxis(.CenterY)
         
         pointsView.font = UIFont (name: "HanziPen SC", size: 30)
         pointsView.textColor = UIColor.colorWithRGBHex(0x0079FF, alpha: 1.0)
         pointsView.centerInView(cell)
-//        pointsView.centerInContainerOnAxis(.CenterY)
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
@@ -396,7 +397,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func openGame(weekBattle : PFObject, userTurn : Bool) {
-        SVProgressHUD.show()
+        var containerToRemove = loadingView().showActivityIndicator(self.view)
         
         var gameQuery = searchModule.findGame(weekBattle["currentGame"].objectId)
 
@@ -410,6 +411,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
                 gameEngineController.weekBattle = [weekBattle]
                 gameEngineController.userTurn = userTurn
                 self.navigationController!.pushViewController(gameEngineController, animated: true)
+                loadingView().hideActivityIndicatorWhenReturning(containerToRemove)
             }
         }
     }

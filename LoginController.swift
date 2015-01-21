@@ -140,10 +140,12 @@ class LoginViewController: UIViewController, UIAlertViewDelegate, PFLogInViewCon
                 NSLog("User signed up and logged in through Facebook!")
                 User.requestFaceBookLoggedInUserInfo()
                 self.openGameOverviewController()
+                NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
             } else {
                 NSLog("User logged in through Facebook!")
                 User.requestFaceBookLoggedInUserInfo()
                 self.openGameOverviewController()
+                NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
             }
         })
     }

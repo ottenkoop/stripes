@@ -40,14 +40,15 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
         self.view.addSubview(friendTableView)
         
         friendTableView.setTranslatesAutoresizingMaskIntoConstraints(false)
-        friendTableView.constrainToSize(CGSizeMake(screenWidth, screenHeight))
+        friendTableView.constrainToHeight(screenHeight)
         friendTableView.pinAttribute(.Left, toAttribute: .Left, ofItem: self.view)
+        friendTableView.pinAttribute(.Right, toAttribute: .Right, ofItem: self.view)
+        friendTableView.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: self.view)
     }
     
     func addSearchBar() {
         SVProgressHUD.dismiss()
         
-//        searchBar.setTranslatesAutoresizingMaskIntoConstraints(false)
         searchBar.backgroundColor = UIColor.whiteColor()
         searchBar.delegate = self
         searchBar.sizeToFit()
@@ -66,7 +67,6 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
         userQuery.findObjectsInBackgroundWithBlock({
             (objects: [AnyObject]!, error: NSError!) -> Void in
             if error == nil {
-                println(objects)
                 self.allFriends = objects
                 
                 self.searchDisplayController?.searchResultsTableView.reloadData()
@@ -74,7 +74,7 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
         })
     }
     
-    func loadTableViewContent () {
+    func loadTableViewContent() {
         if showFaceBookFriends {
             var friendsRequest : FBRequest = FBRequest.requestForMyFriends()
             
@@ -86,6 +86,10 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
                     self.allFriends = resultdict.objectForKey("data") as NSArray
                     
                     self.friendTableView.reloadData()
+                    SVProgressHUD.dismiss()
+                } else {
+                    self.addSearchBar()
+                    self.showFaceBookFriends = false
                     SVProgressHUD.dismiss()
                 }
             }
@@ -125,61 +129,58 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        SVProgressHUD.show()
+        let indexP = tableView.indexPathForSelectedRow()!
+        let currentCell = tableView.cellForRowAtIndexPath(indexP)!
+        var opponent : PFUser = PFUser()
         
         if showFaceBookFriends {
-            cell = friendTableView.cellForRowAtIndexPath(indexPath)
+            let predicate = NSPredicate(format: "fullName = %@ AND username != %@", currentCell.textLabel!.text!, currentCell.textLabel!.text!)
+            var opponentUser = PFUser.queryWithPredicate(predicate)
+            opponentUser.findObjectsInBackgroundWithBlock {
+                (objects: [AnyObject]!, error: NSError!) -> Void in
+                if error != nil {
+                    // There was an error
+                } else {
+                    var opponent = objects[0] as PFUser
+        
+                    var battleExists = self.checkIfBattleExists(opponent)
+        
+                    if battleExists {
+                        let alert = UIAlertView(title: "Uh oh!", message: "This battle already exists.", delegate: self, cancelButtonTitle: "Return")
+                        alert.show()
+                        SVProgressHUD.dismiss()
+                    } else {
+                        Game.addGame(opponent, grid: 3)
+                        self.navigationController!.popViewControllerAnimated(true)
+                    }
+                }
+            }
+
         } else {
-            cell = searchDisplayController?.searchResultsTableView.cellForRowAtIndexPath(indexPath)
-        }
+            var opponent : PFUser = allFriends[Int(indexPath.row)] as PFUser
+        
+            var battleExists = checkIfBattleExists(opponent)
 
-        var oppName = cell!.textLabel?.text
-        
-        opponentName = oppName!
-        
-        var sheet : UIActionSheet = UIActionSheet()
-        let title = "Select a grid"
-        
-        sheet.title = title
-        sheet.delegate = self
-        sheet.addButtonWithTitle("3x3")
-        sheet.addButtonWithTitle("4x4")
-        sheet.addButtonWithTitle("Cancel")
-        sheet.cancelButtonIndex = 2
-
-        sheet.showInView(self.view)
-    }
-    
-    func actionSheet(sheet: UIActionSheet!, clickedButtonAtIndex buttonIndex: Int) {
-        SVProgressHUD.show()
-        if buttonIndex == 0 {
-            var battleExists = checkIfBattleExists(opponentName)
-            
             if battleExists {
                 let alert = UIAlertView(title: "Uh oh!", message: "This battle already exists.", delegate: self, cancelButtonTitle: "Return")
                 alert.show()
                 SVProgressHUD.dismiss()
             } else {
-                Game.addGame("\(opponentName)", grid: 3)
+                Game.addGame(opponent, grid: 3)
                 self.navigationController!.popViewControllerAnimated(true)
             }
-            
-        } else if buttonIndex == 1 {
-            Game.addGame("\(opponentName)", grid: 4)
-            self.navigationController!.popViewControllerAnimated(true)
-        } else {
-            sheet.dismissWithClickedButtonIndex(2, animated: true)
-            SVProgressHUD.dismiss()
         }
     }
     
-    func checkIfBattleExists(oppName: NSString) -> Bool {
-        var query = PFQuery(className:"weekBattle")
+    func checkIfBattleExists(oppName: PFUser) -> Bool {
+        let predicate = NSPredicate(format: "user = %@ AND user2 = %@ OR user2 = %@ AND user = %@", PFUser.currentUser(), oppName, PFUser.currentUser(), oppName)
         
-        println(oppName)
+        println(predicate)
+        var weekBattleQuery = PFQuery(className:"weekBattle", predicate: predicate)
+        var weekBattle = weekBattleQuery.findObjects()
         
-        let predicate = NSPredicate(format: "userFullName = %@ AND user2FullName = %@ OR user2FullName = %@ AND user2FullName = %@", PFUser.currentUser()["fullName"] as NSString, oppName, PFUser.currentUser()["fullName"] as NSString, oppName)
-        
-        var weekBattle = query.findObjects()
+        println(weekBattle)
         
         if weekBattle.isEmpty {
             return false
@@ -193,13 +194,3 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
         navigationController!.navigationBar.barTintColor = UIColor.whiteColor()
     }
 }
-
-
-
-
-
-
-
-
-
-

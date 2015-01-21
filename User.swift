@@ -33,8 +33,10 @@ class User: PFObject {
         var user = PFUser.currentUser()
         
         user["fullName"] = user["username"]
+        PFUser.currentUser()["fullName"] = user["username"]
         
         user.saveEventually()
+        PFUser.currentUser().saveEventually()
     }
     
     class func findUser (opponentName : String) -> PFQuery {

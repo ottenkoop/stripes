@@ -8,7 +8,7 @@
 
 import Foundation
 
-class settingsView : QuickDialogController {
+class settingsView : QuickDialogController, UIActionSheetDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,11 +36,21 @@ class settingsView : QuickDialogController {
     func logOut() {
         var sheet : UIActionSheet = UIActionSheet()
         
+        sheet.delegate = self
         sheet.addButtonWithTitle("Log Out")
         sheet.addButtonWithTitle("Cancel")
         sheet.cancelButtonIndex = 1
         
         sheet.showInView(self.view)
+    }
+    
+    func actionSheet(sheet: UIActionSheet!, clickedButtonAtIndex buttonIndex: Int) {
+        if buttonIndex == 0 {
+            PFUser.logOut()
+            
+            var loginController = LoginViewController()
+            self.navigationController?.pushViewController(loginController, animated: false)
+        }
     }
     
     override func didReceiveMemoryWarning() {
