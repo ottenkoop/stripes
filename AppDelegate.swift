@@ -98,6 +98,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if (notification.objectForKey("content-available") != nil) {
             if notification.objectForKey("content-available") as Int == 1 {
                 NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
+//                NSNotificationCenter.defaultCenter().postNotificationName("resetLookingForGame", object: nil)
             }
         } else {
             PFPush.handlePush(userInfo)
@@ -106,10 +107,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     
     func application(application: UIApplication, openURL url: NSURL, sourceApplication: NSString?, annotation: AnyObject) -> Bool {
-        
-        //        var wasHandled:Bool = FBAppCall.handleOpenURL(url, sourceApplication: sourceApplication)
-        //        return wasHandled
-        
         return FBAppCall.handleOpenURL(url, sourceApplication:sourceApplication, withSession:PFFacebookUtils.session())
     }
     

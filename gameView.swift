@@ -406,7 +406,12 @@ class gameView {
             specialsLeft = gameObject[0]["opponentSpecialsLeft"] as Int
         }
 
-        specialsBtn.constrainToSize(CGSizeMake(61, 50))
+        if (UIInterfaceOrientationIsPortrait(gameController.interfaceOrientation)) {
+            specialsBtn.constrainToSize(CGSizeMake(61, 50))
+        } else {
+            specialsBtn.constrainToSize(CGSizeMake(61, 60))
+        }
+
         
         if specialsLeft != 0 {
             specialsBtn.setImage(UIImage(named: "specials\(specialsLeft)"), forState: .Normal)

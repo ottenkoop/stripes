@@ -82,16 +82,46 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
                 (connection : FBRequestConnection!, result : AnyObject!, error : NSError!) -> Void in
                 
                 if error == nil {
-                    var resultdict = result as NSDictionary
-                    self.allFriends = resultdict.objectForKey("data") as NSArray
+                    var friendObjects : NSArray = result.objectForKey("data") as NSArray
+                    var friendIds : NSMutableArray = NSMutableArray(capacity: friendObjects.count)
                     
+                    for friendObject in friendObjects as [NSDictionary] {
+                        friendIds.addObject(friendObject.objectForKey("id")!)
+                    }
+                    
+                    var friendQuery : PFQuery = PFUser.query()
+                    friendQuery.whereKey("fbId", containedIn: friendIds)
+                    
+                    var friendUsers = friendQuery.findObjects()
+                    
+                    self.allFriends = friendUsers as NSArray
                     self.friendTableView.reloadData()
+                    
                     SVProgressHUD.dismiss()
                 } else {
                     self.addSearchBar()
                     self.showFaceBookFriends = false
                     SVProgressHUD.dismiss()
                 }
+                
+//                if (!error) {
+//                    // result will contain an array with your user's friends in the "data" key
+//                    NSArray *friendObjects = [result objectForKey:@"data"];
+//                    NSMutableArray *friendIds = [NSMutableArray arrayWithCapacity:friendObjects.count];
+//                    // Create a list of friends' Facebook IDs
+//                    for (NSDictionary *friendObject in friendObjects) {
+//                        [friendIds addObject:[friendObject objectForKey:@"id"]];
+//                    }
+//                    
+//                    // Construct a PFUser query that will find friends whose facebook ids
+//                    // are contained in the current user's friend list.
+//                    PFQuery *friendQuery = [PFUser query];
+//                    [friendQuery whereKey:@"fbId" containedIn:friendIds];
+//                    
+//                    // findObjects will return a list of PFUsers that are friends
+//                    // with the current user
+//                    NSArray *friendUsers = [friendQuery findObjects];
+//                }
             }
         } else {
             // show search btn
@@ -117,64 +147,30 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
             cell!.backgroundColor = UIColor.clearColor()
         }
         
-        if showFaceBookFriends {
-            var user : AnyObject = allFriends[Int(indexPath.row)]
-            cell!.textLabel?.text = String(user.name as NSString)
-        } else {
-            var user : AnyObject = allFriends[Int(indexPath.row)]
-            cell!.textLabel?.text = String(user["fullName"] as NSString)
-        }
-        
+        var user : AnyObject = allFriends[Int(indexPath.row)]
+        cell!.textLabel?.text = String(user["fullName"] as NSString)
+    
         return cell!
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         SVProgressHUD.show()
-        let indexP = tableView.indexPathForSelectedRow()!
-        let currentCell = tableView.cellForRowAtIndexPath(indexP)!
-        var opponent : PFUser = PFUser()
-        
-        if showFaceBookFriends {
-            let predicate = NSPredicate(format: "fullName = %@ AND username != %@", currentCell.textLabel!.text!, currentCell.textLabel!.text!)
-            var opponentUser = PFUser.queryWithPredicate(predicate)
-            opponentUser.findObjectsInBackgroundWithBlock {
-                (objects: [AnyObject]!, error: NSError!) -> Void in
-                if error != nil {
-                    // There was an error
-                } else {
-                    var opponent = objects[0] as PFUser
-        
-                    var battleExists = self.checkIfBattleExists(opponent)
-        
-                    if battleExists {
-                        let alert = UIAlertView(title: "Uh oh!", message: "This battle already exists.", delegate: self, cancelButtonTitle: "Return")
-                        alert.show()
-                        SVProgressHUD.dismiss()
-                    } else {
-                        Game.addGame(opponent, grid: 3)
-                        self.navigationController!.popViewControllerAnimated(true)
-                    }
-                }
-            }
 
+        var opponent : PFUser = allFriends[Int(indexPath.row)] as PFUser
+        var battleExists = checkIfBattleExists(opponent)
+        
+        if battleExists {
+            let alert = UIAlertView(title: "Uh oh!", message: "This battle already exists.", delegate: self, cancelButtonTitle: "Return")
+            alert.show()
+            SVProgressHUD.dismiss()
         } else {
-            var opponent : PFUser = allFriends[Int(indexPath.row)] as PFUser
-        
-            var battleExists = checkIfBattleExists(opponent)
-
-            if battleExists {
-                let alert = UIAlertView(title: "Uh oh!", message: "This battle already exists.", delegate: self, cancelButtonTitle: "Return")
-                alert.show()
-                SVProgressHUD.dismiss()
-            } else {
-                Game.addGame(opponent, grid: 3)
-                self.navigationController!.popViewControllerAnimated(true)
-            }
+            Game.addGame(opponent, grid: 3)
+            self.navigationController!.popViewControllerAnimated(true)
         }
     }
     
-    func checkIfBattleExists(oppName: PFUser) -> Bool {
-        let predicate = NSPredicate(format: "user = %@ AND user2 = %@ OR user2 = %@ AND user = %@", PFUser.currentUser(), oppName, PFUser.currentUser(), oppName)
+    func checkIfBattleExists(opp: PFUser) -> Bool {
+        let predicate = NSPredicate(format: "user = %@ AND user2 = %@ OR user2 = %@ AND user = %@", PFUser.currentUser(), opp, PFUser.currentUser(), opp)
         
         println(predicate)
         var weekBattleQuery = PFQuery(className:"weekBattle", predicate: predicate)

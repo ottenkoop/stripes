@@ -162,17 +162,25 @@ class gameHandler {
             })
             
         } else {
-            var name: AnyObject! = PFUser.currentUser()["fullName"]
-            var userWonGame : Bool = false
+            var oppName = ""
+            var oppFullName = (PFUser.currentUser()["fullName"] as NSString).componentsSeparatedByString(" ") as NSArray
+            
+            var lastName = oppFullName.lastObject as String
+            var lastLetter = lastName[lastName.startIndex]
+            
+            oppName = "\(oppFullName[0]) \(lastLetter)."
+            
+            var userWonGame : Int = 0
 
             if button.tag == 1 {
-                pushNotificationHandler.gameFinishedNotification(gameObject[0], content: "You lost against \(name)! :( Try again.")
-                userWonGame = true
+                pushNotificationHandler.gameFinishedNotification(gameObject[0], content: "You lost against \(oppName)! :( Try again.")
+                userWonGame = 1
             } else if button.tag == 2 {
-                pushNotificationHandler.gameFinishedNotification(gameObject[0], content: "You won against \(name)! Good job!")
-                userWonGame = false
+                pushNotificationHandler.gameFinishedNotification(gameObject[0], content: "You won against \(oppName)! Good job!")
+                userWonGame = 2
             } else {
-                pushNotificationHandler.gameFinishedNotification(gameObject[0], content: "It's a draw against \(name)! At least you didn't lose.")
+                pushNotificationHandler.gameFinishedNotification(gameObject[0], content: "It's a draw against \(oppName)! At least you didn't lose.")
+                userWonGame = 0
             }
             
             weekBattleObject[0].saveInBackgroundWithBlock(nil)

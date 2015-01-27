@@ -49,7 +49,7 @@ class settingsView : QuickDialogController, UIActionSheetDelegate {
             PFUser.logOut()
             
             var loginController = LoginViewController()
-            self.navigationController?.pushViewController(loginController, animated: false)
+            self.navigationController?.pushViewController(loginController, animated: true)
         }
     }
     

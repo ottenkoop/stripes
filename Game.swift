@@ -116,31 +116,32 @@ class Game: PFObject {
         return weekBattle
     }
     
-    class func gameFinished(game : PFObject, weekBattle : PFObject, uWonGame : Bool) -> PFObject {
+    class func gameFinished(game : PFObject, weekBattle : PFObject, uWonGame : Int) -> PFObject {
         if weekBattle["user"].objectId == PFUser.currentUser().objectId {
             weekBattle["userOnTurn"] = weekBattle["user2"]
             game["finished"] = true
             game["lastStripe"] = []
             
-            if uWonGame {
+            if uWonGame == 1 {
                 var points = weekBattle["userPoints"] as Int
                 points += 1
                 weekBattle["userPoints"] = points
-            } else {
+            } else if uWonGame == 2 {
                 var points = weekBattle["user2Points"] as Int
                 points += 1
                 weekBattle["user2Points"] = points
             }
+            
         } else {
             weekBattle["userOnTurn"] = weekBattle["user"]
             game["finished"] = true
             game["lastStripe"] = []
             
-            if uWonGame {
+            if uWonGame == 1 {
                 var points = weekBattle["user2Points"] as Int
                 points += 1
                 weekBattle["user2Points"] = points
-            } else {
+            } else if uWonGame == 2 {
                 var points = weekBattle["userPoints"] as Int
                 points += 1
                 weekBattle["userPoints"] = points

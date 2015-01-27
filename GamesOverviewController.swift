@@ -39,10 +39,29 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         
         addBannerView()
         
-        println(PFUser.currentUser()["fullName"])
+        addUserFacebookInfo()
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadTableViewContent", name: "reloadGameTableView", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "resetLookingForGame", name: "resetLookingForGame", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "deleteObjectFromSection", name: "deleteObjectFromYourTurnSection", object: nil)
+    }
+    
+    func addUserFacebookInfo() {
+        if PFFacebookUtils.isLinkedWithUser(PFUser.currentUser()) {
+            FBRequestConnection.startForMeWithCompletionHandler({
+                (connection : FBRequestConnection!, result : AnyObject!, error : NSError!) -> Void in
+
+                if error == nil {
+                    PFUser.currentUser().setObject(result.objectForKey("id"), forKey: "fbId")
+                    PFUser.currentUser().saveInBackgroundWithBlock(nil)
+                }  
+            })
+        }
+    }
+    
+    func resetLookingForGame() {
+        PFUser.currentUser().setObject(false, forKey: "lookingForGame")
+        PFUser.currentUser().saveInBackgroundWithBlock(nil)
     }
     
     func addTimer() {
@@ -190,14 +209,15 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         newGameBtn.pinAttribute(.Top, toAttribute: .Bottom, ofItem: navBar, withConstant: 0)
     }
     
-    func addRefreshTableDrag () {
+    func addRefreshTableDrag() {
         var refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: "refresh:", forControlEvents: UIControlEvents.ValueChanged)
+        refreshControl.addTarget(self, action: "refresh:", forControlEvents: .ValueChanged)
         
         gameTableView.addSubview(refreshControl)
     }
     
     func refresh (sender: UIRefreshControl) {
+        navigationItem.title = "Searching..."
         loadTableViewContent()
         
         sender.endRefreshing()
@@ -397,10 +417,13 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func openGame(weekBattle : PFObject, userTurn : Bool) {
+        var lastUpdate : NSDate = weekBattle.updatedAt as NSDate
+        var dateNow = NSDate()
+        
         var containerToRemove = loadingView().showActivityIndicator(self.view)
         
         var gameQuery = searchModule.findGame(weekBattle["currentGame"].objectId)
-
+        
         gameQuery.findObjectsInBackgroundWithBlock {
             (objects: [AnyObject]!, error: NSError!) -> Void in
             if error == nil {
@@ -412,6 +435,16 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
                 gameEngineController.userTurn = userTurn
                 self.navigationController!.pushViewController(gameEngineController, animated: true)
                 loadingView().hideActivityIndicatorWhenReturning(containerToRemove)
+                
+                if  lastUpdate.dateAtStartOfWeek().dateByAddingDays(1).isEarlierThanDate(dateNow) {
+                    println("time voorbij")
+//                    weekBattle["user"].objectId == PFUser.currentUser().objectId
+                    if weekBattle["user"].objectId == PFUser.currentUser().objectId {
+                        weekBattleFinished().openPopup(gameEngineController, uPoints : weekBattle["userPoints"] as Int, oppPoints : weekBattle["user2Points"] as Int)
+                    } else {
+                        weekBattleFinished().openPopup(gameEngineController, uPoints : weekBattle["user2Points"] as Int, oppPoints : weekBattle["userPoints"] as Int)
+                    }
+                }
             }
         }
     }
@@ -468,6 +501,10 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
             currentInstallation.badge = 0
         }
         
+        if currentInstallation.badge > 0 {
+            resetLookingForGame()
+        }
+        
         currentInstallation.saveEventually()
     }
     
@@ -497,7 +534,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         
         btns[0].addTarget(self, action: "faceBookFriendGame:", forControlEvents: .TouchUpInside)
         btns[1].addTarget(self, action: "searchingForUsername:", forControlEvents: .TouchUpInside)
-        
+        btns[2].addTarget(self, action: "randomGame:", forControlEvents: .TouchUpInside)
         btns[3].addTarget(self, action: "cancelBtnPressed:", forControlEvents: .TouchUpInside)
         
         navigationItem.leftBarButtonItem?.enabled = false
@@ -522,6 +559,38 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         newGamePopup().removePopup(uButton)
     }
     
+    func randomGame(rButton : UIButton!) {
+        SVProgressHUD.show()
+        var query = PFUser.query()
+        query.whereKey("lookingForGame", equalTo: true)
+        
+        var usersLookingForGame = query.findObjects() as NSArray
+        
+        if usersLookingForGame.count == 0 {
+            let alert = UIAlertView(title: "", message: "Searching for an opponent. This may take a while.", delegate: self, cancelButtonTitle: "Ok")
+            alert.show()
+            PFUser.currentUser().setObject(true, forKey: "lookingForGame")
+            PFUser.currentUser().saveInBackgroundWithBlock(nil)
+            SVProgressHUD.dismiss()
+        } else {
+            var int = Int(arc4random_uniform(UInt32(usersLookingForGame.count)))
+            
+            var opponent = usersLookingForGame[int] as PFUser
+            
+            Game.addGame(opponent, grid: 3)
+            
+            SVProgressHUD.dismiss()
+            
+            newGamePopup().removePopup(rButton)
+            
+            var addNewGameBtn = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "newGame")
+            var settingsMenu = UIBarButtonItem(image: UIImage(named: "settingsIcon"), style: .Plain, target: self, action: "openSettings")
+            
+            navigationItem.leftBarButtonItem?.enabled = true
+            navigationItem.rightBarButtonItem?.enabled = true
+        }
+    }
+    
     func cancelBtnPressed(cButton : UIButton!) {
         newGamePopup().cancelPopup(cButton)
         
@@ -534,25 +603,20 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     
     //iAd
     func bannerViewWillLoadAd(banner: ADBannerView!) {
-        println("start")
     }
     
     func bannerViewDidLoadAd(banner: ADBannerView!) {
         // self.bannerView.alpha = 1.0
-        println("goed!")
     }
     
     func bannerViewActionDidFinish(banner: ADBannerView!) {
-        println("gefinished")
     }
     
     func bannerViewActionShouldBegin(banner: ADBannerView!, willLeaveApplication willLeave: Bool) -> Bool {
-        println("...")
         return true 
     }
     
     func bannerView(banner: ADBannerView!, didFailToReceiveAdWithError error: NSError!) {
-        println("ging iets Fout")
         self.bannerView.alpha = 0.0
     }
     

@@ -68,8 +68,8 @@ class newGamePopup {
             container.constrainToSize(CGSizeMake(uiView.bounds.width - 20, uiView.bounds.height - 100))
             container.centerInContainerOnAxis(.CenterX)
         } else {
-            container.constrainToSize(CGSizeMake(350, uiView.bounds.height - 130))
-            container.pinAttribute(.Right, toAttribute: .Right, ofItem: uiView, withConstant: -10)
+            container.constrainToSize(CGSizeMake(500, uiView.bounds.height - 130))
+            container.centerInContainerOnAxis(.CenterX)
         }
         
         container.pinAttribute(.Top, toAttribute: .Top, ofItem: uiView, withConstant: 70)
@@ -80,7 +80,7 @@ class newGamePopup {
     func addTitleLabel() {
         var titleLabel = UILabel()
         
-        titleLabel.text = "New Game"
+        titleLabel.text = "New Battle"
         titleLabel.textColor = UIColor.colorWithRGBHex(0x0079FF, alpha: 1.0)
         titleLabel.font = UIFont(name: "HanziPen SC", size: 36)
         
