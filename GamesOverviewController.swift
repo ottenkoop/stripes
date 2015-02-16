@@ -417,12 +417,10 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func openGame(weekBattle : PFObject, userTurn : Bool) {
-        var lastUpdate : NSDate = weekBattle.updatedAt as NSDate
-        var dateNow = NSDate()
-        
         var containerToRemove = loadingView().showActivityIndicator(self.view)
-        
         var gameQuery = searchModule.findGame(weekBattle["currentGame"].objectId)
+        
+        var btns : [UIButton] = []
         
         gameQuery.findObjectsInBackgroundWithBlock {
             (objects: [AnyObject]!, error: NSError!) -> Void in
@@ -431,20 +429,10 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
                 var game : PFObject = objects[0] as PFObject
                 
                 gameEngineController.gameObject = [game]
-                gameEngineController.weekBattle = [weekBattle]
+                gameEngineController.weekBattleObject = [weekBattle]
                 gameEngineController.userTurn = userTurn
                 self.navigationController!.pushViewController(gameEngineController, animated: true)
                 loadingView().hideActivityIndicatorWhenReturning(containerToRemove)
-                
-                if  lastUpdate.dateAtStartOfWeek().dateByAddingDays(1).isEarlierThanDate(dateNow) {
-                    println("time voorbij")
-//                    weekBattle["user"].objectId == PFUser.currentUser().objectId
-                    if weekBattle["user"].objectId == PFUser.currentUser().objectId {
-                        weekBattleFinished().openPopup(gameEngineController, uPoints : weekBattle["userPoints"] as Int, oppPoints : weekBattle["user2Points"] as Int)
-                    } else {
-                        weekBattleFinished().openPopup(gameEngineController, uPoints : weekBattle["user2Points"] as Int, oppPoints : weekBattle["userPoints"] as Int)
-                    }
-                }
             }
         }
     }

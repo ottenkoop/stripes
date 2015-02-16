@@ -60,10 +60,10 @@ class gameHandler {
                 gameObject[0]["allScoredSquares"] = squaresBackend
             }
             
-            gameBoardView.addSquareBackgroundImage(square, content: "fullSquareBlue")
             
             var squareObjectToSave = Game.createSquareObject(square.superview!.tag, squareIndex: square.tag)
             squareObjects += [squareObjectToSave]
+            gameBoardView.addSquareBackgroundImage(square, content: "fullSquareBlue")
         }
         
         if doubleStripeToSubmit.superview != nil {
@@ -91,7 +91,7 @@ class gameHandler {
             }
         }
         
-        var pointsArray = gameBoardView.updateGameBoardPoints(gameObject[0]["allScoredSquares"] as NSArray, newScoredSquaresArray: squareObjects)
+        var pointsArray = gameBoardView.updateGameBoardPoints(gameObject[0]["allScoredSquares"] as NSArray, newScoredSquaresArray: squareObjects, uBoard : userBoard, oppBoard: opponentBoard)
         
         var gameToSave = Game.saveSquare(gameObject[0], squaresArray: squareObjects, userPoints: pointsArray[0], oppPoints: pointsArray[1], userBoard: userBoard, oppBoard: opponentBoard)
         

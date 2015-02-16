@@ -66,11 +66,14 @@ class Board {
         // Magic
         
         // verstuur notificatie met veranderde square
-        NSNotificationCenter.defaultCenter().postNotificationName("", object: nil)
     }
     
     func removeStripe(x:Int, y:Int, stripe: StripeType) {
         board[x][y].removeStripe(stripe)
+    }
+    
+    func allBelongsToUser(x:Int,y:Int) -> Bool {
+        return board[x][y].content == 15
     }
     
     func loadSquareFromBackend(boardArray : [[Int]]) {

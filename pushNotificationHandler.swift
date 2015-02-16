@@ -94,4 +94,29 @@ class pushNotificationHandler: PFObject {
         push.setData(data)
         push.sendPush(nil)
     }
+    
+    class func restartBattleNotification(weekBattle : PFObject) {
+        var push = PFPush()
+        var query = PFInstallation.query()
+        
+        var oppName = ""
+        var oppFullName = (PFUser.currentUser()["fullName"] as NSString).componentsSeparatedByString(" ") as NSArray
+        var lastName = oppFullName.lastObject as String
+        var lastLetter = lastName[lastName.startIndex]
+        
+        oppName = "\(oppFullName[0]) \(lastLetter)."
+        
+        var data : NSDictionary = ["alert": "\(oppName) is challenging you for another Battle!", "badge":"1", "content-available":"1", "sound":"default"]
+        query.whereKey("channels", equalTo: "gameNotification")
+        
+        if weekBattle["user"].objectId == PFUser.currentUser().objectId {
+            query.whereKey("user", equalTo: weekBattle["user2"])
+        } else {
+            query.whereKey("user", equalTo: weekBattle["user"])
+        }
+        
+        push.setQuery(query)
+        push.setData(data)
+        push.sendPush(nil)
+    }
 }

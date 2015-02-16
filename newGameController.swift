@@ -14,7 +14,7 @@ class newGameController: UIViewController {
 
     var userTurn : Bool = false
     var gameObject : [PFObject] = []
-    var weekBattle : [PFObject] = []
+    var weekBattleObject : [PFObject] = []
     
     var gridDimension : Int = 0
     internal var localGameBoard = Board(dimension: 0)
@@ -50,7 +50,7 @@ class newGameController: UIViewController {
         userBoard = Board(dimension: gridDimension)
         opponentBoard = Board(dimension: gridDimension)
         
-        GameHandler = gameHandler(gameBoardV: gameBoardView, localBoard: localGameBoard, uBoard: userBoard, oppBoard: opponentBoard, gameObj: gameObject, weekB: weekBattle, dimension: gridDimension, submitButton: submitBtn)
+        GameHandler = gameHandler(gameBoardV: gameBoardView, localBoard: localGameBoard, uBoard: userBoard, oppBoard: opponentBoard, gameObj: gameObject, weekB: weekBattleObject, dimension: gridDimension, submitButton: submitBtn)
         
         loadSquaresFromBackEnd()
 
@@ -213,7 +213,7 @@ class newGameController: UIViewController {
         specialUsed = false
     }
     
-    func popViewController() {        
+    func popViewController() {
         self.navigationController?.popViewControllerAnimated(true)
         loadingView().hideActivityIndicatorWhenReturning(self.view)
 
@@ -238,6 +238,61 @@ class newGameController: UIViewController {
         })
     }
     
+    func checkIfTimesUp() {
+        var lastUpdate : NSDate = weekBattleObject[0].updatedAt as NSDate
+        var dateNow = NSDate()
+        
+        if weekBattleObject[0]["battleFinished"] as Bool == true || lastUpdate.dateAtStartOfWeek().dateByAddingDays(1).isEarlierThanDate(dateNow) && weekBattleObject[0]["userOnTurn"].objectId == PFUser.currentUser().objectId {
+            var btns : [UIButton] = []
+
+            if weekBattleObject[0]["user"].objectId == PFUser.currentUser().objectId {
+                btns = weekBattleFinished().openPopup(self, uPoints : weekBattleObject[0]["userPoints"] as Int, oppPoints : weekBattleObject[0]["user2Points"] as Int, oppName: weekBattleObject[0]["user2FullName"] as NSString)
+            } else {
+                btns = weekBattleFinished().openPopup(self, uPoints : weekBattleObject[0]["user2Points"] as Int, oppPoints : weekBattleObject[0]["userPoints"] as Int, oppName: weekBattleObject[0]["userFullName"] as NSString)
+            }
+            
+            btns[0].addTarget(self, action: "yesBtnClicked", forControlEvents: .TouchUpInside)
+            btns[1].addTarget(self, action: "noBtnClicked", forControlEvents: .TouchUpInside)
+        }
+    }
+    
+    func yesBtnClicked() {
+        if weekBattleObject[0]["battleFinished"] as Bool == true {
+            weekBattle.resetWeekBattle(weekBattleObject[0], game: gameObject[0])
+            weekBattleObject[0]["battleFinished"] = false
+        } else {
+            weekBattle.resetGame(3, game: gameObject[0])
+            weekBattleObject[0]["battleFinished"] = true
+            
+            if weekBattleObject[0]["user"].objectId == PFUser.currentUser().objectId {
+                weekBattleObject[0]["userOnTurn"] = weekBattleObject[0]["user2"]
+            } else {
+                weekBattleObject[0]["userOnTurn"] = weekBattleObject[0]["user"]
+            }
+            pushNotificationHandler.restartBattleNotification(weekBattleObject[0])
+        }
+        
+        weekBattleObject[0].saveInBackgroundWithBlock({(succeeded: Bool!, err: NSError!) -> Void in
+            if succeeded != nil {
+                self.gameObject[0].saveEventually()
+                NSNotificationCenter.defaultCenter().postNotificationName("popViewController", object: nil)
+                NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
+            }
+        })
+        
+    }
+    
+    func noBtnClicked() {
+        gameObject[0].deleteEventually()
+        weekBattleObject[0].deleteInBackgroundWithBlock(nil)
+        
+        NSNotificationCenter.defaultCenter().postNotificationName("popViewController", object: nil)
+        NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
+
+        popViewController()
+        
+    }
+    
     func gameFinished(button : UIButton!) {
         GameHandler.gameFinished(button)
     }
@@ -250,5 +305,6 @@ class newGameController: UIViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(true)
         SVProgressHUD.dismiss()
+        checkIfTimesUp()
     }
 }

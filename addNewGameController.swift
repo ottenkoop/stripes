@@ -172,11 +172,8 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
     func checkIfBattleExists(opp: PFUser) -> Bool {
         let predicate = NSPredicate(format: "user = %@ AND user2 = %@ OR user2 = %@ AND user = %@", PFUser.currentUser(), opp, PFUser.currentUser(), opp)
         
-        println(predicate)
         var weekBattleQuery = PFQuery(className:"weekBattle", predicate: predicate)
         var weekBattle = weekBattleQuery.findObjects()
-        
-        println(weekBattle)
         
         if weekBattle.isEmpty {
             return false

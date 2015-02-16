@@ -477,7 +477,7 @@ class gameView {
         return UIButton()
     }
     
-    func updateGameBoardPoints(alreadyScoredSquares : NSArray, newScoredSquaresArray : NSArray) -> [Int] {
+    func updateGameBoardPoints(alreadyScoredSquares : NSArray, newScoredSquaresArray : NSArray, uBoard : Board, oppBoard : Board) -> [Int] {
         var userFullNameArr = []
         var oppFullNameArr = []
 
@@ -498,6 +498,12 @@ class gameView {
             } else {
                 opponentPoints += 1
             }
+            
+            if uBoard.allBelongsToUser(s["rowIndex"] as Int, y: s["squareIndex"] as Int) {
+                userPoints += 1
+            } else if oppBoard.allBelongsToUser(s["rowIndex"] as Int, y: s["squareIndex"] as Int) {
+                opponentPoints += 1
+            }
         }
         
         for square in newScoredSquaresArray {
@@ -506,7 +512,14 @@ class gameView {
             } else {
                 opponentPoints += 1
             }
+
+            if uBoard.allBelongsToUser(square["rowIndex"] as Int, y: square["squareIndex"] as Int) {
+                userPoints += 1
+            } else if oppBoard.allBelongsToUser(square["rowIndex"] as Int, y: square["squareIndex"] as Int) {
+                opponentPoints += 1
+            }
         }
+        
 
         userPointsView.text = "\(userFullNameArr[0]): \(userPoints)"
         opponentPointsView.text = "\(oppFullNameArr[0]): \(opponentPoints)"
