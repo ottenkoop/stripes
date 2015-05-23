@@ -216,23 +216,23 @@ class weekBattleFinished {
         var oppPointsLabel = UILabel()
         
         var userName = ""
-        var userFullName = (PFUser.currentUser()["fullName"] as NSString).componentsSeparatedByString(" ") as NSArray
-        var lastUName = userFullName.lastObject as String
+        var userFullName = (PFUser.currentUser()["fullName"] as! NSString).componentsSeparatedByString(" ") as! NSArray
+        var lastUName = userFullName.lastObject as! String
         var lastULetter = lastUName[lastUName.startIndex]
         
         userName = "\(userFullName[0]) \(lastULetter)."
         
         var opponentName = ""
-        var oppFullName = (oppName as NSString).componentsSeparatedByString(" ") as NSArray
-        var lastName = oppFullName.lastObject as String
+        var oppFullName = (oppName as! NSString).componentsSeparatedByString(" ") as! NSArray
+        var lastName = oppFullName.lastObject as! String
         var lastLetter = lastName[lastName.startIndex]
         
         opponentName = "\(oppFullName[0]) \(lastLetter)."
         
         uNameLabel.text = userName
         oppNameLabel.text = opponentName
-        uPointsLabel.text = String(uPoints) as NSString
-        oppPointsLabel.text = String(oppPoints) as NSString
+        uPointsLabel.text = String(uPoints) as String
+        oppPointsLabel.text = String(oppPoints) as String
         
         uNameLabel.textAlignment = .Center
         oppNameLabel.textAlignment = .Center

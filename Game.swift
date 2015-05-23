@@ -29,8 +29,8 @@ class Game: PFObject {
         game["lastStripe"] = []
         game["finished"] = false
 
-        game.saveInBackgroundWithBlock({(succeeded: Bool!, err: NSError!) -> Void in
-            if succeeded != nil {
+        game.saveInBackgroundWithBlock({(succeeded: Bool, err: NSError!) -> Void in
+            if succeeded {
                 weekBattle.newBattle(game)
             }
         })
@@ -55,7 +55,7 @@ class Game: PFObject {
             game["userBoard"] = opponentBoardArray as [[Int]]
         }
         
-        for square in game["allScoredSquares"] as NSArray {
+        for square in game["allScoredSquares"] as! NSArray {
             newArrayToSave += [square]
         }
         
@@ -86,7 +86,7 @@ class Game: PFObject {
         var opponentUser = PFUser()
         var firstStripe = Bool()
 
-        if game["userBoard"] as NSObject == [] {
+        if game["userBoard"] as! NSObject == [] {
             firstStripe = true
         } else {
             firstStripe = false
@@ -95,11 +95,11 @@ class Game: PFObject {
         if game["user"].objectId == PFUser.currentUser().objectId {
             game["userBoard"] = userBoardArray as [[Int]]
             game["opponentBoard"] = oppBoardArray as [[Int]]
-            opponentUser = game["user2"] as PFUser
+            opponentUser = game["user2"] as! PFUser
         } else {
             game["opponentBoard"] = userBoardArray as [[Int]]
             game["userBoard"] = oppBoardArray as [[Int]]
-            opponentUser = game["user"] as PFUser
+            opponentUser = game["user"] as! PFUser
         }
         
         game["lastStripe"] = [lastStripeObject]
@@ -123,11 +123,11 @@ class Game: PFObject {
             game["lastStripe"] = []
             
             if uWonGame == 1 {
-                var points = weekBattle["userPoints"] as Int
+                var points = weekBattle["userPoints"] as! Int
                 points += 1
                 weekBattle["userPoints"] = points
             } else if uWonGame == 2 {
-                var points = weekBattle["user2Points"] as Int
+                var points = weekBattle["user2Points"] as! Int
                 points += 1
                 weekBattle["user2Points"] = points
             }
@@ -138,11 +138,11 @@ class Game: PFObject {
             game["lastStripe"] = []
             
             if uWonGame == 1 {
-                var points = weekBattle["user2Points"] as Int
+                var points = weekBattle["user2Points"] as! Int
                 points += 1
                 weekBattle["user2Points"] = points
             } else if uWonGame == 2 {
-                var points = weekBattle["userPoints"] as Int
+                var points = weekBattle["userPoints"] as! Int
                 points += 1
                 weekBattle["userPoints"] = points
             }
@@ -150,5 +150,20 @@ class Game: PFObject {
         
         game.saveInBackgroundWithBlock(nil)
         return weekBattle
+    }
+    
+    class func currentGame() -> PFObject {
+        var currentGame = getCurrentGame()
+        
+        return currentGame["object"] as! PFObject
+    }
+    
+    class func getCurrentGame() -> PFObject {
+        var query = PFQuery(className: "currentGame")
+        query.fromLocalDatastore()
+
+        var cG = query.getFirstObject()
+        
+        return cG
     }
 }

@@ -82,19 +82,19 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
                 (connection : FBRequestConnection!, result : AnyObject!, error : NSError!) -> Void in
                 
                 if error == nil {
-                    var friendObjects : NSArray = result.objectForKey("data") as NSArray
+                    var friendObjects : NSArray = result.objectForKey("data") as! NSArray
                     var friendIds : NSMutableArray = NSMutableArray(capacity: friendObjects.count)
                     
-                    for friendObject in friendObjects as [NSDictionary] {
+                    for friendObject in friendObjects as! [NSDictionary] {
                         friendIds.addObject(friendObject.objectForKey("id")!)
                     }
                     
                     var friendQuery : PFQuery = PFUser.query()
-                    friendQuery.whereKey("fbId", containedIn: friendIds)
+                    friendQuery.whereKey("fbId", containedIn: friendIds as [AnyObject])
                     
                     var friendUsers = friendQuery.findObjects()
                     
-                    self.allFriends = friendUsers as NSArray
+                    self.allFriends = friendUsers as [AnyObject]
                     self.friendTableView.reloadData()
                     
                     SVProgressHUD.dismiss()
@@ -148,7 +148,7 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
         }
         
         var user : AnyObject = allFriends[Int(indexPath.row)]
-        cell!.textLabel?.text = String(user["fullName"] as NSString)
+        cell!.textLabel?.text = String(user["fullName"] as! NSString)
     
         return cell!
     }
@@ -156,7 +156,7 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         SVProgressHUD.show()
 
-        var opponent : PFUser = allFriends[Int(indexPath.row)] as PFUser
+        var opponent : PFUser = allFriends[Int(indexPath.row)] as! PFUser
         var battleExists = checkIfBattleExists(opponent)
         
         if battleExists {

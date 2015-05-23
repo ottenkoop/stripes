@@ -8,12 +8,12 @@
 
 import Foundation
 
-class newGameController: UIViewController {
-    private var gameBoardView = gameView(gameControl: UIViewController(), dimension: 0, gameObj: [AnyObject]())
-    private var GameHandler = gameHandler(gameBoardV: gameView(gameControl: UIViewController(), dimension: 0, gameObj: [AnyObject]()), localBoard: Board(dimension: 0), uBoard: Board(dimension: 0), oppBoard: Board(dimension: 0), gameObj: [AnyObject](), weekB: [AnyObject](), dimension: 0, submitButton: UIButton())
+class gameEngineController: UIViewController {
+    private var gameBoardView = gameView(gameControl: UIViewController())
+    private var GameHandler = gameHandler(gameBoardV: gameView(gameControl: UIViewController()), localBoard: Board(dimension: 0), uBoard: Board(dimension: 0), oppBoard: Board(dimension: 0), weekB: [AnyObject](), dimension: 0, submitButton: UIButton())
 
-    var userTurn : Bool = false
-    var gameObject : [PFObject] = []
+    var userTurn = false
+    var gameObject = PFObject(className: "currentGame")
     var weekBattleObject : [PFObject] = []
     
     var gridDimension : Int = 0
@@ -32,14 +32,20 @@ class newGameController: UIViewController {
     override func viewDidLoad() {
         self.view.backgroundColor = UIColor(patternImage: UIImage(named: "gameBackground")!)
 
+        setCurrentGameVariables()
         addObservers()
-        gridDimension = gameObject[0]["grid"] as Int
-        gameBoardView = gameView(gameControl: self, dimension: gridDimension, gameObj: gameObject)
+        gameBoardView = gameView(gameControl: self)
         
         buildGame()
         addSubmitBtn()
         addSpecialsBtn()
         GameHandler.checkifGameIsFinished()
+    }
+    
+    func setCurrentGameVariables() {
+        gameObject = Game.currentGame()
+        gridDimension = gameObject["grid"] as! Int
+        
     }
     
     func buildGame() {
@@ -50,7 +56,7 @@ class newGameController: UIViewController {
         userBoard = Board(dimension: gridDimension)
         opponentBoard = Board(dimension: gridDimension)
         
-        GameHandler = gameHandler(gameBoardV: gameBoardView, localBoard: localGameBoard, uBoard: userBoard, oppBoard: opponentBoard, gameObj: gameObject, weekB: weekBattleObject, dimension: gridDimension, submitButton: submitBtn)
+        GameHandler = gameHandler(gameBoardV: gameBoardView, localBoard: localGameBoard, uBoard: userBoard, oppBoard: opponentBoard, weekB: weekBattleObject, dimension: gridDimension, submitButton: submitBtn)
         
         loadSquaresFromBackEnd()
 
@@ -61,18 +67,18 @@ class newGameController: UIViewController {
         loadScoredSquares()
         selectLastPlayedStripe()
     }
-    
+
     func loadSquaresFromBackEnd() {
-        if gameObject[0]["user"].objectId == PFUser.currentUser().objectId {
-            userBoard.loadSquareFromBackend(gameObject[0]["userBoard"] as [[Int]])
-            opponentBoard.loadSquareFromBackend(gameObject[0]["opponentBoard"] as [[Int]])
+        if gameObject["user"].objectId == PFUser.currentUser().objectId {
+            userBoard.loadSquareFromBackend(gameObject["userBoard"] as! [[Int]])
+            opponentBoard.loadSquareFromBackend(gameObject["opponentBoard"] as! [[Int]])
         } else {
-            userBoard.loadSquareFromBackend(gameObject[0]["opponentBoard"] as [[Int]])
-            opponentBoard.loadSquareFromBackend(gameObject[0]["userBoard"] as [[Int]])
+            userBoard.loadSquareFromBackend(gameObject["opponentBoard"] as! [[Int]])
+            opponentBoard.loadSquareFromBackend(gameObject["userBoard"] as! [[Int]])
         }
         
-        localGameBoard.loadSquareFromBackend(gameObject[0]["userBoard"] as [[Int]])
-        localGameBoard.loadSquareFromBackend(gameObject[0]["opponentBoard"] as [[Int]])
+        localGameBoard.loadSquareFromBackend(gameObject["userBoard"] as! [[Int]])
+        localGameBoard.loadSquareFromBackend(gameObject["opponentBoard"] as! [[Int]])
     }
     
     func loadScoredSquares () {
@@ -83,7 +89,7 @@ class newGameController: UIViewController {
         gameBoardView.addRow(rowIndex)
         
         for (squareIndex, square) in enumerate(row) {
-            addSquare(rowIndex, squareIndex: squareIndex, square: square as Square)
+            addSquare(rowIndex, squareIndex: squareIndex, square: square as! Square)
         }
     }
     
@@ -242,13 +248,13 @@ class newGameController: UIViewController {
         var lastUpdate : NSDate = weekBattleObject[0].updatedAt as NSDate
         var dateNow = NSDate()
         
-        if weekBattleObject[0]["battleFinished"] as Bool == true || lastUpdate.dateAtStartOfWeek().dateByAddingDays(1).isEarlierThanDate(dateNow) && weekBattleObject[0]["userOnTurn"].objectId == PFUser.currentUser().objectId {
+        if weekBattleObject[0]["battleFinished"] as! Bool == true || lastUpdate.dateAtStartOfWeek().dateByAddingDays(1).isEarlierThanDate(dateNow) && weekBattleObject[0]["userOnTurn"].objectId == PFUser.currentUser().objectId {
             var btns : [UIButton] = []
 
             if weekBattleObject[0]["user"].objectId == PFUser.currentUser().objectId {
-                btns = weekBattleFinished().openPopup(self, uPoints : weekBattleObject[0]["userPoints"] as Int, oppPoints : weekBattleObject[0]["user2Points"] as Int, oppName: weekBattleObject[0]["user2FullName"] as NSString)
+                btns = weekBattleFinished().openPopup(self, uPoints : weekBattleObject[0]["userPoints"] as! Int, oppPoints : weekBattleObject[0]["user2Points"] as! Int, oppName: weekBattleObject[0]["user2FullName"] as! NSString)
             } else {
-                btns = weekBattleFinished().openPopup(self, uPoints : weekBattleObject[0]["user2Points"] as Int, oppPoints : weekBattleObject[0]["userPoints"] as Int, oppName: weekBattleObject[0]["userFullName"] as NSString)
+                btns = weekBattleFinished().openPopup(self, uPoints : weekBattleObject[0]["user2Points"] as! Int, oppPoints : weekBattleObject[0]["userPoints"] as! Int, oppName: weekBattleObject[0]["userFullName"] as! NSString)
             }
             
             btns[0].addTarget(self, action: "yesBtnClicked", forControlEvents: .TouchUpInside)
@@ -257,11 +263,11 @@ class newGameController: UIViewController {
     }
     
     func yesBtnClicked() {
-        if weekBattleObject[0]["battleFinished"] as Bool == true {
-            weekBattle.resetWeekBattle(weekBattleObject[0], game: gameObject[0])
+        if weekBattleObject[0]["battleFinished"] as! Bool == true {
+            weekBattle.resetWeekBattle(weekBattleObject[0], game: gameObject)
             weekBattleObject[0]["battleFinished"] = false
         } else {
-            weekBattle.resetGame(3, game: gameObject[0])
+            weekBattle.resetGame(3, game: gameObject)
             weekBattleObject[0]["battleFinished"] = true
             
             if weekBattleObject[0]["user"].objectId == PFUser.currentUser().objectId {
@@ -272,9 +278,9 @@ class newGameController: UIViewController {
             pushNotificationHandler.restartBattleNotification(weekBattleObject[0])
         }
         
-        weekBattleObject[0].saveInBackgroundWithBlock({(succeeded: Bool!, err: NSError!) -> Void in
-            if succeeded != nil {
-                self.gameObject[0].saveEventually()
+        weekBattleObject[0].saveInBackgroundWithBlock({(succeeded: Bool, err: NSError!) -> Void in
+            if succeeded {
+                self.gameObject.saveEventually()
                 NSNotificationCenter.defaultCenter().postNotificationName("popViewController", object: nil)
                 NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
             }
@@ -283,7 +289,7 @@ class newGameController: UIViewController {
     }
     
     func noBtnClicked() {
-        gameObject[0].deleteEventually()
+        gameObject.deleteEventually()
         weekBattleObject[0].deleteInBackgroundWithBlock(nil)
         
         NSNotificationCenter.defaultCenter().postNotificationName("popViewController", object: nil)

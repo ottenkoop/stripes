@@ -17,7 +17,7 @@ class User: PFObject {
             if error == nil {
                 PFUser.currentUser().setObject(result.name, forKey: "fullName")
                 PFUser.currentUser().saveInBackgroundWithBlock ({
-                    (succeeded: Bool!, err: NSError!) -> Void in
+                    (succeeded: Bool, err: NSError!) -> Void in
                     println(err)
                 })
             }

@@ -15,8 +15,8 @@ class pushNotificationHandler: PFObject {
         var push = PFPush()
         
         var oppName = ""
-        var oppFullName = (PFUser.currentUser()["fullName"] as NSString).componentsSeparatedByString(" ") as NSArray
-        var lastName = oppFullName.lastObject as String
+        var oppFullName = (PFUser.currentUser()["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
+        var lastName = oppFullName.lastObject as! String
         var lastLetter = lastName[lastName.startIndex]
         
         oppName = "\(oppFullName[0]) \(lastLetter)."
@@ -27,7 +27,7 @@ class pushNotificationHandler: PFObject {
         query.whereKey("user", equalTo: opponent)
         
         push.setQuery(query)
-        push.setData(data)
+        push.setData(data as [NSObject : AnyObject])
         push.sendPush(nil)
     }
     
@@ -36,8 +36,8 @@ class pushNotificationHandler: PFObject {
         var push = PFPush()
         
         var oppName = ""
-        var oppFullName = (PFUser.currentUser()["fullName"] as NSString).componentsSeparatedByString(" ") as NSArray
-        var lastName = oppFullName.lastObject as String
+        var oppFullName = (PFUser.currentUser()["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
+        var lastName = oppFullName.lastObject as! String
         var lastLetter = lastName[lastName.startIndex]
         
         oppName = "\(oppFullName[0]) \(lastLetter)."
@@ -48,7 +48,7 @@ class pushNotificationHandler: PFObject {
         query.whereKey("user", equalTo: user)
         
         push.setQuery(query)
-        push.setData(data)
+        push.setData(data as [NSObject : AnyObject])
         push.sendPush(nil)
     }
     
@@ -56,8 +56,8 @@ class pushNotificationHandler: PFObject {
         var push = PFPush()
         var query = PFInstallation.query()
         var oppName = ""
-        var oppFullName = (PFUser.currentUser()["fullName"] as NSString).componentsSeparatedByString(" ") as NSArray
-        var lastName = oppFullName.lastObject as String
+        var oppFullName = (PFUser.currentUser()["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
+        var lastName = oppFullName.lastObject as! String
         var lastLetter = lastName[lastName.startIndex]
         
         oppName = "\(oppFullName[0]) \(lastLetter)."
@@ -73,7 +73,7 @@ class pushNotificationHandler: PFObject {
         }
         
         push.setQuery(query)
-        push.setData(data)
+        push.setData(data as [NSObject : AnyObject])
         push.sendPush(nil)
     }
     
@@ -91,7 +91,7 @@ class pushNotificationHandler: PFObject {
         }
         
         push.setQuery(query)
-        push.setData(data)
+        push.setData(data as [NSObject : AnyObject])
         push.sendPush(nil)
     }
     
@@ -100,8 +100,8 @@ class pushNotificationHandler: PFObject {
         var query = PFInstallation.query()
         
         var oppName = ""
-        var oppFullName = (PFUser.currentUser()["fullName"] as NSString).componentsSeparatedByString(" ") as NSArray
-        var lastName = oppFullName.lastObject as String
+        var oppFullName = (PFUser.currentUser()["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
+        var lastName = oppFullName.lastObject as! String
         var lastLetter = lastName[lastName.startIndex]
         
         oppName = "\(oppFullName[0]) \(lastLetter)."
@@ -116,7 +116,7 @@ class pushNotificationHandler: PFObject {
         }
         
         push.setQuery(query)
-        push.setData(data)
+        push.setData(data as [NSObject : AnyObject])
         push.sendPush(nil)
     }
 }

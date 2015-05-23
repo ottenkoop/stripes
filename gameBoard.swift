@@ -109,7 +109,7 @@ class Board {
         
         for (index, b) in enumerate(board) {
             var row : [Int] = []
-            
+
             for s in b {
                 row.append (Int(s.content))
             }

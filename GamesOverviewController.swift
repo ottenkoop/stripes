@@ -162,10 +162,10 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         var minuteTimerString = NSMutableAttributedString()
         var secondsTimerString = NSMutableAttributedString()
         
-        dayTimerString = NSMutableAttributedString(string: dayString, attributes: [NSFontAttributeName:UIFont(name: "HanziPen SC", size: 18.0)!])
-        hourTimerString = NSMutableAttributedString(string: hourString, attributes: [NSFontAttributeName:UIFont(name: "HanziPen SC", size: 18.0)!])
-        minuteTimerString = NSMutableAttributedString(string: minuteString, attributes: [NSFontAttributeName:UIFont(name: "HanziPen SC", size: 18.0)!])
-        secondsTimerString = NSMutableAttributedString(string: secondsString, attributes: [NSFontAttributeName:UIFont(name: "HanziPen SC", size: 18.0)!])
+        dayTimerString = NSMutableAttributedString(string: dayString as String, attributes: [NSFontAttributeName:UIFont(name: "HanziPen SC", size: 18.0)!])
+        hourTimerString = NSMutableAttributedString(string: hourString as String, attributes: [NSFontAttributeName:UIFont(name: "HanziPen SC", size: 18.0)!])
+        minuteTimerString = NSMutableAttributedString(string: minuteString as String, attributes: [NSFontAttributeName:UIFont(name: "HanziPen SC", size: 18.0)!])
+        secondsTimerString = NSMutableAttributedString(string: secondsString as String, attributes: [NSFontAttributeName:UIFont(name: "HanziPen SC", size: 18.0)!])
 
         // style the label.
         styleTimerString(dayTimerString, stringLength: dayString.length, attributeLength: 4)
@@ -255,7 +255,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
-    func tableView(tableView: UITableView!, titleForHeaderInSection section: Int) -> String! {
+    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch section {
         case 0:
             return "Your Turn"
@@ -266,11 +266,11 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
-    func tableView(tableView: UITableView!, heightForHeaderInSection section: Int) -> CGFloat {
+    func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 30
     }
     
-    func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView! {
+    func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let label = UILabel(frame: CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 50))
         label.textAlignment = NSTextAlignment.Center
 
@@ -329,17 +329,17 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         var oppFullName = []
         
         if weekBattle["user"].objectId == PFUser.currentUser().objectId {
-            uPoints = weekBattle["userPoints"] as Int
-            oppPoints = weekBattle["user2Points"] as Int
-            oppFullName = (weekBattle["user2FullName"] as NSString).componentsSeparatedByString(" ")
+            uPoints = weekBattle["userPoints"] as! Int
+            oppPoints = weekBattle["user2Points"] as! Int
+            oppFullName = (weekBattle["user2FullName"] as! NSString).componentsSeparatedByString(" ")
         } else {
-            oppPoints = weekBattle["userPoints"] as Int
-            uPoints = weekBattle["user2Points"] as Int
-            oppFullName = (weekBattle["userFullName"] as NSString).componentsSeparatedByString(" ")
+            oppPoints = weekBattle["userPoints"] as! Int
+            uPoints = weekBattle["user2Points"] as! Int
+            oppFullName = (weekBattle["userFullName"] as! NSString).componentsSeparatedByString(" ")
         }
 
         if oppFullName.count > 1 {
-            var lastName = oppFullName.lastObject as String
+            var lastName = oppFullName.lastObject as! String
             var lastLetter = lastName[lastName.startIndex]
             
             oppName.text = "\(oppFullName[0]) \(lastLetter)."
@@ -396,7 +396,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
                 self.gamesWithUserTurn = []
                 self.gamesWithOpponentTurn = []
                 
-                for object in objects as [PFObject] {
+                for object in objects as! [PFObject] {
                     if object["userOnTurn"].objectId == PFUser.currentUser().objectId {
                         self.gamesWithUserTurn += [object]
                     } else {
@@ -425,13 +425,18 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         gameQuery.findObjectsInBackgroundWithBlock {
             (objects: [AnyObject]!, error: NSError!) -> Void in
             if error == nil {
-                let gameEngineController = newGameController()
-                var game : PFObject = objects[0] as PFObject
+                var game : PFObject = objects[0] as! PFObject
+                let currentGame = PFObject(className: "currentGame")
+                currentGame["object"] = game
+                currentGame.pinInBackgroundWithBlock(nil)
                 
-                gameEngineController.gameObject = [game]
-                gameEngineController.weekBattleObject = [weekBattle]
-                gameEngineController.userTurn = userTurn
-                self.navigationController!.pushViewController(gameEngineController, animated: true)
+                var gC = gameEngineController()
+                gC.weekBattleObject = [weekBattle]
+                
+                let dC = demoController()
+                
+                self.navigationController!.pushViewController(gC, animated: true)
+                
                 loadingView().hideActivityIndicatorWhenReturning(containerToRemove)
             }
         }
@@ -444,11 +449,13 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         setBadgeNumber()
         SVProgressHUD.dismiss()
         
+        PFObject.unpinAllObjects()
+        
         navigationItem.leftBarButtonItem?.enabled = true
         navigationItem.rightBarButtonItem?.enabled = true
     }
     
-    func tableView(tableView: UITableView!, editActionsForRowAtIndexPath indexPath: NSIndexPath!) -> [AnyObject]! {
+    func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [AnyObject]? {
         var deleteAction = UITableViewRowAction(style: .Default, title: "Resign") { (action, indexPath) -> Void in
             tableView.editing = true
             
@@ -477,7 +484,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         return [deleteAction]
     }
     
-    func tableView(tableView: UITableView!, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath!) {
+    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
     }
     
     func setBadgeNumber () {
@@ -512,9 +519,9 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func openSettings() {
-        let settingsV = settingsView()
+//        let settingsV = settingsView()
         
-        navigationController!.pushViewController(settingsV, animated: true)
+//        navigationController!.pushViewController(settingsV, animated: true)
     }
     
     func newGame() {
@@ -563,7 +570,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         } else {
             var int = Int(arc4random_uniform(UInt32(usersLookingForGame.count)))
             
-            var opponent = usersLookingForGame[int] as PFUser
+            var opponent = usersLookingForGame[int] as! PFUser
             
             Game.addGame(opponent, grid: 3)
             

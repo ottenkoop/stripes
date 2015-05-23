@@ -9,7 +9,7 @@
 import Foundation
 
 class gameHandler {
-    private var gameBoardView = gameView(gameControl: UIViewController(), dimension: 0, gameObj: [AnyObject]())
+    private var gameBoardView = gameView(gameControl: UIViewController())
     
     private var submitBtn = UIButton()
     
@@ -17,18 +17,18 @@ class gameHandler {
     var userBoard = Board(dimension: 0)
     var opponentBoard = Board(dimension: 0)
     
-    var gameObject : [PFObject] = []
+    var gameObject : PFObject = PFObject(className: "currentGame")
     var weekBattleObject : [PFObject] = []
     var gridDimension : Int = 0
     
-    init (gameBoardV: gameView, localBoard : Board, uBoard : Board, oppBoard : Board, gameObj : [AnyObject], weekB : [AnyObject], dimension : Int, submitButton : UIButton) {
+    init (gameBoardV: gameView, localBoard : Board, uBoard : Board, oppBoard : Board, weekB : [AnyObject], dimension : Int, submitButton : UIButton) {
         gameBoardView = gameBoardV
         
         localGameBoard = localBoard
         userBoard = uBoard
         opponentBoard = oppBoard
-        gameObject = gameObj as [PFObject]
-        weekBattleObject = weekB as [PFObject]
+        gameObject = Game.currentGame()
+        weekBattleObject = weekB as! [PFObject]
         
         gridDimension = dimension
         submitBtn = submitButton
@@ -49,15 +49,15 @@ class gameHandler {
             if specialUsed {
                 square.subviews[4].removeFromSuperview()
 
-                var squaresBackend = gameObject[0]["allScoredSquares"] as [[String:AnyObject]]
+                var squaresBackend = gameObject["allScoredSquares"] as! [[String:AnyObject]]
                 
                 for (index,scoredSquare) in enumerate(squaresBackend) {
-                    if scoredSquare["rowIndex"] as Int == square.superview!.tag && scoredSquare["squareIndex"] as Int == square.tag {
+                    if scoredSquare["rowIndex"] as! Int == square.superview!.tag && scoredSquare["squareIndex"] as! Int == square.tag {
                         squaresBackend.removeAtIndex(index)
                     }
                 }
              
-                gameObject[0]["allScoredSquares"] = squaresBackend
+                gameObject["allScoredSquares"] = squaresBackend
             }
             
             
@@ -80,27 +80,25 @@ class gameHandler {
         if specialUsed {
             opponentBoard.removeStripe(rowIndex, y: squareIndex, stripe: gameBoardView.position[stripeToSubmit]!)
             
-            if (gameObject[0]["user"] as PFUser).objectId == PFUser.currentUser().objectId {
-                var specialsLeft = gameObject[0]["userSpecialsLeft"] as Int
+            if (gameObject["user"] as! PFUser).objectId == PFUser.currentUser().objectId {
+                var specialsLeft = gameObject["userSpecialsLeft"] as! Int
                 specialsLeft -= 1
-                gameObject[0]["userSpecialsLeft"] = specialsLeft
+                gameObject["userSpecialsLeft"] = specialsLeft
             } else {
-                var specialsLeft = gameObject[0]["opponentSpecialsLeft"] as Int
+                var specialsLeft = gameObject["opponentSpecialsLeft"] as! Int
                 specialsLeft -= 1
-                gameObject[0]["opponentSpecialsLeft"] = specialsLeft
+                gameObject["opponentSpecialsLeft"] = specialsLeft
             }
         }
         
-        var pointsArray = gameBoardView.updateGameBoardPoints(gameObject[0]["allScoredSquares"] as NSArray, newScoredSquaresArray: squareObjects, uBoard : userBoard, oppBoard: opponentBoard)
+        var pointsArray = gameBoardView.updateGameBoardPoints(gameObject["allScoredSquares"] as! [AnyObject], newScoredSquaresArray: squareObjects, uBoard : userBoard, oppBoard: opponentBoard)
         
-        var gameToSave = Game.saveSquare(gameObject[0], squaresArray: squareObjects, userPoints: pointsArray[0], oppPoints: pointsArray[1], userBoard: userBoard, oppBoard: opponentBoard)
+        var gameToSave = Game.saveSquare(gameObject, squaresArray: squareObjects, userPoints: pointsArray[0], oppPoints: pointsArray[1], userBoard: userBoard, oppBoard: opponentBoard)
         
-        gameToSave.saveInBackgroundWithBlock({(succeeded: Bool!, err: NSError!) -> Void in
-            if succeeded != nil {
+        gameToSave.saveInBackgroundWithBlock({(succeeded: Bool, err: NSError!) -> Void in
+            if succeeded {
                 self.gameBoardView.removeStylingWhenSubmit(stripeToSubmit, points: squareObjects.count)
-                
                 self.checkifGameIsFinished()
-                
             }
         })
     }
@@ -119,21 +117,21 @@ class gameHandler {
                 opponentBoard.removeStripe(doubleStripeToSubmit.superview!.superview!.tag, y: doubleStripeToSubmit.superview!.tag, stripe: gameBoardView.position[doubleStripeToSubmit]!)
             }
             
-            if (gameObject[0]["user"] as PFUser).objectId == PFUser.currentUser().objectId {
-                var specialsLeft = gameObject[0]["userSpecialsLeft"] as Int
+            if (gameObject["user"] as! PFUser).objectId == PFUser.currentUser().objectId {
+                var specialsLeft = gameObject["userSpecialsLeft"] as! Int
                 specialsLeft -= 1
-                gameObject[0]["userSpecialsLeft"] = specialsLeft
+                gameObject["userSpecialsLeft"] = specialsLeft
             } else {
-                var specialsLeft = gameObject[0]["opponentSpecialsLeft"] as Int
+                var specialsLeft = gameObject["opponentSpecialsLeft"] as! Int
                 specialsLeft -= 1
-                gameObject[0]["opponentSpecialsLeft"] = specialsLeft
+                gameObject["opponentSpecialsLeft"] = specialsLeft
             }
         }
         
-        var gameToSave = Game.updateUserGameBoardAndSwitchUserTurn(gameObject[0], weekBattle: weekBattleObject[0], userBoard: userBoard, oppBoard: opponentBoard, lastStripe: stripeToSubmit)
+        var gameToSave = Game.updateUserGameBoardAndSwitchUserTurn(gameObject, weekBattle: weekBattleObject[0], userBoard: userBoard, oppBoard: opponentBoard, lastStripe: stripeToSubmit)
         
-        gameToSave.saveInBackgroundWithBlock({(succeeded: Bool!, err: NSError!) -> Void in
-            if succeeded != nil {
+        gameToSave.saveInBackgroundWithBlock({(succeeded: Bool, err: NSError!) -> Void in
+            if succeeded {
                 NSNotificationCenter.defaultCenter().postNotificationName("popViewController", object: nil)
                 NSNotificationCenter.defaultCenter().postNotificationName("deleteObjectFromYourTurnSection", object: nil)
             }
@@ -148,14 +146,14 @@ class gameHandler {
     }
     
     func gameFinished(button : UIButton!) {
-        if gameObject[0]["finished"] as Bool == true {
+        if gameObject["finished"] as! Bool == true {
             var nextGrid = [3, 4]
-            nextGrid.remove(gameObject[0]["grid"] as Int)
+            nextGrid.remove(gameObject["grid"] as! Int)
 
-            weekBattle.resetGame(nextGrid[0] as Int, game: gameObject[0])
+            weekBattle.resetGame(nextGrid[0] as Int, game: gameObject)
             
-            gameObject[0].saveInBackgroundWithBlock({(succeeded: Bool!, err: NSError!) -> Void in
-                if succeeded != nil {
+            gameObject.saveInBackgroundWithBlock({(succeeded: Bool, err: NSError!) -> Void in
+                if succeeded {
                     NSNotificationCenter.defaultCenter().postNotificationName("popViewController", object: nil)
                     NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
                 }
@@ -163,9 +161,9 @@ class gameHandler {
             
         } else {
             var oppName = ""
-            var oppFullName = (PFUser.currentUser()["fullName"] as NSString).componentsSeparatedByString(" ") as NSArray
+            var oppFullName = (PFUser.currentUser()["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
             
-            var lastName = oppFullName.lastObject as String
+            var lastName = oppFullName.lastObject as! String
             var lastLetter = lastName[lastName.startIndex]
             
             oppName = "\(oppFullName[0]) \(lastLetter)."
@@ -173,21 +171,21 @@ class gameHandler {
             var userWonGame : Int = 0
 
             if button.tag == 1 {
-                pushNotificationHandler.gameFinishedNotification(gameObject[0], content: "You lost against \(oppName)! :( Try again.")
+                pushNotificationHandler.gameFinishedNotification(gameObject, content: "You lost against \(oppName)! :( Try again.")
                 userWonGame = 1
             } else if button.tag == 2 {
-                pushNotificationHandler.gameFinishedNotification(gameObject[0], content: "You won against \(oppName)! Good job!")
+                pushNotificationHandler.gameFinishedNotification(gameObject, content: "You won against \(oppName)! Good job!")
                 userWonGame = 2
             } else {
-                pushNotificationHandler.gameFinishedNotification(gameObject[0], content: "It's a draw against \(oppName)! At least you didn't lose.")
+                pushNotificationHandler.gameFinishedNotification(gameObject, content: "It's a draw against \(oppName)! At least you didn't lose.")
                 userWonGame = 0
             }
             
             weekBattleObject[0].saveInBackgroundWithBlock(nil)
-            var gameToSave = Game.gameFinished(gameObject[0], weekBattle: weekBattleObject[0], uWonGame: userWonGame)
+            var gameToSave = Game.gameFinished(gameObject, weekBattle: weekBattleObject[0], uWonGame: userWonGame)
             
-            gameToSave.saveInBackgroundWithBlock({(succeeded: Bool!, err: NSError!) -> Void in
-                if succeeded != nil {
+            gameToSave.saveInBackgroundWithBlock({(succeeded: Bool, err: NSError!) -> Void in
+                if succeeded {
                     NSNotificationCenter.defaultCenter().postNotificationName("deleteObjectFromYourTurnSection", object: nil)
                     NSNotificationCenter.defaultCenter().postNotificationName("popViewController", object: nil)
                 }

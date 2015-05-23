@@ -42,7 +42,7 @@ class newGamePopup {
         // first el always 1btn, etc..
         buttonArray = [faceBookFriend, userSearch, randomOpp, cancelBtn]
         
-        buttonArea.spaceViews(buttonsToSpace, onAxis: .Vertical)
+        buttonArea.spaceViews(buttonsToSpace as! [AnyObject], onAxis: .Vertical)
         
         return buttonArray
     }

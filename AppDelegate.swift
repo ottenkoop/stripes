@@ -16,24 +16,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var navigationController : navController?
     var loginController : LoginViewController?
     var gamesOverviewController : GameOverviewController?
-//    var gameEngineController: GameEngineController?
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         loginController = LoginViewController()
-//        gameEngineController = GameEngineController()
         gamesOverviewController = GameOverviewController()
         navigationController = navController()
         
         ParseCrashReporting.enable()
+        Parse.enableLocalDatastore()
         Parse.setApplicationId("Rfb6FpX2ewMytcvOLIHjsZs2faNMSTMBMZCz3BUo", clientKey: "Dk5u1t8oQwTUNyOKDPSSMtjjAB74g3TGkw6EJWyR")
         
         PFFacebookUtils.initializeFacebook()
         PFAnalytics.trackAppOpenedWithLaunchOptionsInBackground(launchOptions, block: nil)
-
-        BITHockeyManager.sharedHockeyManager().configureWithIdentifier("0ca020e3c03e6f1f569fd4201ad5a1be")
-        BITHockeyManager.sharedHockeyManager().startManager()
-        BITHockeyManager.sharedHockeyManager().authenticator.authenticateInstallation()
-        BITHockeyManager.sharedHockeyManager().testIdentifier()
+//
+//        BITHockeyManager.sharedHockeyManager().configureWithIdentifier("0ca020e3c03e6f1f569fd4201ad5a1be")
+//        BITHockeyManager.sharedHockeyManager().startManager()
+//        BITHockeyManager.sharedHockeyManager().authenticator.authenticateInstallation()
+//        BITHockeyManager.sharedHockeyManager().testIdentifier()
         
         registerForRemoteNotification()
         
@@ -66,11 +65,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
-    func application(application: UIApplication!, didRegisterUserNotificationSettings notificationSettings: UIUserNotificationSettings!) {
+    func application(application: UIApplication, didRegisterUserNotificationSettings notificationSettings: UIUserNotificationSettings) {
         UIApplication.sharedApplication().registerForRemoteNotifications()
     }
     
-    func application(application: UIApplication!, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData!) {
+    func application(application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData) {
         let currentInstallation : PFInstallation = PFInstallation.currentInstallation()
         
         currentInstallation.setDeviceTokenFromData(deviceToken)
@@ -81,32 +80,53 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         currentInstallation.saveInBackgroundWithBlock {
-            (success: Bool!, error: NSError!) -> Void in
+            (success: Bool, error: NSError!) -> Void in
             
             println(error)
         }
     }
     
-    func application(application: UIApplication!, didFailToRegisterForRemoteNotificationsWithError error: NSError!) {
+    func application(application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: NSError) {
         println(error.localizedDescription)
     }
+
+    //    func application(application: UIApplication,
+//        didReceiveRemoteNotification userInfo: [NSObject : AnyObject],
+//        fetchCompletionHandler completionHandler: (UIBackgroundFetchResult) -> Void) {
+//            if let photoId: String = userInfo["p"] as? String {
+//                let targetPhoto = PFObject(withoutDataWithClassName: "Photo", objectId: photoId)
+//                targetPhoto.fetchIfNeededInBackgroundWithBlock({ (object: PFObject!, error: NSError!) -> Void in
+//                    // Show photo view controller
+//                    if error != nil {
+//                        completionHandler(UIBackgroundFetchResult.Failed)
+//                    } else if PFUser.currentUser() != nil {
+//                        let viewController = PhotoVC(withPhoto: object)
+//                        self.navController.pushViewController(viewController, animated: true)
+//                        completionHandler(UIBackgroundFetchResult.NewData)
+//                    } else {
+//                        completionHandler(UIBackgroundFetchResult.NoData)
+//                    }
+//                })
+//            }
+//            handler(UIBackgroundFetchResult.NoData)
+//    }
     
-    func application(application: UIApplication!, didReceiveRemoteNotification userInfo:NSDictionary!) {
+    func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
         
-        var notification:NSDictionary = userInfo.objectForKey("aps") as NSDictionary
+        var notification:NSDictionary = userInfo["aps"] as! NSDictionary
         
         if (notification.objectForKey("content-available") != nil) {
-            if notification.objectForKey("content-available") as Int == 1 {
+            if notification.objectForKey("content-available") as! Int == 1 {
                 NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
-//                NSNotificationCenter.defaultCenter().postNotificationName("resetLookingForGame", object: nil)
+                //                NSNotificationCenter.defaultCenter().postNotificationName("resetLookingForGame", object: nil)
             }
         } else {
             PFPush.handlePush(userInfo)
         }
+
     }
     
-    
-    func application(application: UIApplication, openURL url: NSURL, sourceApplication: NSString?, annotation: AnyObject) -> Bool {
+    func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject?) -> Bool {
         return FBAppCall.handleOpenURL(url, sourceApplication:sourceApplication, withSession:PFFacebookUtils.session())
     }
     

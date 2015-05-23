@@ -13,7 +13,7 @@ class gameView {
     private var gameController = UIViewController()
     private var gameBoardView = UIView()
     private var gridDimension = 0
-    private var gameObject : [AnyObject] = []
+    private var currentGame = PFObject(className: "currentGame")
     private var loadingContainer = UIView()
     
     let screenWidth : CGFloat = UIScreen.mainScreen().bounds.size.width
@@ -33,10 +33,10 @@ class gameView {
     
     var position = [UIButton: StripeType]()
     
-    init (gameControl : UIViewController, dimension : Int, gameObj : [AnyObject]) {
+    init (gameControl : UIViewController) {
         gameController = gameControl
-        gameObject = gameObj
-        gridDimension = dimension
+        gridDimension = Game.currentGame()["grid"] as! Int
+        currentGame = Game.currentGame()
     }
 
     func addGameBoard() {
@@ -65,22 +65,23 @@ class gameView {
             gameBoardView.constrainToSize(CGSizeMake(gameBoardViewWidth, gameBoardViewHeight))
             gameBoardView.pinAttribute(.Left, toAttribute: .Left, ofItem: gameController.view, withConstant: 15)
         }
+        
     }
     
     func addScoreBoard () {
         var userFullNameArr = []
         var oppFullNameArr = []
         
-        if (gameObject[0]["user"] as PFUser).objectId == PFUser.currentUser().objectId {
-            userPoints = gameObject[0]["userPoints"] as Int
-            opponentPoints = gameObject[0]["opponentPoints"] as Int
-            userFullNameArr = (gameObject[0]["userFullName"] as NSString).componentsSeparatedByString(" ")
-            oppFullNameArr = (gameObject[0]["user2FullName"] as NSString).componentsSeparatedByString(" ")
+        if currentGame["user"].objectId == PFUser.currentUser().objectId {
+            userPoints = currentGame["userPoints"] as! Int
+            opponentPoints = currentGame["opponentPoints"] as! Int
+            userFullNameArr = (currentGame["userFullName"] as! NSString).componentsSeparatedByString(" ")
+            oppFullNameArr = (currentGame["user2FullName"] as! NSString).componentsSeparatedByString(" ")
         } else {
-            userPoints = gameObject[0]["opponentPoints"] as Int
-            opponentPoints = gameObject[0]["userPoints"] as Int
-            userFullNameArr = (gameObject[0]["user2FullName"] as NSString).componentsSeparatedByString(" ")
-            oppFullNameArr = (gameObject[0]["userFullName"] as NSString).componentsSeparatedByString(" ")
+            userPoints = currentGame["opponentPoints"] as! Int
+            opponentPoints = currentGame["userPoints"] as! Int
+            userFullNameArr = (currentGame["user2FullName"] as! NSString).componentsSeparatedByString(" ")
+            oppFullNameArr = (currentGame["userFullName"] as! NSString).componentsSeparatedByString(" ")
         }
         
         // should be user first name
@@ -131,13 +132,14 @@ class gameView {
         row.tag = rowindex
         
         gameBoardView.addSubview(row)
+        
         row.setTranslatesAutoresizingMaskIntoConstraints(false)
         
         var plus = Int(6) * Int(gridDimension)
-        
-        var rowHeight : CGFloat =  gameBoardViewHeight / CGFloat(gridDimension) + CGFloat(plus)
+        var rowHeight : CGFloat = gameBoardViewHeight / CGFloat(gridDimension) + CGFloat(plus)
         
         row.constrainToSize(CGSizeMake(gameBoardViewWidth, rowHeight))
+        
         row.centerInContainerOnAxis(.CenterX)
         
         allRows += [row]
@@ -256,20 +258,20 @@ class gameView {
         var lastRow = allRows.last!
         
         for square in squaresArrayToUseHere {
-            var rightButtonsToHide : UIButton = square.subviews[1] as UIButton
-            var bottomButtonsToHide : UIButton = square.subviews[2] as UIButton
+            var rightButtonsToHide : UIButton = square.subviews[1] as! UIButton
+            var bottomButtonsToHide : UIButton = square.subviews[2] as! UIButton
             
             buttonsToHide += [rightButtonsToHide, bottomButtonsToHide]
         }
         
         for row in allRows {
-            var rightButtonsNotToHide : UIButton = row.subviews.last!.subviews[1] as UIButton
+            var rightButtonsNotToHide : UIButton = row.subviews.last!.subviews[1] as! UIButton
             
             buttonsToHide.remove(rightButtonsNotToHide)
             
             if row == allRows.last! {
                 for subview in row.subviews{
-                    var bottomButtonsNotToHide : UIButton = subview.subviews[2] as UIButton
+                    var bottomButtonsNotToHide : UIButton = subview.subviews[2] as! UIButton
                     
                     buttonsToHide.remove(bottomButtonsNotToHide)
                 }
@@ -283,12 +285,11 @@ class gameView {
     }
     
     func giveColorToScoredSquares() {
-        var game: PFObject = gameObject[0] as PFObject
-        
-        for squareObject in game["allScoredSquares"] as NSArray {
-            var square: UIView = allRows[squareObject["rowIndex"] as Int].subviews[squareObject["squareIndex"] as Int] as UIView
+        for squareObject in currentGame["allScoredSquares"] as! NSArray {
             
-            if squareObject["userId"] as NSString == PFUser.currentUser().objectId {
+            var square: UIView = allRows[squareObject["rowIndex"] as! Int].subviews[squareObject["squareIndex"] as! Int] as! UIView
+            
+            if squareObject["userId"] as! NSString == PFUser.currentUser().objectId {
                 addSquareBackgroundImage(square, content: "fullSquareBlue")
             } else {
                 addSquareBackgroundImage(square, content: "fullSquareRed")
@@ -320,7 +321,7 @@ class gameView {
         }
         
         if stripe != oldStripe {
-            var image = UIImage(named: "\(position[stripe]!.rawValue)_currentBlueStripe") as UIImage?
+            var image = UIImage(named: "\(position[stripe]!.rawValue)_currentBlueStripe") as! UIImage?
             stripe.setImage(image, forState: .Normal)
 
             animateStripe(stripe, duration: duration, delay: 0, startFloat: 0.0001)
@@ -341,7 +342,7 @@ class gameView {
             oldDoubleStripe.backgroundColor = UIColor.clearColor()
             
         } else if stripe == oldStripe && stripe.selected == false {
-            var image = UIImage(named: "\(position[stripe]!.rawValue)_currentBlueStripe") as UIImage?
+            var image = UIImage(named: "\(position[stripe]!.rawValue)_currentBlueStripe") as! UIImage?
             stripe.setImage(image, forState: .Normal)
             animateStripe(stripe, duration: duration, delay: 0, startFloat: 0.4)
             stripe.selected = true
@@ -400,10 +401,10 @@ class gameView {
         
         var specialsLeft : Int = 0
 
-        if (gameObject[0]["user"] as PFUser).objectId == PFUser.currentUser().objectId {
-            specialsLeft = gameObject[0]["userSpecialsLeft"] as Int
+        if currentGame["user"].objectId == PFUser.currentUser().objectId {
+            specialsLeft = currentGame["userSpecialsLeft"] as! Int
         } else {
-            specialsLeft = gameObject[0]["opponentSpecialsLeft"] as Int
+            specialsLeft = currentGame["opponentSpecialsLeft"] as! Int
         }
 
         if (UIInterfaceOrientationIsPortrait(gameController.interfaceOrientation)) {
@@ -431,7 +432,7 @@ class gameView {
     func removeStylingWhenSubmit(stripeToSubmit : UIButton, points : Int) {
         stripeToSubmit.userInteractionEnabled = false
         
-        var image = UIImage(named: "\(position[stripeToSubmit]!.rawValue)_blueStripe") as UIImage?
+        var image = UIImage(named: "\(position[stripeToSubmit]!.rawValue)_blueStripe") as! UIImage?
         stripeToSubmit.setImage(image, forState: .Normal)
         
         loadingView().hideActivityIndicatorWhenScoring(loadingContainer, points: points)
@@ -440,7 +441,7 @@ class gameView {
         for square in allSquares {
             for s in square.subviews {
                 if s.isKindOfClass(UIButton) {
-                    var stripe = s as UIButton
+                    var stripe = s as! UIButton
                     if stripe.selected != true {
                         stripe.userInteractionEnabled = true
                     } else {
@@ -458,7 +459,7 @@ class gameView {
         
         if squareOfStripeTag > 0 {
             if position[stripe] == .Left {
-                var doubleStripe: UIButton = rowOfStripe.subviews[squareOfStripeTag - 1].subviews[1] as UIButton
+                var doubleStripe: UIButton = rowOfStripe.subviews[squareOfStripeTag - 1].subviews[1] as! UIButton
                 doubleStripe.selected = true
                 
                 return doubleStripe
@@ -467,7 +468,7 @@ class gameView {
         
         if rowOfStripe.tag > 0 {
             if position[stripe] == .Top {
-                var doubleStripe: UIButton = allRows[rowOfStripe.tag - 1].subviews[squareOfStripeTag].subviews[2] as UIButton
+                var doubleStripe: UIButton = allRows[rowOfStripe.tag - 1].subviews[squareOfStripeTag].subviews[2] as! UIButton
                 doubleStripe.selected = true
                 
                 return doubleStripe
@@ -477,45 +478,45 @@ class gameView {
         return UIButton()
     }
     
-    func updateGameBoardPoints(alreadyScoredSquares : NSArray, newScoredSquaresArray : NSArray, uBoard : Board, oppBoard : Board) -> [Int] {
+    func updateGameBoardPoints(alreadyScoredSquares : [AnyObject], newScoredSquaresArray : NSArray, uBoard : Board, oppBoard : Board) -> [Int] {
         var userFullNameArr = []
         var oppFullNameArr = []
 
         userPoints = 0
         opponentPoints = 0
         
-        if (gameObject[0]["user"] as PFUser).objectId == PFUser.currentUser().objectId {
-            userFullNameArr = (gameObject[0]["userFullName"] as NSString).componentsSeparatedByString(" ")
-            oppFullNameArr = (gameObject[0]["user2FullName"] as NSString).componentsSeparatedByString(" ")
+        if currentGame["user"].objectId == PFUser.currentUser().objectId {
+            userFullNameArr = (currentGame["userFullName"] as! NSString).componentsSeparatedByString(" ")
+            oppFullNameArr = (currentGame["user2FullName"] as! NSString).componentsSeparatedByString(" ")
         } else {
-            userFullNameArr = (gameObject[0]["user2FullName"] as NSString).componentsSeparatedByString(" ")
-            oppFullNameArr = (gameObject[0]["userFullName"] as NSString).componentsSeparatedByString(" ")
+            userFullNameArr = (currentGame["user2FullName"] as! NSString).componentsSeparatedByString(" ")
+            oppFullNameArr = (currentGame["userFullName"] as! NSString).componentsSeparatedByString(" ")
         }
         
         for s in alreadyScoredSquares {
-            if s["userId"] as? String == PFUser.currentUser().objectId {
+            if s["userId"] as! String == PFUser.currentUser().objectId {
                 userPoints += 1
             } else {
                 opponentPoints += 1
             }
             
-            if uBoard.allBelongsToUser(s["rowIndex"] as Int, y: s["squareIndex"] as Int) {
+            if uBoard.allBelongsToUser(s["rowIndex"] as! Int, y: s["squareIndex"] as! Int) {
                 userPoints += 1
-            } else if oppBoard.allBelongsToUser(s["rowIndex"] as Int, y: s["squareIndex"] as Int) {
+            } else if oppBoard.allBelongsToUser(s["rowIndex"] as! Int, y: s["squareIndex"] as! Int) {
                 opponentPoints += 1
             }
         }
         
         for square in newScoredSquaresArray {
-            if square["userId"] as? String == PFUser.currentUser().objectId {
+            if square["userId"] as! String == PFUser.currentUser().objectId {
                 userPoints += 1
             } else {
                 opponentPoints += 1
             }
 
-            if uBoard.allBelongsToUser(square["rowIndex"] as Int, y: square["squareIndex"] as Int) {
+            if uBoard.allBelongsToUser(square["rowIndex"] as! Int, y: square["squareIndex"] as! Int) {
                 userPoints += 1
-            } else if oppBoard.allBelongsToUser(square["rowIndex"] as Int, y: square["squareIndex"] as Int) {
+            } else if oppBoard.allBelongsToUser(square["rowIndex"] as! Int, y: square["squareIndex"] as! Int) {
                 opponentPoints += 1
             }
         }
@@ -530,10 +531,10 @@ class gameView {
     func colorSelectedStripes(rowIndex : Int, squareIdx : Int, stripe: UIButton, boardObject : Board, userBoard : Bool) {
         if boardObject.board[rowIndex][squareIdx].isStripeSelected(position[stripe]!) {
             if userBoard {
-                var image = UIImage(named: "\(position[stripe]!.rawValue)_blueStripe") as UIImage?
+                var image = UIImage(named: "\(position[stripe]!.rawValue)_blueStripe") as! UIImage?
                 stripe.setImage(image, forState: .Normal)
             } else {
-                var image = UIImage(named: "\(position[stripe]!.rawValue)_redStripe") as UIImage?
+                var image = UIImage(named: "\(position[stripe]!.rawValue)_redStripe") as! UIImage?
                 stripe.setImage(image, forState: .Normal)
                 opponentSelectedStripes += [stripe]
             }
@@ -549,19 +550,19 @@ class gameView {
     }
     
     func selectLastPlayedStripe() {
-        var lastStripeObject = gameObject[0]["lastStripe"] as NSArray
+        var lastStripeObject: AnyObject = (currentGame["lastStripe"] as! NSArray)[0]
         var lastStripe = UIButton()
         
-        if lastStripeObject != [] {
-            var rowIndex = lastStripeObject[0]["rowIndex"] as Int
-            var squareIndex = lastStripeObject[0]["squareIndex"] as Int
-            var stripeIndex = lastStripeObject[0]["stripeIndex"] as Int
+        if true {
+            var rowIndex = lastStripeObject.objectForKey("rowIndex") as! Int
+            var squareIndex = lastStripeObject.objectForKey("squareIndex") as! Int
+            var stripeIndex = lastStripeObject.objectForKey("stripeIndex") as! Int
             
-            lastStripe = allRows[rowIndex].subviews[squareIndex].subviews[stripeIndex] as UIButton
+            lastStripe = allRows[rowIndex].subviews[squareIndex].subviews[stripeIndex] as! UIButton
             
             lastStripe.backgroundColor = UIColor(patternImage: UIImage(named: "\(position[lastStripe]!.rawValue)_stripeBackground")!)
             
-            if lastStripeObject[0]["userId"] as NSString == PFUser.currentUser().objectId {
+            if lastStripeObject.objectForKey("userId") as? NSString == PFUser.currentUser().objectId {
                 lastStripe.setImage(UIImage(named: "\(position[lastStripe]!.rawValue)_currentBlueStripe"), forState: .Normal)
             } else {
                 lastStripe.setImage(UIImage(named: "\(position[lastStripe]!.rawValue)_currentRedStripe"), forState: .Normal)
@@ -604,7 +605,7 @@ class gameView {
         for square in allSquares {
             for openStripe in square.subviews {
                 if openStripe.isKindOfClass(UIButton) {
-                    var stripe = openStripe as UIButton
+                    var stripe = openStripe as! UIButton
                     stripe.userInteractionEnabled = false
                 }
             }
