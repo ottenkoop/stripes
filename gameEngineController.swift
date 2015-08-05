@@ -39,13 +39,17 @@ class gameEngineController: UIViewController {
         buildGame()
         addSubmitBtn()
         addSpecialsBtn()
-        GameHandler.checkifGameIsFinished()
+//        GameHandler.checkifGameIsFinished()
+//        gameHasFinished()
     }
     
     func setCurrentGameVariables() {
         gameObject = Game.currentGame()
         gridDimension = gameObject["grid"] as! Int
         
+        
+        // TODO: Get userOnTurn from gameObject.
+        userTurn = gameObject["userOnTurn"] as! PFUser == PFUser.currentUser()
     }
     
     func buildGame() {
@@ -119,7 +123,7 @@ class gameEngineController: UIViewController {
         gameBoardView.selectLastPlayedStripe()
     }
     
-    func stripePressed(stripe : UIButton!) {
+    func stripePressed(stripe : UIButton) {
         if specialUsed {
             gameBoardView.removeSpecialAnimation()
         }
@@ -168,11 +172,9 @@ class gameEngineController: UIViewController {
         } else {
             NSTimer.scheduledTimerWithTimeInterval(0.01, target: self, selector: "placeStripeAndSwitchUserTurn", userInfo: nil, repeats: false)
         }
-
     }
     
     func addSpecialsBtn() {
-        
         gameBoardView.addSpecialsBtn(specialsBtn)
         specialsBtn.addTarget(self, action: "openSpecials:", forControlEvents: .TouchUpInside)
     }
@@ -227,20 +229,19 @@ class gameEngineController: UIViewController {
     }
     
     func gameHasFinished() {
+        var finishBtn = UIButton()
+        finishBtn.addTarget(self, action: "gameFinished:", forControlEvents: .TouchUpInside)
+        
         2.0.waitSecondsAndDo({
             if self.gameBoardView.userPoints > self.gameBoardView.opponentPoints {
-                var winBtn = finishScreen().gameDidFinishWithCurrentUserWinner(self, userTurn: self.userTurn)
-                winBtn.tag = 1
-                winBtn.addTarget(self, action: "gameFinished:", forControlEvents: .TouchUpInside)
+                finishBtn.tag = 1
             } else if self.gameBoardView.userPoints < self.gameBoardView.opponentPoints {
-                var lostBtn = finishScreen().gameDidFinishWithOpponentWinner(self, userTurn: self.userTurn)
-                lostBtn.tag = 2
-                lostBtn.addTarget(self, action: "gameFinished:", forControlEvents: .TouchUpInside)
+                finishBtn.tag = 2
             } else {
-                var drawBtn = finishScreen().gameDidFinishDraw(self, userTurn: self.userTurn)
-                drawBtn.tag = 3
-                drawBtn.addTarget(self, action: "gameFinished:", forControlEvents: .TouchUpInside)
+                finishBtn.tag = 3
             }
+            
+            finishScreen().openPopup(self.view, finishBtn: finishBtn)
         })
     }
     
@@ -248,7 +249,8 @@ class gameEngineController: UIViewController {
         var lastUpdate : NSDate = weekBattleObject[0].updatedAt as NSDate
         var dateNow = NSDate()
         
-        if weekBattleObject[0]["battleFinished"] as! Bool == true || lastUpdate.dateAtStartOfWeek().dateByAddingDays(1).isEarlierThanDate(dateNow) && weekBattleObject[0]["userOnTurn"].objectId == PFUser.currentUser().objectId {
+        if weekBattleObject[0]["battleFinished"] as! Bool == true {
+            //      TODO: ENABLE. TIME NOT WORKING IN SIMU. lastUpdate.dateAtStartOfWeek().dateByAddingDays(1).isEarlierThanDate(dateNow) && weekBattleObject[0]["userOnTurn"].objectId == PFUser.currentUser().objectId {
             var btns : [UIButton] = []
 
             if weekBattleObject[0]["user"].objectId == PFUser.currentUser().objectId {

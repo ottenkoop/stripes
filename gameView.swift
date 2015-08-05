@@ -286,10 +286,10 @@ class gameView {
     
     func giveColorToScoredSquares() {
         for squareObject in currentGame["allScoredSquares"] as! NSArray {
-            
+        
             var square: UIView = allRows[squareObject["rowIndex"] as! Int].subviews[squareObject["squareIndex"] as! Int] as! UIView
             
-            if squareObject["userId"] as! NSString == PFUser.currentUser().objectId {
+            if squareObject["userId"] as? NSString == PFUser.currentUser().objectId {
                 addSquareBackgroundImage(square, content: "fullSquareBlue")
             } else {
                 addSquareBackgroundImage(square, content: "fullSquareRed")
@@ -321,7 +321,7 @@ class gameView {
         }
         
         if stripe != oldStripe {
-            var image = UIImage(named: "\(position[stripe]!.rawValue)_currentBlueStripe") as! UIImage?
+            var image = UIImage(named: "\(position[stripe]!.rawValue)_currentBlueStripe") as UIImage?
             stripe.setImage(image, forState: .Normal)
 
             animateStripe(stripe, duration: duration, delay: 0, startFloat: 0.0001)
@@ -342,7 +342,7 @@ class gameView {
             oldDoubleStripe.backgroundColor = UIColor.clearColor()
             
         } else if stripe == oldStripe && stripe.selected == false {
-            var image = UIImage(named: "\(position[stripe]!.rawValue)_currentBlueStripe") as! UIImage?
+            var image = UIImage(named: "\(position[stripe]!.rawValue)_currentBlueStripe") as UIImage?
             stripe.setImage(image, forState: .Normal)
             animateStripe(stripe, duration: duration, delay: 0, startFloat: 0.4)
             stripe.selected = true
@@ -432,7 +432,7 @@ class gameView {
     func removeStylingWhenSubmit(stripeToSubmit : UIButton, points : Int) {
         stripeToSubmit.userInteractionEnabled = false
         
-        var image = UIImage(named: "\(position[stripeToSubmit]!.rawValue)_blueStripe") as! UIImage?
+        var image = UIImage(named: "\(position[stripeToSubmit]!.rawValue)_blueStripe") as UIImage?
         stripeToSubmit.setImage(image, forState: .Normal)
         
         loadingView().hideActivityIndicatorWhenScoring(loadingContainer, points: points)
@@ -531,10 +531,10 @@ class gameView {
     func colorSelectedStripes(rowIndex : Int, squareIdx : Int, stripe: UIButton, boardObject : Board, userBoard : Bool) {
         if boardObject.board[rowIndex][squareIdx].isStripeSelected(position[stripe]!) {
             if userBoard {
-                var image = UIImage(named: "\(position[stripe]!.rawValue)_blueStripe") as! UIImage?
+                var image = UIImage(named: "\(position[stripe]!.rawValue)_blueStripe") as UIImage?
                 stripe.setImage(image, forState: .Normal)
             } else {
-                var image = UIImage(named: "\(position[stripe]!.rawValue)_redStripe") as! UIImage?
+                var image = UIImage(named: "\(position[stripe]!.rawValue)_redStripe") as UIImage?
                 stripe.setImage(image, forState: .Normal)
                 opponentSelectedStripes += [stripe]
             }
@@ -550,10 +550,13 @@ class gameView {
     }
     
     func selectLastPlayedStripe() {
-        var lastStripeObject: AnyObject = (currentGame["lastStripe"] as! NSArray)[0]
+        var lastStripeObject : AnyObject = currentGame["lastStripe"] as! NSArray
         var lastStripe = UIButton()
         
-        if true {
+        println(lastStripeObject)
+        
+        if lastStripeObject.count > 0 {
+            lastStripeObject = lastStripeObject[0]
             var rowIndex = lastStripeObject.objectForKey("rowIndex") as! Int
             var squareIndex = lastStripeObject.objectForKey("squareIndex") as! Int
             var stripeIndex = lastStripeObject.objectForKey("stripeIndex") as! Int

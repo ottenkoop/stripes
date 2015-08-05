@@ -216,14 +216,14 @@ class weekBattleFinished {
         var oppPointsLabel = UILabel()
         
         var userName = ""
-        var userFullName = (PFUser.currentUser()["fullName"] as! NSString).componentsSeparatedByString(" ") as! NSArray
+        var userFullName = (PFUser.currentUser()["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
         var lastUName = userFullName.lastObject as! String
         var lastULetter = lastUName[lastUName.startIndex]
         
         userName = "\(userFullName[0]) \(lastULetter)."
         
         var opponentName = ""
-        var oppFullName = (oppName as! NSString).componentsSeparatedByString(" ") as! NSArray
+        var oppFullName = (oppName as NSString).componentsSeparatedByString(" ") as NSArray
         var lastName = oppFullName.lastObject as! String
         var lastLetter = lastName[lastName.startIndex]
         

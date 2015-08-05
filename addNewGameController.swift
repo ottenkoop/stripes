@@ -147,8 +147,8 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
             cell!.backgroundColor = UIColor.clearColor()
         }
         
-        var user : AnyObject = allFriends[Int(indexPath.row)]
-        cell!.textLabel?.text = String(user["fullName"] as! NSString)
+        var user : PFUser = allFriends[Int(indexPath.row)] as! PFUser
+        cell!.textLabel?.text = user["fullName"] as? String
     
         return cell!
     }

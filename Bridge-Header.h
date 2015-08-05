@@ -20,5 +20,6 @@
 #import <HockeySDK/HockeySDK.h>
 #import "MGSwipeTableCell.h"
 #import "MGSwipeButton.h"
+#import <Bolts/Bolts.h>
 
 #endif

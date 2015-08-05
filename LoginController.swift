@@ -154,7 +154,7 @@ class LoginViewController: UIViewController, UIAlertViewDelegate, PFLogInViewCon
         
         let currentInstallation:PFInstallation = PFInstallation.currentInstallation()
         currentInstallation["user"] = PFUser.currentUser()
-        currentInstallation.saveInBackgroundWithTarget(nil, selector: nil)
+        currentInstallation.saveInBackground()
     }
     
     override func didReceiveMemoryWarning() {

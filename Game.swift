@@ -111,7 +111,7 @@ class Game: PFObject {
             pushNotificationHandler.sendUserTurnNotification(opponentUser as PFUser)
         }
         
-        game.saveInBackgroundWithBlock(nil)
+        game.saveInBackground()
         
         return weekBattle
     }
@@ -148,17 +148,29 @@ class Game: PFObject {
             }
         }
         
-        game.saveInBackgroundWithBlock(nil)
+        game.saveInBackground()
         return weekBattle
     }
     
     class func currentGame() -> PFObject {
-        var currentGame = getCurrentGame()
+        var currentGame = getCurrentGameFromLocalDataStore()
         
         return currentGame["object"] as! PFObject
     }
     
-    class func getCurrentGame() -> PFObject {
+    class func getCurrentGameFromParse(weekBattle : PFObject) -> PFObject {
+        var gameId = weekBattle["currentGame"].objectId
+        
+        var gameQuery = PFQuery(className:"Game")
+        gameQuery.whereKey("objectId", equalTo:"\(gameId)")
+        
+        var game : PFObject = gameQuery.findObjects()[0] as! PFObject
+        
+        
+        return game
+    }
+    
+    class func getCurrentGameFromLocalDataStore() -> PFObject {
         var query = PFQuery(className: "currentGame")
         query.fromLocalDatastore()
 

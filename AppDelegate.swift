@@ -22,7 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         gamesOverviewController = GameOverviewController()
         navigationController = navController()
         
-        ParseCrashReporting.enable()
+//        ParseCrashReporting.enable()
         Parse.enableLocalDatastore()
         Parse.setApplicationId("Rfb6FpX2ewMytcvOLIHjsZs2faNMSTMBMZCz3BUo", clientKey: "Dk5u1t8oQwTUNyOKDPSSMtjjAB74g3TGkw6EJWyR")
         
@@ -79,11 +79,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             currentInstallation["user"] = PFUser.currentUser()
         }
         
-        currentInstallation.saveInBackgroundWithBlock {
-            (success: Bool, error: NSError!) -> Void in
-            
-            println(error)
-        }
+        currentInstallation.saveInBackground()
     }
     
     func application(application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: NSError) {
