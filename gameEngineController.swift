@@ -47,9 +47,7 @@ class gameEngineController: UIViewController {
         gameObject = Game.currentGame()
         gridDimension = gameObject["grid"] as! Int
         
-        
-        // TODO: Get userOnTurn from gameObject.
-        userTurn = gameObject["userOnTurn"] as! PFUser == PFUser.currentUser()
+        userTurn = weekBattleObject[0]["userOnTurn"] as? PFUser == PFUser.currentUser() ? true : false
     }
     
     func buildGame() {
@@ -73,7 +71,7 @@ class gameEngineController: UIViewController {
     }
 
     func loadSquaresFromBackEnd() {
-        if gameObject["user"].objectId == PFUser.currentUser().objectId {
+        if gameObject["user"]!.objectId == PFUser.currentUser()!.objectId {
             userBoard.loadSquareFromBackend(gameObject["userBoard"] as! [[Int]])
             opponentBoard.loadSquareFromBackend(gameObject["opponentBoard"] as! [[Int]])
         } else {
@@ -246,14 +244,14 @@ class gameEngineController: UIViewController {
     }
     
     func checkIfTimesUp() {
-        var lastUpdate : NSDate = weekBattleObject[0].updatedAt as NSDate
+        var lastUpdate : NSDate = weekBattleObject[0].updatedAt!
         var dateNow = NSDate()
         
         if weekBattleObject[0]["battleFinished"] as! Bool == true {
             //      TODO: ENABLE. TIME NOT WORKING IN SIMU. lastUpdate.dateAtStartOfWeek().dateByAddingDays(1).isEarlierThanDate(dateNow) && weekBattleObject[0]["userOnTurn"].objectId == PFUser.currentUser().objectId {
             var btns : [UIButton] = []
 
-            if weekBattleObject[0]["user"].objectId == PFUser.currentUser().objectId {
+            if weekBattleObject[0]["user"]!.objectId == PFUser.currentUser()!.objectId {
                 btns = weekBattleFinished().openPopup(self, uPoints : weekBattleObject[0]["userPoints"] as! Int, oppPoints : weekBattleObject[0]["user2Points"] as! Int, oppName: weekBattleObject[0]["user2FullName"] as! NSString)
             } else {
                 btns = weekBattleFinished().openPopup(self, uPoints : weekBattleObject[0]["user2Points"] as! Int, oppPoints : weekBattleObject[0]["userPoints"] as! Int, oppName: weekBattleObject[0]["userFullName"] as! NSString)
@@ -272,22 +270,24 @@ class gameEngineController: UIViewController {
             weekBattle.resetGame(3, game: gameObject)
             weekBattleObject[0]["battleFinished"] = true
             
-            if weekBattleObject[0]["user"].objectId == PFUser.currentUser().objectId {
+            if weekBattleObject[0]["user"]!.objectId == PFUser.currentUser()!.objectId {
                 weekBattleObject[0]["userOnTurn"] = weekBattleObject[0]["user2"]
             } else {
                 weekBattleObject[0]["userOnTurn"] = weekBattleObject[0]["user"]
             }
             pushNotificationHandler.restartBattleNotification(weekBattleObject[0])
         }
+        weekBattleObject[0].saveInBackground()
+        NSNotificationCenter.defaultCenter().postNotificationName("popViewController", object: nil)
+        NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
         
-        weekBattleObject[0].saveInBackgroundWithBlock({(succeeded: Bool, err: NSError!) -> Void in
-            if succeeded {
-                self.gameObject.saveEventually()
-                NSNotificationCenter.defaultCenter().postNotificationName("popViewController", object: nil)
-                NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
-            }
-        })
-        
+//        weekBattleObject[0].saveInBackgroundWithBlock({(succeeded: Bool, err: NSError!) -> Void in
+//            if succeeded {
+//                self.gameObject.saveEventually()
+//                NSNotificationCenter.defaultCenter().postNotificationName("popViewController", object: nil)
+//                NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
+//            }
+//        })
     }
     
     func noBtnClicked() {

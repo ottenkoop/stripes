@@ -12,7 +12,7 @@ class weekBattle: PFObject {
     class func newBattle(newGame : PFObject) {
         var weekBattle = PFObject(className:"weekBattle")
         
-        weekBattle["userFullName"] = PFUser.currentUser()["fullName"]
+        weekBattle["userFullName"] = PFUser.currentUser()!["fullName"]
         weekBattle["user2FullName"] = newGame["user2FullName"]
         weekBattle["user"] = PFUser.currentUser()
         weekBattle["user2"] = newGame["user2"]
@@ -22,11 +22,14 @@ class weekBattle: PFObject {
         weekBattle["userOnTurn"] = newGame["userOnTurn"]
         weekBattle["battleFinished"] = false
         
-        weekBattle.saveInBackgroundWithBlock({(succeeded: Bool, err: NSError!) -> Void in
-            if succeeded {
-                NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
-            }
-        })
+        weekBattle.saveInBackground()
+        NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
+        
+//        weekBattle.saveInBackgroundWithBlock({(succeeded: Bool, err: NSError!) -> Void in
+//            if succeeded {
+//                NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
+//            }
+//        })
     }
     
     class func resetGame(grid : Int, game : PFObject) -> PFObject {
@@ -55,10 +58,11 @@ class weekBattle: PFObject {
         weekBattle["userOnTurn"] = PFUser.currentUser()
         
         
-        weekBattle.saveInBackgroundWithBlock({(succeeded: Bool, err: NSError!) -> Void in
+        weekBattle.saveInBackgroundWithBlock {
+            (succeeded: Bool, err: NSError?) -> Void in
             if succeeded {
                 NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
             }
-        })
+        }
     }
 }

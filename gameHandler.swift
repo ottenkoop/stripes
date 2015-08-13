@@ -80,7 +80,7 @@ class gameHandler {
         if specialUsed {
             opponentBoard.removeStripe(rowIndex, y: squareIndex, stripe: gameBoardView.position[stripeToSubmit]!)
             
-            if (gameObject["user"] as! PFUser).objectId == PFUser.currentUser().objectId {
+            if (gameObject["user"] as! PFUser).objectId == PFUser.currentUser()!.objectId {
                 var specialsLeft = gameObject["userSpecialsLeft"] as! Int
                 specialsLeft -= 1
                 gameObject["userSpecialsLeft"] = specialsLeft
@@ -95,12 +95,14 @@ class gameHandler {
         
         var gameToSave = Game.saveSquare(gameObject, squaresArray: squareObjects, userPoints: pointsArray[0], oppPoints: pointsArray[1], userBoard: userBoard, oppBoard: opponentBoard)
         
-        gameToSave.saveInBackgroundWithBlock({(succeeded: Bool, err: NSError!) -> Void in
-            if succeeded {
+        gameToSave.saveInBackgroundWithBlock {
+            (succes: Bool, err: NSError?) -> Void in
+            
+            if succes {
                 self.gameBoardView.removeStylingWhenSubmit(stripeToSubmit, points: squareObjects.count)
                 self.checkifGameIsFinished()
             }
-        })
+        }
     }
     
     func placeStripeAndSwitchUserTurn(stripeToSubmit : UIButton, doubleStripeToSubmit : UIButton, specialUsed : Bool) {
@@ -117,7 +119,7 @@ class gameHandler {
                 opponentBoard.removeStripe(doubleStripeToSubmit.superview!.superview!.tag, y: doubleStripeToSubmit.superview!.tag, stripe: gameBoardView.position[doubleStripeToSubmit]!)
             }
             
-            if (gameObject["user"] as! PFUser).objectId == PFUser.currentUser().objectId {
+            if (gameObject["user"] as! PFUser).objectId == PFUser.currentUser()!.objectId {
                 var specialsLeft = gameObject["userSpecialsLeft"] as! Int
                 specialsLeft -= 1
                 gameObject["userSpecialsLeft"] = specialsLeft
@@ -130,12 +132,14 @@ class gameHandler {
         
         var gameToSave = Game.updateUserGameBoardAndSwitchUserTurn(gameObject, weekBattle: weekBattleObject[0], userBoard: userBoard, oppBoard: opponentBoard, lastStripe: stripeToSubmit)
         
-        gameToSave.saveInBackgroundWithBlock({(succeeded: Bool, err: NSError!) -> Void in
+        gameToSave.saveInBackgroundWithBlock {
+            (succeeded: Bool, err: NSError?) -> Void in
+            
             if succeeded {
                 NSNotificationCenter.defaultCenter().postNotificationName("popViewController", object: nil)
                 NSNotificationCenter.defaultCenter().postNotificationName("deleteObjectFromYourTurnSection", object: nil)
             }
-        })
+        }
     }
     
     func checkifGameIsFinished() {
@@ -152,16 +156,18 @@ class gameHandler {
 
             weekBattle.resetGame(nextGrid[0] as Int, game: gameObject)
             
-            gameObject.saveInBackgroundWithBlock({(succeeded: Bool, err: NSError!) -> Void in
+            gameObject.saveInBackgroundWithBlock {
+                (succeeded: Bool, err: NSError?) -> Void in
                 if succeeded {
                     NSNotificationCenter.defaultCenter().postNotificationName("popViewController", object: nil)
                     NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
                 }
-            })
+            }
             
         } else {
             var oppName = ""
-            var oppFullName = (PFUser.currentUser()["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
+//            var oppFullName = (PFUser.currentUser()["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
+            var oppFullName : NSArray = ["FirstName", "LastName"]
             
             var lastName = oppFullName.lastObject as! String
             var lastLetter = lastName[lastName.startIndex]
@@ -184,12 +190,13 @@ class gameHandler {
             weekBattleObject[0].saveInBackgroundWithBlock(nil)
             var gameToSave = Game.gameFinished(gameObject, weekBattle: weekBattleObject[0], uWonGame: userWonGame)
             
-            gameToSave.saveInBackgroundWithBlock({(succeeded: Bool, err: NSError!) -> Void in
+            gameToSave.saveInBackgroundWithBlock {
+                (succeeded: Bool, err: NSError?) -> Void in
                 if succeeded {
                     NSNotificationCenter.defaultCenter().postNotificationName("deleteObjectFromYourTurnSection", object: nil)
                     NSNotificationCenter.defaultCenter().postNotificationName("popViewController", object: nil)
                 }
-            })
+            }
         }
     }
 }

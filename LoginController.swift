@@ -74,12 +74,12 @@ class LoginViewController: UIViewController, UIAlertViewDelegate, PFLogInViewCon
         var logInController = PFLogInViewController()
         logInController.delegate = self
         logInController.fields = PFLogInFields.DismissButton | PFLogInFields.UsernameAndPassword | PFLogInFields.PasswordForgotten | PFLogInFields.LogInButton
-        logInController.logInView.logo = nil
+        logInController.logInView!.logo = nil
         
-        styleLoginAndSignupField(logInController.logInView.logInButton, image: "loginBtn")
+        styleLoginAndSignupField(logInController.logInView!.logInButton!, image: "loginBtn")
 
         if (UIDevice.currentDevice().systemVersion as NSString).floatValue >= 8.0 {
-            logInController.logInView.logInButton.pinAttribute(.Top, toAttribute: .Bottom, ofItem: logInController.logInView.passwordField, withConstant: 10)
+            logInController.logInView!.logInButton!.pinAttribute(.Top, toAttribute: .Bottom, ofItem: logInController.logInView!.passwordField, withConstant: 10)
         }
         
         self.presentViewController(logInController, animated:true, completion: nil)
@@ -89,25 +89,25 @@ class LoginViewController: UIViewController, UIAlertViewDelegate, PFLogInViewCon
         var signupController = PFSignUpViewController()
         signupController.delegate = self
         signupController.fields = PFSignUpFields.DismissButton | PFSignUpFields.UsernameAndPassword | PFSignUpFields.Email | PFSignUpFields.SignUpButton
-        signupController.signUpView.logo = nil
+        signupController.signUpView!.logo = nil
 
-        styleLoginAndSignupField(signupController.signUpView.signUpButton, image: "registerButton")
+        styleLoginAndSignupField(signupController.signUpView!.signUpButton!, image: "registerButton")
         
         if (UIDevice.currentDevice().systemVersion as NSString).floatValue >= 8.0 {
-            signupController.signUpView.signUpButton.pinAttribute(.Top, toAttribute: .Bottom, ofItem: signupController.signUpView.emailField, withConstant: 10)
+            signupController.signUpView!.signUpButton!.pinAttribute(.Top, toAttribute: .Bottom, ofItem: signupController.signUpView!.emailField, withConstant: 10)
         }
 
         self.presentViewController(signupController, animated:true, completion: nil)
     }
     
-    func logInViewController(logInController: PFLogInViewController!, didLogInUser user: PFUser!) {
+    func logInViewController(logInController: PFLogInViewController, didLogInUser user: PFUser) {
         self.dismissViewControllerAnimated(true, completion: nil)
         
         loadingView().showActivityIndicator(self.view)
         openGameOverviewController()
     }
     
-    func signUpViewController(signUpController: PFSignUpViewController!, didSignUpUser user: PFUser!) {
+    func signUpViewController(signUpController: PFSignUpViewController, didSignUpUser user: PFUser) {
         self.dismissViewControllerAnimated(true, completion: nil)
         
         loadingView().showActivityIndicator(self.view)
@@ -129,12 +129,12 @@ class LoginViewController: UIViewController, UIAlertViewDelegate, PFLogInViewCon
         var permissions = ["public_profile", "email", "user_friends"]
         
         PFFacebookUtils.logInWithPermissions(permissions, block: {
-            (user: PFUser!, error: NSError!) -> Void in
+            (user: PFUser?, error: NSError?) -> Void in
             if user == nil {
                 let alert = UIAlertView(title: "Facebook login failed", message: "Please check your Facebook settings on your phone.", delegate: self, cancelButtonTitle: "Ok")
                 alert.show()
         
-            } else if user.isNew {
+            } else if user!.isNew {
                 NSLog("User signed up and logged in through Facebook!")
                 User.requestFaceBookLoggedInUserInfo()
                 self.openGameOverviewController()

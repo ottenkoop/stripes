@@ -64,14 +64,14 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
     func searchBarSearchButtonClicked(searchBar: UISearchBar) {
         var userQuery = searchModule.findUsers(searchBar.text)
         
-        userQuery.findObjectsInBackgroundWithBlock({
-            (objects: [AnyObject]!, error: NSError!) -> Void in
+        userQuery.findObjectsInBackgroundWithBlock {
+            (objects: [AnyObject]?, error: NSError?) -> Void in
             if error == nil {
-                self.allFriends = objects
+                self.allFriends = objects!
                 
                 self.searchDisplayController?.searchResultsTableView.reloadData()
             }
-        })
+        }
     }
     
     func loadTableViewContent() {
@@ -89,12 +89,12 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
                         friendIds.addObject(friendObject.objectForKey("id")!)
                     }
                     
-                    var friendQuery : PFQuery = PFUser.query()
+                    var friendQuery : PFQuery = PFUser.query()!
                     friendQuery.whereKey("fbId", containedIn: friendIds as [AnyObject])
                     
                     var friendUsers = friendQuery.findObjects()
                     
-                    self.allFriends = friendUsers as [AnyObject]
+                    self.allFriends = friendUsers!
                     self.friendTableView.reloadData()
                     
                     SVProgressHUD.dismiss()
@@ -170,12 +170,12 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
     }
     
     func checkIfBattleExists(opp: PFUser) -> Bool {
-        let predicate = NSPredicate(format: "user = %@ AND user2 = %@ OR user2 = %@ AND user = %@", PFUser.currentUser(), opp, PFUser.currentUser(), opp)
+        let predicate = NSPredicate(format: "user = %@ AND user2 = %@ OR user2 = %@ AND user = %@", PFUser.currentUser()!, opp, PFUser.currentUser()!, opp)
         
         var weekBattleQuery = PFQuery(className:"weekBattle", predicate: predicate)
         var weekBattle = weekBattleQuery.findObjects()
         
-        if weekBattle.isEmpty {
+        if weekBattle!.isEmpty {
             return false
         } else {
             return true

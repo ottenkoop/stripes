@@ -28,7 +28,7 @@ class newGamePopup {
         var buttonsToSpace : NSArray = []
         addCancelBtn()
         
-        if PFFacebookUtils.isLinkedWithUser(PFUser.currentUser()) {
+        if PFFacebookUtils.isLinkedWithUser(PFUser.currentUser()!) {
             addFaceBookFriendsBtn()
             buttonsToSpace = [faceBookFriend, userSearch, randomOpp]
         } else {

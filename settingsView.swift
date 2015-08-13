@@ -26,7 +26,7 @@ class settingsView : UITableViewController, UIActionSheetDelegate {
         
 //        var version = QLabelElement(title: "Version", value: PFInstallation.currentInstallation()["appVersion"])
 //        var logOut = QLabelElement()
-        if PFFacebookUtils.isLinkedWithUser(PFUser.currentUser()) {
+        if PFFacebookUtils.isLinkedWithUser(PFUser.currentUser()!) {
 //            logOut = QLabelElement(title: "Logged in as!:", value: PFUser.currentUser()["fullName"])
         } else {
 //            logOut = QLabelElement(title: "Logged in as!:", value: PFUser.currentUser()["username"])

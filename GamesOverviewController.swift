@@ -49,21 +49,16 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func addUserFacebookInfo() {
-        if PFFacebookUtils.isLinkedWithUser(PFUser.currentUser()) {
+        if PFFacebookUtils.isLinkedWithUser(PFUser.currentUser()!) {
             FBRequestConnection.startForMeWithCompletionHandler({
                 (connection : FBRequestConnection!, result : AnyObject!, error : NSError!) -> Void in
 
                 if error == nil {
-                    PFUser.currentUser().setObject(result.objectForKey("id"), forKey: "fbId")
-                    PFUser.currentUser().saveInBackground()
-                }  
+                    PFUser.currentUser()!.setObject(result.objectForKey("id")!, forKey: "fbId")
+                    PFUser.currentUser()!.saveInBackground()
+                }
             })
         }
-    }
-    
-    func resetLookingForGame() {
-        PFUser.currentUser().setObject(false, forKey: "lookingForGame")
-        PFUser.currentUser().saveInBackground()
     }
     
     func addTimer() {
@@ -330,16 +325,8 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         var uPoints : Int = 0
         var oppFullName = []
         
-//        var gameInProgress = Game.getCurrentGameFromParse(weekBattle)
         
-        
-        
-//        var game = Game.getCurrentGameFromParse(weekBattle)
-//        println(game)
-        
-//        var gameInProgress = weekBattle
-        
-        if weekBattle["user"].objectId == PFUser.currentUser().objectId {
+        if weekBattle["user"]!.objectId == PFUser.currentUser()!.objectId {
             uPoints = weekBattle["userPoints"] as! Int
             oppPoints = weekBattle["user2Points"] as! Int
             oppFullName = (weekBattle["user2FullName"] as! NSString).componentsSeparatedByString(" ")
@@ -386,11 +373,11 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         switch indexPath.section {
         case 0:
             var game : PFObject = gamesWithUserTurn[Int(indexPath.row)] as PFObject
-            openGame(game, userTurn: true)
+            openGame(game)
         case 1:
             var game : PFObject = gamesWithOpponentTurn[Int(indexPath.row)] as PFObject
         
-            openGame(game, userTurn: false)
+            openGame(game)
         default:
             fatalError("What did you think ??")
         }
@@ -403,57 +390,58 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func loadTableViewContent() {
-//        var weekBattlesQuery = searchModule.findWeekBattles()
+        var weekBattlesQuery = searchModule.findWeekBattles()
         
-//        weekBattlesQuery.findObjectsInBackgroundWithBlock {
-//            (objects: [AnyObject]!, error: NSError!) -> Void in
-//            if error == nil {
-//                self.gamesWithUserTurn = []
-//                self.gamesWithOpponentTurn = []
-//                
-////                for object in objects as! [PFObject] {
-////                    if object["userOnTurn"].objectId == PFUser.currentUser().objectId {
-////                        self.gamesWithUserTurn += [object]
-////                    } else {
-////                        self.gamesWithOpponentTurn += [object]
-////                    }
-////                }
-//                
-//                self.navigationItem.title = "Your battles"
-//                self.gameTableView.reloadData()
-//                self.setBadgeNumber()
-//            } else {
-//                let alert = UIAlertView(title: "Connection Failed", message: "There seems to be an error with your internet connection.", delegate: self, cancelButtonTitle: "Try Again")
-//                alert.show()
-//                
-//                println("Error: %@ %@", error, error.userInfo!)
-//            }
-//        }
+        weekBattlesQuery.findObjectsInBackgroundWithBlock {
+            (objects: [AnyObject]?, error: NSError?) -> Void in
+            if error == nil {
+                self.gamesWithUserTurn = []
+                self.gamesWithOpponentTurn = []
+                
+                for object in objects as! [PFObject] {
+                    if object["userOnTurn"]!.objectId == PFUser.currentUser()!.objectId {
+                        self.gamesWithUserTurn += [object]
+                    } else {
+                        self.gamesWithOpponentTurn += [object]
+                    }
+                }
+                
+                self.navigationItem.title = "Your battles"
+                self.gameTableView.reloadData()
+                self.setBadgeNumber()
+            } else {
+                let alert = UIAlertView(title: "Connection Failed", message: "There seems to be an error with your internet connection.", delegate: self, cancelButtonTitle: "Try Again")
+                alert.show()
+                
+                println("Error: %@ %@", error, error!.userInfo!)
+            }
+        }
     }
     
-    func openGame(weekBattle : PFObject, userTurn : Bool) {
+    func openGame(weekBattle : PFObject) {
         var containerToRemove = loadingView().showActivityIndicator(self.view)
-        var gameQuery = searchModule.findGame(weekBattle["currentGame"].objectId)
+        var gameQuery = searchModule.findGame(weekBattle["currentGame"]!.objectId! as! NSString)
         
-        Game.getCurrentGameFromParse(weekBattle)
-        
-        var btns : [UIButton] = []
-        
-        gameQuery.findObjectsInBackgroundWithBlock {
-            (objects: [AnyObject]!, error: NSError!) -> Void in
-            if error == nil {
-                var game : PFObject = objects[0] as! PFObject
-                let currentGame = PFObject(className: "currentGame")
-                currentGame["object"] = game
-                currentGame.pinInBackgroundWithBlock(nil)
-                
-                var gC = gameEngineController()
-                gC.weekBattleObject = [weekBattle]
-                
-                self.navigationController!.pushViewController(gC, animated: true)
-                
-                loadingView().hideActivityIndicatorWhenReturning(containerToRemove)
+        gameQuery.findObjectsInBackground().continueWithBlock {
+            (task: BFTask!) -> AnyObject in
+            if let error = task.error {
+                println("Error: \(error)")
+                return task
             }
+            
+            var game : PFObject = task.result![0] as! PFObject
+
+            let currentGame = PFObject(className: "currentGame")
+            
+            currentGame["object"] = game
+            currentGame.pin()
+            
+            let gC = gameEngineController()
+            gC.weekBattleObject = [weekBattle]
+            
+            self.navigationController!.pushViewController(gC, animated: true)
+            loadingView().hideActivityIndicatorWhenReturning(containerToRemove)
+            return task
         }
     }
     
@@ -464,10 +452,25 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         setBadgeNumber()
         SVProgressHUD.dismiss()
         
-        PFObject.unpinAllObjects()
+        emptyLocalPinnedObjects()
         
         navigationItem.leftBarButtonItem?.enabled = true
         navigationItem.rightBarButtonItem?.enabled = true
+    }
+    
+    func emptyLocalPinnedObjects() {
+        let query = PFQuery(className:"currentGame")
+        query.fromLocalDatastore()
+        
+        query.findObjectsInBackgroundWithBlock {
+            (objects: [AnyObject]?, error: NSError?) -> Void in
+            if error == nil {
+                for object in objects! as! [PFObject] {
+                    println(object)
+                    object.deleteEventually()
+                }
+            }
+        }
     }
     
     func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [AnyObject]? {
@@ -512,7 +515,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         }
         
         if currentInstallation.badge > 0 {
-            resetLookingForGame()
+            User.resetLookingForGame()
         }
         
         currentInstallation.saveInBackground()
@@ -572,15 +575,15 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     func randomGame(rButton : UIButton!) {
         SVProgressHUD.show()
         var query = PFUser.query()
-        query.whereKey("lookingForGame", equalTo: true)
+        query!.whereKey("lookingForGame", equalTo: true)
         
-        var usersLookingForGame = query.findObjects() as NSArray
+        var usersLookingForGame = query!.findObjects() as! NSArray
         
         if usersLookingForGame.count == 0 {
             let alert = UIAlertView(title: "", message: "Searching for an opponent. This may take a while.", delegate: self, cancelButtonTitle: "Ok")
             alert.show()
-            PFUser.currentUser().setObject(true, forKey: "lookingForGame")
-            PFUser.currentUser().saveInBackground()
+            PFUser.currentUser()!.setObject(true, forKey: "lookingForGame")
+            PFUser.currentUser()!.saveInBackground()
             SVProgressHUD.dismiss()
         } else {
             var int = Int(arc4random_uniform(UInt32(usersLookingForGame.count)))
@@ -613,14 +616,15 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func bannerViewDidLoadAd(banner: ADBannerView!) {
-//        self.bannerView.alpha = 1.0
+        self.bannerView.alpha = 1.0
     }
     
     func bannerViewActionDidFinish(banner: ADBannerView!) {
+        
     }
     
     func bannerViewActionShouldBegin(banner: ADBannerView!, willLeaveApplication willLeave: Bool) -> Bool {
-        return true 
+        return true
     }
     
     func bannerView(banner: ADBannerView!, didFailToReceiveAdWithError error: NSError!) {

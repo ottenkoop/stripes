@@ -12,7 +12,7 @@ class searchModule: PFObject {
     }
     
     class func findWeekBattles() -> PFQuery {
-        let predicate = NSPredicate(format: "user = %@ OR user2 = %@", PFUser.currentUser(), PFUser.currentUser())
+        let predicate = NSPredicate(format: "user = %@ OR user2 = %@", PFUser.currentUser()!, PFUser.currentUser()!)
         var game = PFQuery(className: "weekBattle", predicate: predicate)
         
         return game
@@ -21,8 +21,8 @@ class searchModule: PFObject {
     class func findUsers(searchString : String) -> PFQuery {
         var usersQuery = PFUser.query()
         
-        usersQuery.whereKey("fullName", hasPrefix: searchString)
+        usersQuery!.whereKey("fullName", hasPrefix: searchString)
         
-        return usersQuery
+        return usersQuery!
     }
 }

@@ -20,8 +20,6 @@ class finishScreen {
     func openPopup(uiView: UIView, finishBtn : UIButton) -> NSArray {
         addContainerView(uiView)
         
-        println(finishBtn.tag)
-        
         switch finishBtn.tag {
         case 1:
             gameDidFinishWithCurrentUserWinner()

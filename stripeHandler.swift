@@ -17,7 +17,7 @@ class stripeHandler: PFObject {
         objectToReturn["rowIndex"] = rowIndex
         objectToReturn["squareIndex"] = squareIndex
         objectToReturn["stripeIndex"] = stripeIndex
-        objectToReturn["userId"] = PFUser.currentUser().objectId
+        objectToReturn["userId"] = PFUser.currentUser()!.objectId
         
         return objectToReturn
         

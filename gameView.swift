@@ -35,8 +35,10 @@ class gameView {
     
     init (gameControl : UIViewController) {
         gameController = gameControl
-        gridDimension = Game.currentGame()["grid"] as! Int
+        
         currentGame = Game.currentGame()
+        gridDimension = currentGame["grid"] as! Int
+        
     }
 
     func addGameBoard() {
@@ -72,7 +74,7 @@ class gameView {
         var userFullNameArr = []
         var oppFullNameArr = []
         
-        if currentGame["user"].objectId == PFUser.currentUser().objectId {
+        if currentGame["user"]!.objectId == PFUser.currentUser()!.objectId {
             userPoints = currentGame["userPoints"] as! Int
             opponentPoints = currentGame["opponentPoints"] as! Int
             userFullNameArr = (currentGame["userFullName"] as! NSString).componentsSeparatedByString(" ")
@@ -289,7 +291,7 @@ class gameView {
         
             var square: UIView = allRows[squareObject["rowIndex"] as! Int].subviews[squareObject["squareIndex"] as! Int] as! UIView
             
-            if squareObject["userId"] as? NSString == PFUser.currentUser().objectId {
+            if squareObject["userId"] as? NSString == PFUser.currentUser()!.objectId {
                 addSquareBackgroundImage(square, content: "fullSquareBlue")
             } else {
                 addSquareBackgroundImage(square, content: "fullSquareRed")
@@ -401,7 +403,7 @@ class gameView {
         
         var specialsLeft : Int = 0
 
-        if currentGame["user"].objectId == PFUser.currentUser().objectId {
+        if currentGame["user"]!.objectId == PFUser.currentUser()!.objectId {
             specialsLeft = currentGame["userSpecialsLeft"] as! Int
         } else {
             specialsLeft = currentGame["opponentSpecialsLeft"] as! Int
@@ -485,7 +487,7 @@ class gameView {
         userPoints = 0
         opponentPoints = 0
         
-        if currentGame["user"].objectId == PFUser.currentUser().objectId {
+        if currentGame["user"]!.objectId == PFUser.currentUser()!.objectId {
             userFullNameArr = (currentGame["userFullName"] as! NSString).componentsSeparatedByString(" ")
             oppFullNameArr = (currentGame["user2FullName"] as! NSString).componentsSeparatedByString(" ")
         } else {
@@ -494,7 +496,7 @@ class gameView {
         }
         
         for s in alreadyScoredSquares {
-            if s["userId"] as! String == PFUser.currentUser().objectId {
+            if s["userId"] as! String == PFUser.currentUser()!.objectId {
                 userPoints += 1
             } else {
                 opponentPoints += 1
@@ -508,7 +510,7 @@ class gameView {
         }
         
         for square in newScoredSquaresArray {
-            if square["userId"] as! String == PFUser.currentUser().objectId {
+            if square["userId"] as! String == PFUser.currentUser()!.objectId {
                 userPoints += 1
             } else {
                 opponentPoints += 1
@@ -553,8 +555,6 @@ class gameView {
         var lastStripeObject : AnyObject = currentGame["lastStripe"] as! NSArray
         var lastStripe = UIButton()
         
-        println(lastStripeObject)
-        
         if lastStripeObject.count > 0 {
             lastStripeObject = lastStripeObject[0]
             var rowIndex = lastStripeObject.objectForKey("rowIndex") as! Int
@@ -565,7 +565,7 @@ class gameView {
             
             lastStripe.backgroundColor = UIColor(patternImage: UIImage(named: "\(position[lastStripe]!.rawValue)_stripeBackground")!)
             
-            if lastStripeObject.objectForKey("userId") as? NSString == PFUser.currentUser().objectId {
+            if lastStripeObject.objectForKey("userId") as? NSString == PFUser.currentUser()!.objectId {
                 lastStripe.setImage(UIImage(named: "\(position[lastStripe]!.rawValue)_currentBlueStripe"), forState: .Normal)
             } else {
                 lastStripe.setImage(UIImage(named: "\(position[lastStripe]!.rawValue)_currentRedStripe"), forState: .Normal)
