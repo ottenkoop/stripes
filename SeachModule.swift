@@ -21,7 +21,7 @@ class searchModule: PFObject {
     class func findUsers(searchString : String) -> PFQuery {
         var usersQuery = PFUser.query()
         
-        usersQuery!.whereKey("fullName", hasPrefix: searchString)
+        usersQuery!.whereKey("fullName", containsString: searchString)
         
         return usersQuery!
     }

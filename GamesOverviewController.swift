@@ -214,7 +214,6 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func refresh (sender: UIRefreshControl) {
-        navigationItem.title = "Searching..."
         loadTableViewContent()
         
         sender.endRefreshing()
@@ -390,6 +389,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func loadTableViewContent() {
+        navigationItem.title = "Refreshing..."
         var weekBattlesQuery = searchModule.findWeekBattles()
         
         weekBattlesQuery.findObjectsInBackgroundWithBlock {
@@ -466,8 +466,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
             (objects: [AnyObject]?, error: NSError?) -> Void in
             if error == nil {
                 for object in objects! as! [PFObject] {
-                    println(object)
-                    object.deleteEventually()
+                    object.unpinInBackground()
                 }
             }
         }
@@ -537,9 +536,10 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func openSettings() {
-        let settingsV = settingsView()
-        
-        navigationController!.pushViewController(settingsV, animated: true)
+        println("Henk")
+//        let settingsV = settingsView()
+//        
+//        navigationController!.pushViewController(settingsV, animated: true)
     }
     
     func newGame() {

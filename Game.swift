@@ -69,7 +69,7 @@ class Game: PFObject {
         return game
     }
     
-    class func createSquareObject(rowIndex : Int, squareIndex : Int) -> NSObject {
+    class func createSquareObject(rowIndex : Int, squareIndex : Int) -> [String : AnyObject] {
         var objectToReturn = [String: AnyObject]()
         
         objectToReturn["rowIndex"] = rowIndex
@@ -176,7 +176,6 @@ class Game: PFObject {
         query.fromLocalDatastore()
 
         var objects: [PFObject] = query.findObjects() as! [PFObject]
-        println(objects.count)
         return objects.last!
     }
 }

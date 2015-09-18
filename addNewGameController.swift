@@ -92,36 +92,20 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
                     var friendQuery : PFQuery = PFUser.query()!
                     friendQuery.whereKey("fbId", containedIn: friendIds as [AnyObject])
                     
-                    var friendUsers = friendQuery.findObjects()
-                    
-                    self.allFriends = friendUsers!
-                    self.friendTableView.reloadData()
-                    
-                    SVProgressHUD.dismiss()
+                    friendQuery.findObjectsInBackground().continueWithBlock {
+                        (task: BFTask!) -> AnyObject in
+                        
+                        self.allFriends = task.result! as! [AnyObject]
+                        self.friendTableView.reloadData()
+                        SVProgressHUD.dismiss()
+                        
+                        return task
+                    }
                 } else {
                     self.addSearchBar()
                     self.showFaceBookFriends = false
                     SVProgressHUD.dismiss()
                 }
-                
-//                if (!error) {
-//                    // result will contain an array with your user's friends in the "data" key
-//                    NSArray *friendObjects = [result objectForKey:@"data"];
-//                    NSMutableArray *friendIds = [NSMutableArray arrayWithCapacity:friendObjects.count];
-//                    // Create a list of friends' Facebook IDs
-//                    for (NSDictionary *friendObject in friendObjects) {
-//                        [friendIds addObject:[friendObject objectForKey:@"id"]];
-//                    }
-//                    
-//                    // Construct a PFUser query that will find friends whose facebook ids
-//                    // are contained in the current user's friend list.
-//                    PFQuery *friendQuery = [PFUser query];
-//                    [friendQuery whereKey:@"fbId" containedIn:friendIds];
-//                    
-//                    // findObjects will return a list of PFUsers that are friends
-//                    // with the current user
-//                    NSArray *friendUsers = [friendQuery findObjects];
-//                }
             }
         } else {
             // show search btn
@@ -170,12 +154,19 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
     }
     
     func checkIfBattleExists(opp: PFUser) -> Bool {
+        var weekBattle : [AnyObject] = []
         let predicate = NSPredicate(format: "user = %@ AND user2 = %@ OR user2 = %@ AND user = %@", PFUser.currentUser()!, opp, PFUser.currentUser()!, opp)
         
         var weekBattleQuery = PFQuery(className:"weekBattle", predicate: predicate)
-        var weekBattle = weekBattleQuery.findObjects()
         
-        if weekBattle!.isEmpty {
+        weekBattleQuery.findObjectsInBackground().continueWithBlock {
+            (task: BFTask!) -> AnyObject in
+            
+            weekBattle = task.result as! [AnyObject]
+            return task
+        }
+        
+        if weekBattle.isEmpty {
             return false
         } else {
             return true

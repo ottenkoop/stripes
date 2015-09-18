@@ -13,8 +13,9 @@ class finishScreen {
     
     var vController : UIViewController = UIViewController()
     var container : UIView = UIView()
-    var textView: UITextView = UITextView()
+    var textLabelView = UILabel()
     var continuButton : UIButton = UIButton()
+    var titleLabel = UILabel()
 
     
     func openPopup(uiView: UIView, finishBtn : UIButton) -> NSArray {
@@ -28,7 +29,7 @@ class finishScreen {
         case 3:
             gameDidFinishDraw()
         default:
-            gameDidFinishDraw()
+            "what?"
         }
         
         var buttonArray : NSArray = []
@@ -61,9 +62,7 @@ class finishScreen {
     }
     
     func addTitleLabel() {
-        var titleLabel = UILabel()
-        
-        titleLabel.text = "Game Finished"
+        titleLabel.text = "Game Finished!"
         titleLabel.textColor = UIColor.colorWithRGBHex(0x0079FF, alpha: 1.0)
         titleLabel.font = UIFont(name: "HanziPen SC", size: 36)
         
@@ -76,11 +75,9 @@ class finishScreen {
     
     
     func gameDidFinishWithCurrentUserWinner() {
-//        container.view.backgroundColor = UIColor.greenColor()
-//        textView.backgroundColor = UIColor.greenColor()
-//        textView.text = "Congratulations! You won."
-        
-//        var winBtn = defaultContainerSetup(uiControl.view, userTurn: userTurn)
+        textLabelView.text = "Awesome! You've won this round."
+        var winBtn = defaultContainerSetup()
+
     }
     
     func gameDidFinishWithOpponentWinner() {
@@ -103,26 +100,20 @@ class finishScreen {
 //        return drawBtn
     }
     
-//    func defaultContainerSetup(uiView: UIView, userTurn : Bool) -> UIButton {
-//        container.view.frame = uiView.frame
-//        container.view.center = uiView.center
-//        
-//        textView.frame = CGRectMake(0, 0, container.view.bounds.width, 100)
-//        textView.font = UIFont.systemFontOfSize(20)
-//        textView.center = uiView.center
-//        textView.textAlignment = .Center
-//        textView.userInteractionEnabled = false
-//        var btn = UIButton()
-//        
-//        uiView.addSubview(container.view)
-//        container.view.addSubview(textView)
-//        
-//        if userTurn {
-//            btn = addContinuButton(uiView)
-//        }
-//        
-//        return btn
-//    }
+    func defaultContainerSetup() -> UIButton {
+        textLabelView.textColor = UIColor.colorWithRGBHex(0x0079FF, alpha: 1.0)
+        textLabelView.font = UIFont(name: "HanziPen SC", size: 20)
+
+        container.addSubview(textLabelView)
+        
+        textLabelView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        textLabelView.pinAttribute(.Top, toAttribute: .Top, ofItem: container, withConstant: 100)
+        textLabelView.centerInContainerOnAxis(.CenterX)
+        
+        var btn = UIButton()
+        
+        return btn
+    }
     
     func addContinuButton(uiView: UIView) -> UIButton {
         continuButton.setTitle("Continue", forState: .Normal)

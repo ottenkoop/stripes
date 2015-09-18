@@ -29,7 +29,7 @@ class pushNotificationHandler: PFObject {
         
         push.setQuery(query)
         push.setData(data as [NSObject : AnyObject])
-        push.sendPush(nil)
+        push.sendPushInBackground()
     }
     
     class func sendNewGameNotification(user : PFUser) {
@@ -51,7 +51,7 @@ class pushNotificationHandler: PFObject {
         
         push.setQuery(query)
         push.setData(data as [NSObject : AnyObject])
-        push.sendPush(nil)
+        push.sendPushInBackground()
     }
     
     class func userResignedGame(game : PFObject) {
@@ -77,7 +77,7 @@ class pushNotificationHandler: PFObject {
         
         push.setQuery(query)
         push.setData(data as [NSObject : AnyObject])
-        push.sendPush(nil)
+        push.sendPushInBackground()
     }
     
     class func gameFinishedNotification(game : PFObject, content : String) {
@@ -95,7 +95,7 @@ class pushNotificationHandler: PFObject {
         
         push.setQuery(query)
         push.setData(data as [NSObject : AnyObject])
-        push.sendPush(nil)
+        push.sendPushInBackground()
     }
     
     class func restartBattleNotification(weekBattle : PFObject) {
@@ -121,6 +121,6 @@ class pushNotificationHandler: PFObject {
         
         push.setQuery(query)
         push.setData(data as [NSObject : AnyObject])
-        push.sendPush(nil)
+        push.sendPushInBackground()
     }
 }

@@ -43,7 +43,7 @@ class gameHandler {
         localGameBoard.placeStripe(rowIndex, y: squareIndex, stripe: gameBoardView.position[stripeToSubmit]!)
 
         // save new userBoard and square
-        var squareObjects : [NSObject] = []
+        var squareObjects : [[String : AnyObject]] = [[String : AnyObject]]()
         
         for square in scoredSquares {
             if specialUsed {
@@ -91,7 +91,7 @@ class gameHandler {
             }
         }
         
-        var pointsArray = gameBoardView.updateGameBoardPoints(gameObject["allScoredSquares"] as! [AnyObject], newScoredSquaresArray: squareObjects, uBoard : userBoard, oppBoard: opponentBoard)
+        var pointsArray = gameBoardView.updateGameBoardPoints(gameObject["allScoredSquares"] as! [[String : AnyObject]], newScoredSquaresArray: squareObjects, uBoard : userBoard, oppBoard: opponentBoard)
         
         var gameToSave = Game.saveSquare(gameObject, squaresArray: squareObjects, userPoints: pointsArray[0], oppPoints: pointsArray[1], userBoard: userBoard, oppBoard: opponentBoard)
         

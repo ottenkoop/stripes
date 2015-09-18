@@ -287,8 +287,9 @@ class gameView {
     }
     
     func giveColorToScoredSquares() {
-        for squareObject in currentGame["allScoredSquares"] as! NSArray {
-        
+        for squareObject in currentGame["allScoredSquares"] as! [[String : AnyObject]] {
+
+            
             var square: UIView = allRows[squareObject["rowIndex"] as! Int].subviews[squareObject["squareIndex"] as! Int] as! UIView
             
             if squareObject["userId"] as? NSString == PFUser.currentUser()!.objectId {
@@ -480,7 +481,7 @@ class gameView {
         return UIButton()
     }
     
-    func updateGameBoardPoints(alreadyScoredSquares : [AnyObject], newScoredSquaresArray : NSArray, uBoard : Board, oppBoard : Board) -> [Int] {
+    func updateGameBoardPoints(alreadyScoredSquares : [[String: AnyObject]], newScoredSquaresArray : [[String : AnyObject]], uBoard : Board, oppBoard : Board) -> [Int] {
         var userFullNameArr = []
         var oppFullNameArr = []
 
@@ -495,25 +496,36 @@ class gameView {
             oppFullNameArr = (currentGame["userFullName"] as! NSString).componentsSeparatedByString(" ")
         }
         
-        for s in alreadyScoredSquares {
-            if s["userId"] as! String == PFUser.currentUser()!.objectId {
-                userPoints += 1
-            } else {
-                opponentPoints += 1
-            }
-            
-            if uBoard.allBelongsToUser(s["rowIndex"] as! Int, y: s["squareIndex"] as! Int) {
-                userPoints += 1
-            } else if oppBoard.allBelongsToUser(s["rowIndex"] as! Int, y: s["squareIndex"] as! Int) {
-                opponentPoints += 1
+        if alreadyScoredSquares.count > 0 {
+            for s in alreadyScoredSquares {
+                
+                switch s["userId"] as? NSString == PFUser.currentUser()!.objectId {
+                case true:
+                    userPoints += 1
+                case false:
+                    opponentPoints += 1
+                default:
+                    0
+                }
+                
+                if uBoard.allBelongsToUser(s["rowIndex"] as! Int, y: s["squareIndex"] as! Int) {
+                    userPoints += 1
+                } else if oppBoard.allBelongsToUser(s["rowIndex"] as! Int, y: s["squareIndex"] as! Int) {
+                    opponentPoints += 1
+                }
             }
         }
         
         for square in newScoredSquaresArray {
-            if square["userId"] as! String == PFUser.currentUser()!.objectId {
+            println(square["userId"]!)
+            
+            switch square["userId"] as? NSString == PFUser.currentUser()!.objectId {
+            case true:
                 userPoints += 1
-            } else {
+            case false:
                 opponentPoints += 1
+            default:
+                0
             }
 
             if uBoard.allBelongsToUser(square["rowIndex"] as! Int, y: square["squareIndex"] as! Int) {
@@ -521,6 +533,9 @@ class gameView {
             } else if oppBoard.allBelongsToUser(square["rowIndex"] as! Int, y: square["squareIndex"] as! Int) {
                 opponentPoints += 1
             }
+            
+            println(userPoints)
+            println(opponentPoints)
         }
         
 
