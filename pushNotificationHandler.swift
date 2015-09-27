@@ -11,18 +11,18 @@ import Foundation
 class pushNotificationHandler: PFObject {
     
     class func sendUserTurnNotification(opponent : PFUser) {
-        var query = PFInstallation.query()
-        var push = PFPush()
+        let query = PFInstallation.query()
+        let push = PFPush()
         
         var oppName = ""
 //        var oppFullName = (PFUser.currentUser()["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
-        var oppFullName : NSArray = ["Opponent", "lastName"]
-        var lastName = oppFullName.lastObject as! String
-        var lastLetter = lastName[lastName.startIndex]
+        let oppFullName : NSArray = ["Opponent", "lastName"]
+        let lastName = oppFullName.lastObject as! String
+        let lastLetter = lastName[lastName.startIndex]
         
         oppName = "\(oppFullName[0]) \(lastLetter)."
         
-        var data : NSDictionary = ["alert": "It's your turn against \(oppName)!", "badge":"1", "content-available":"1", "sound":"default"]
+        let data : NSDictionary = ["alert": "It's your turn against \(oppName)!", "badge":"1", "content-available":"1", "sound":"default"]
         
         query!.whereKey("channels", equalTo: "gameNotification")
         query!.whereKey("user", equalTo: opponent)
@@ -33,18 +33,18 @@ class pushNotificationHandler: PFObject {
     }
     
     class func sendNewGameNotification(user : PFUser) {
-        var query = PFInstallation.query()
-        var push = PFPush()
+        let query = PFInstallation.query()
+        let push = PFPush()
         
         var oppName = ""
 //        var oppFullName = (PFUser.currentUser()["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
-        var oppFullName : NSArray = ["Opponent", "lastName"]
-        var lastName = oppFullName.lastObject as! String
-        var lastLetter = lastName[lastName.startIndex]
+        let oppFullName : NSArray = ["Opponent", "lastName"]
+        let lastName = oppFullName.lastObject as! String
+        let lastLetter = lastName[lastName.startIndex]
         
         oppName = "\(oppFullName[0]) \(lastLetter)."
         
-        var data : NSDictionary = ["alert": "\(oppName) has challenged you to play a game!", "badge":"1", "content-available":"1", "sound":"default"]
+        let data : NSDictionary = ["alert": "\(oppName) has challenged you to play a game!", "badge":"1", "content-available":"1", "sound":"default"]
         
         query!.whereKey("channels", equalTo: "gameNotification")
         query!.whereKey("user", equalTo: user)
@@ -55,17 +55,17 @@ class pushNotificationHandler: PFObject {
     }
     
     class func userResignedGame(game : PFObject) {
-        var push = PFPush()
-        var query = PFInstallation.query()
+        let push = PFPush()
+        let query = PFInstallation.query()
         var oppName = ""
 //        var oppFullName = (PFUser.currentUser()["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
-        var oppFullName : NSArray = ["Opponent", "lastName"]
-        var lastName = oppFullName.lastObject as! String
-        var lastLetter = lastName[lastName.startIndex]
+        let oppFullName : NSArray = ["Opponent", "lastName"]
+        let lastName = oppFullName.lastObject as! String
+        let lastLetter = lastName[lastName.startIndex]
         
         oppName = "\(oppFullName[0]) \(lastLetter)."
         
-        var data : NSDictionary = ["alert": "\(oppName) resigned!", "badge":"0", "content-available":"1", "sound":"default"]
+        let data : NSDictionary = ["alert": "\(oppName) resigned!", "badge":"0", "content-available":"1", "sound":"default"]
         
         query!.whereKey("channels", equalTo: "gameNotification")
         
@@ -81,10 +81,10 @@ class pushNotificationHandler: PFObject {
     }
     
     class func gameFinishedNotification(game : PFObject, content : String) {
-        var push = PFPush()
-        var query = PFInstallation.query()
+        let push = PFPush()
+        let query = PFInstallation.query()
         
-        var data : NSDictionary = ["alert": "\(content)", "badge":"1", "content-available":"1", "sound":"default"]
+        let data : NSDictionary = ["alert": "\(content)", "badge":"1", "content-available":"1", "sound":"default"]
         query!.whereKey("channels", equalTo: "gameNotification")
         
         if game["user"]!.objectId == PFUser.currentUser()!.objectId {
@@ -99,18 +99,18 @@ class pushNotificationHandler: PFObject {
     }
     
     class func restartBattleNotification(weekBattle : PFObject) {
-        var push = PFPush()
-        var query = PFInstallation.query()
+        let push = PFPush()
+        let query = PFInstallation.query()
         
         var oppName = ""
 //        var oppFullName = (PFUser.currentUser()["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
-        var oppFullName : NSArray = ["Opponent", "lastName"]
-        var lastName = oppFullName.lastObject as! String
-        var lastLetter = lastName[lastName.startIndex]
+        let oppFullName : NSArray = ["Opponent", "lastName"]
+        let lastName = oppFullName.lastObject as! String
+        let lastLetter = lastName[lastName.startIndex]
         
         oppName = "\(oppFullName[0]) \(lastLetter)."
         
-        var data : NSDictionary = ["alert": "\(oppName) is challenging you for another Battle!", "badge":"1", "content-available":"1", "sound":"default"]
+        let data : NSDictionary = ["alert": "\(oppName) is challenging you for another Battle!", "badge":"1", "content-available":"1", "sound":"default"]
         query!.whereKey("channels", equalTo: "gameNotification")
         
         if weekBattle["user"]!.objectId == PFUser.currentUser()!.objectId {

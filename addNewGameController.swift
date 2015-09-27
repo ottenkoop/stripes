@@ -10,7 +10,7 @@ import Foundation
 
 class addNewGameController : UIViewController, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate, UISearchBarDelegate, UISearchDisplayDelegate {
     var friendTableView : UITableView = UITableView()
-    var cell : UITableViewCell?
+    var cell : UITableViewCell!
     var searchBar : UISearchBar = UISearchBar()
     var searchController : UISearchDisplayController!
     
@@ -39,7 +39,7 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
         self.friendTableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "cell")
         self.view.addSubview(friendTableView)
         
-        friendTableView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        friendTableView.translatesAutoresizingMaskIntoConstraints = false
         friendTableView.constrainToHeight(screenHeight)
         friendTableView.pinAttribute(.Left, toAttribute: .Left, ofItem: self.view)
         friendTableView.pinAttribute(.Right, toAttribute: .Right, ofItem: self.view)
@@ -62,7 +62,7 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
     }
     
     func searchBarSearchButtonClicked(searchBar: UISearchBar) {
-        var userQuery = searchModule.findUsers(searchBar.text)
+        let userQuery = searchModule.findUsers(searchBar.text!)
         
         userQuery.findObjectsInBackgroundWithBlock {
             (objects: [AnyObject]?, error: NSError?) -> Void in
@@ -76,20 +76,20 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
     
     func loadTableViewContent() {
         if showFaceBookFriends {
-            var friendsRequest : FBRequest = FBRequest.requestForMyFriends()
+            let friendsRequest : FBRequest = FBRequest.requestForMyFriends()
             
             friendsRequest.startWithCompletionHandler {
                 (connection : FBRequestConnection!, result : AnyObject!, error : NSError!) -> Void in
                 
                 if error == nil {
-                    var friendObjects : NSArray = result.objectForKey("data") as! NSArray
-                    var friendIds : NSMutableArray = NSMutableArray(capacity: friendObjects.count)
+                    let friendObjects : NSArray = result.objectForKey("data") as! NSArray
+                    let friendIds : NSMutableArray = NSMutableArray(capacity: friendObjects.count)
                     
                     for friendObject in friendObjects as! [NSDictionary] {
                         friendIds.addObject(friendObject.objectForKey("id")!)
                     }
                     
-                    var friendQuery : PFQuery = PFUser.query()!
+                    let friendQuery : PFQuery = PFUser.query()!
                     friendQuery.whereKey("fbId", containedIn: friendIds as [AnyObject])
                     
                     friendQuery.findObjectsInBackground().continueWithBlock {
@@ -124,14 +124,14 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        var cell = friendTableView.dequeueReusableCellWithIdentifier("cell") as? UITableViewCell
+        var cell = friendTableView.dequeueReusableCellWithIdentifier("cell")
         
         if cell != nil {
             cell = UITableViewCell(style: UITableViewCellStyle.Value1, reuseIdentifier: "CELL")
             cell!.backgroundColor = UIColor.clearColor()
         }
         
-        var user : PFUser = allFriends[Int(indexPath.row)] as! PFUser
+        let user : PFUser = allFriends[Int(indexPath.row)] as! PFUser
         cell!.textLabel?.text = user["fullName"] as? String
     
         return cell!
@@ -140,8 +140,8 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         SVProgressHUD.show()
 
-        var opponent : PFUser = allFriends[Int(indexPath.row)] as! PFUser
-        var battleExists = checkIfBattleExists(opponent)
+        let opponent : PFUser = allFriends[Int(indexPath.row)] as! PFUser
+        let battleExists = checkIfBattleExists(opponent)
         
         if battleExists {
             let alert = UIAlertView(title: "Uh oh!", message: "This battle already exists.", delegate: self, cancelButtonTitle: "Return")
@@ -157,7 +157,7 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
         var weekBattle : [AnyObject] = []
         let predicate = NSPredicate(format: "user = %@ AND user2 = %@ OR user2 = %@ AND user = %@", PFUser.currentUser()!, opp, PFUser.currentUser()!, opp)
         
-        var weekBattleQuery = PFQuery(className:"weekBattle", predicate: predicate)
+        let weekBattleQuery = PFQuery(className:"weekBattle", predicate: predicate)
         
         weekBattleQuery.findObjectsInBackground().continueWithBlock {
             (task: BFTask!) -> AnyObject in

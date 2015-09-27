@@ -17,7 +17,7 @@ class loginPopupView {
     var passWord : UITextField = UITextField()
     
     func openRegisterLogin(loginView : UIView) {
-        container.setTranslatesAutoresizingMaskIntoConstraints(false)
+        container.translatesAutoresizingMaskIntoConstraints = false
         container.constrainToSize(CGSizeMake(loginView.bounds.width - 20, loginView.bounds.height - 100))
         
         container.layer.borderWidth = 1.0
@@ -35,7 +35,7 @@ class loginPopupView {
     }
     
     func addCancelBtn() {
-        cancelBtn.setTranslatesAutoresizingMaskIntoConstraints(false)
+        cancelBtn.translatesAutoresizingMaskIntoConstraints = false
         cancelBtn.setImage(UIImage(named: "cancelBtniPhone"), forState: .Normal)
         
         container.addSubview(cancelBtn)
@@ -47,7 +47,7 @@ class loginPopupView {
     }
     
     func addTextFields() {
-        fullName.setTranslatesAutoresizingMaskIntoConstraints(false)
+        fullName.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(fullName)
 
         fullName.placeholder = "Full name"
@@ -57,7 +57,7 @@ class loginPopupView {
         fullName.centerInContainerOnAxis(.CenterX)
         fullName.pinAttribute(.Top, toAttribute: .Top, ofItem: container, withConstant: 100)
         
-        userName.setTranslatesAutoresizingMaskIntoConstraints(false)
+        userName.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(userName)
         
         userName.placeholder = "Username"

@@ -32,7 +32,7 @@ class finishScreen {
             "what?"
         }
         
-        var buttonArray : NSArray = []
+        let buttonArray : NSArray = []
 //        addSpecial1Btn()
 //        addSpecial2Btn()
 //        addCancelBtn()
@@ -44,7 +44,7 @@ class finishScreen {
     }
     
     func addContainerView(uiView : UIView) {
-        container.setTranslatesAutoresizingMaskIntoConstraints(false)
+        container.translatesAutoresizingMaskIntoConstraints = false
         container.constrainToSize(CGSizeMake(uiView.bounds.width - 20, uiView.bounds.height - 100))
         
         container.layer.borderWidth = 1.0
@@ -53,7 +53,7 @@ class finishScreen {
         container.layer.cornerRadius = 8
         
         uiView.addSubview(container)
-        container.pulseToSize(1.1, duration: 0.2, repeat: false)
+        container.pulseToSize(1.1, duration: 0.2, `repeat`: false)
         
         container.pinAttribute(.Top, toAttribute: .Top, ofItem: uiView, withConstant: 70)
         container.centerInContainerOnAxis(.CenterX)
@@ -68,7 +68,7 @@ class finishScreen {
         
         container.addSubview(titleLabel)
         
-        titleLabel.setTranslatesAutoresizingMaskIntoConstraints(false)
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.pinAttribute(.Top, toAttribute: .Top, ofItem: container, withConstant: 5)
         titleLabel.centerInContainerOnAxis(.CenterX)
     }
@@ -106,11 +106,11 @@ class finishScreen {
 
         container.addSubview(textLabelView)
         
-        textLabelView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        textLabelView.translatesAutoresizingMaskIntoConstraints = false
         textLabelView.pinAttribute(.Top, toAttribute: .Top, ofItem: container, withConstant: 100)
         textLabelView.centerInContainerOnAxis(.CenterX)
         
-        var btn = UIButton()
+        let btn = UIButton()
         
         return btn
     }
@@ -121,7 +121,7 @@ class finishScreen {
         
         uiView.addSubview(continuButton)
         
-        continuButton.setTranslatesAutoresizingMaskIntoConstraints(false)
+        continuButton.translatesAutoresizingMaskIntoConstraints = false
         continuButton.constrainToSize(CGSizeMake(uiView.bounds.width - 10, 50))
         continuButton.centerInContainerOnAxis(.CenterX)
         continuButton.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: uiView, withConstant: -10)

@@ -35,9 +35,9 @@ class gameHandler {
     }
     
     func placeStripeAndSavePoint(stripeToSubmit : UIButton, doubleStripeToSubmit : UIButton, scoredSquares : [UIView], specialUsed : Bool) {
-        var rowIndex = stripeToSubmit.superview!.superview!.tag
-        var squareIndex = stripeToSubmit.superview!.tag
-        var userIsTakingOverOpponentSquare = false
+        let rowIndex = stripeToSubmit.superview!.superview!.tag
+        let squareIndex = stripeToSubmit.superview!.tag
+        let userIsTakingOverOpponentSquare = false
         
         userBoard.placeStripe(rowIndex, y: squareIndex, stripe: gameBoardView.position[stripeToSubmit]!)
         localGameBoard.placeStripe(rowIndex, y: squareIndex, stripe: gameBoardView.position[stripeToSubmit]!)
@@ -51,7 +51,7 @@ class gameHandler {
 
                 var squaresBackend = gameObject["allScoredSquares"] as! [[String:AnyObject]]
                 
-                for (index,scoredSquare) in enumerate(squaresBackend) {
+                for (index,scoredSquare) in squaresBackend.enumerate() {
                     if scoredSquare["rowIndex"] as! Int == square.superview!.tag && scoredSquare["squareIndex"] as! Int == square.tag {
                         squaresBackend.removeAtIndex(index)
                     }
@@ -61,7 +61,7 @@ class gameHandler {
             }
             
             
-            var squareObjectToSave = Game.createSquareObject(square.superview!.tag, squareIndex: square.tag)
+            let squareObjectToSave = Game.createSquareObject(square.superview!.tag, squareIndex: square.tag)
             squareObjects += [squareObjectToSave]
             gameBoardView.addSquareBackgroundImage(square, content: "fullSquareBlue")
         }
@@ -93,7 +93,7 @@ class gameHandler {
         
         var pointsArray = gameBoardView.updateGameBoardPoints(gameObject["allScoredSquares"] as! [[String : AnyObject]], newScoredSquaresArray: squareObjects, uBoard : userBoard, oppBoard: opponentBoard)
         
-        var gameToSave = Game.saveSquare(gameObject, squaresArray: squareObjects, userPoints: pointsArray[0], oppPoints: pointsArray[1], userBoard: userBoard, oppBoard: opponentBoard)
+        let gameToSave = Game.saveSquare(gameObject, squaresArray: squareObjects, userPoints: pointsArray[0], oppPoints: pointsArray[1], userBoard: userBoard, oppBoard: opponentBoard)
         
         gameToSave.saveInBackgroundWithBlock {
             (succes: Bool, err: NSError?) -> Void in
@@ -130,7 +130,7 @@ class gameHandler {
             }
         }
         
-        var gameToSave = Game.updateUserGameBoardAndSwitchUserTurn(gameObject, weekBattle: weekBattleObject[0], userBoard: userBoard, oppBoard: opponentBoard, lastStripe: stripeToSubmit)
+        let gameToSave = Game.updateUserGameBoardAndSwitchUserTurn(gameObject, weekBattle: weekBattleObject[0], userBoard: userBoard, oppBoard: opponentBoard, lastStripe: stripeToSubmit)
         
         gameToSave.saveInBackgroundWithBlock {
             (succeeded: Bool, err: NSError?) -> Void in
@@ -152,7 +152,7 @@ class gameHandler {
     func gameFinished(button : UIButton!) {
         if gameObject["finished"] as! Bool == true {
             var nextGrid = [3, 4]
-            nextGrid.remove(gameObject["grid"] as! Int)
+            nextGrid.removeObject(gameObject["grid"] as! Int)
 
             weekBattle.resetGame(nextGrid[0] as Int, game: gameObject)
             
@@ -167,10 +167,10 @@ class gameHandler {
         } else {
             var oppName = ""
 //            var oppFullName = (PFUser.currentUser()["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
-            var oppFullName : NSArray = ["FirstName", "LastName"]
+            let oppFullName : NSArray = ["FirstName", "LastName"]
             
-            var lastName = oppFullName.lastObject as! String
-            var lastLetter = lastName[lastName.startIndex]
+            let lastName = oppFullName.lastObject as! String
+            let lastLetter = lastName[lastName.startIndex]
             
             oppName = "\(oppFullName[0]) \(lastLetter)."
             
@@ -188,7 +188,7 @@ class gameHandler {
             }
             
             weekBattleObject[0].saveInBackgroundWithBlock(nil)
-            var gameToSave = Game.gameFinished(gameObject, weekBattle: weekBattleObject[0], uWonGame: userWonGame)
+            let gameToSave = Game.gameFinished(gameObject, weekBattle: weekBattleObject[0], uWonGame: userWonGame)
             
             gameToSave.saveInBackgroundWithBlock {
                 (succeeded: Bool, err: NSError?) -> Void in

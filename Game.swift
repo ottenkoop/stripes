@@ -6,7 +6,7 @@
 class Game: PFObject {
     
     class func addGame(opponent : PFUser, grid : Int) {
-        var game = PFObject(className:"Game")
+        let game = PFObject(className:"Game")
         var board = Board(dimension: grid)
         
 //        var opponentUser = PFUser.query()
@@ -39,8 +39,8 @@ class Game: PFObject {
     
     class func saveSquare(game : PFObject, squaresArray : NSArray, userPoints : Int, oppPoints : Int, userBoard : Board, oppBoard : Board) -> PFObject {
         var newArrayToSave : [AnyObject] = []
-        var userBoardArray = userBoard.toString(userBoard.board)
-        var opponentBoardArray = oppBoard.toString(oppBoard.board)
+        let userBoardArray = userBoard.toString(userBoard.board)
+        let opponentBoardArray = oppBoard.toString(oppBoard.board)
     
         if game["user"]!.objectId == PFUser.currentUser()!.objectId {
             game["userPoints"] = userPoints
@@ -80,10 +80,10 @@ class Game: PFObject {
     }
     
     class func updateUserGameBoardAndSwitchUserTurn(game : PFObject, weekBattle : PFObject, userBoard : Board, oppBoard : Board, lastStripe : UIButton) -> PFObject {
-        var lastStripeObject = stripeHandler.createStripeObject(lastStripe.superview!.superview!.tag, squareIndex: lastStripe.superview!.tag, stripeIndex: lastStripe.tag)
+        let lastStripeObject = stripeHandler.createStripeObject(lastStripe.superview!.superview!.tag, squareIndex: lastStripe.superview!.tag, stripeIndex: lastStripe.tag)
         
-        var userBoardArray = userBoard.toString(userBoard.board)
-        var oppBoardArray = oppBoard.toString(oppBoard.board)
+        let userBoardArray = userBoard.toString(userBoard.board)
+        let oppBoardArray = oppBoard.toString(oppBoard.board)
         var opponentUser = PFUser()
         var firstStripe = Bool()
 
@@ -154,18 +154,18 @@ class Game: PFObject {
     }
     
     class func currentGame() -> PFObject {
-        var currentGame = getCurrentGameFromLocalDataStore()
+        let currentGame = getCurrentGameFromLocalDataStore()
         
         return currentGame["object"] as! PFObject
     }
     
     class func getCurrentGameFromParse(weekBattle : PFObject) -> PFObject {
-        var gameId = weekBattle["currentGame"]!.objectId
+        let gameId = weekBattle["currentGame"]!.objectId
         
-        var gameQuery = PFQuery(className:"Game")
+        let gameQuery = PFQuery(className:"Game")
         gameQuery.whereKey("objectId", equalTo:"\(gameId)")
         
-        var game : PFObject = gameQuery.findObjects()![0] as! PFObject
+        let game : PFObject = gameQuery.findObjects()![0] as! PFObject
         
         
         return game
@@ -175,7 +175,7 @@ class Game: PFObject {
         let query = PFQuery(className:"currentGame")
         query.fromLocalDatastore()
 
-        var objects: [PFObject] = query.findObjects() as! [PFObject]
+        let objects: [PFObject] = query.findObjects() as! [PFObject]
         return objects.last!
     }
 }

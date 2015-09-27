@@ -52,7 +52,7 @@ class settingsView : UITableViewController, UIActionSheetDelegate {
     }
 
     override  func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(textCellIdentifier, forIndexPath: indexPath) as! UITableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier(textCellIdentifier, forIndexPath: indexPath) 
         
         let row = indexPath.row
         cell.textLabel?.text = "HOndje"
@@ -61,7 +61,7 @@ class settingsView : UITableViewController, UIActionSheetDelegate {
     }
     
     func logOut() {
-        var sheet : UIActionSheet = UIActionSheet()
+        let sheet : UIActionSheet = UIActionSheet()
         
         sheet.delegate = self
         sheet.addButtonWithTitle("Log Out")

@@ -43,7 +43,7 @@ class gameView {
 
     func addGameBoard() {
         gameController.view.addSubview(gameBoardView)
-        gameBoardView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        gameBoardView.translatesAutoresizingMaskIntoConstraints = false
         
         if (UIInterfaceOrientationIsPortrait(gameController.interfaceOrientation)) {
             
@@ -100,7 +100,7 @@ class gameView {
         if (UIInterfaceOrientationIsPortrait(gameController.interfaceOrientation)) {
             for label in labelPointsViews {
                 gameController.view.addSubview(label)
-                label.setTranslatesAutoresizingMaskIntoConstraints(false)
+                label.translatesAutoresizingMaskIntoConstraints = false
                 label.textAlignment = .Center
                 label.font = UIFont(name: "HanziPen SC", size: 22)
                 
@@ -115,7 +115,7 @@ class gameView {
         } else {
             for label in labelPointsViews {
                 gameController.view.addSubview(label)
-                label.setTranslatesAutoresizingMaskIntoConstraints(false)
+                label.translatesAutoresizingMaskIntoConstraints = false
                 label.textAlignment = .Center
                 
                 label.font = UIFont(name: "HanziPen SC", size: 40)
@@ -135,10 +135,10 @@ class gameView {
         
         gameBoardView.addSubview(row)
         
-        row.setTranslatesAutoresizingMaskIntoConstraints(false)
+        row.translatesAutoresizingMaskIntoConstraints = false
         
-        var plus = Int(6) * Int(gridDimension)
-        var rowHeight : CGFloat = gameBoardViewHeight / CGFloat(gridDimension) + CGFloat(plus)
+        let plus = Int(6) * Int(gridDimension)
+        let rowHeight : CGFloat = gameBoardViewHeight / CGFloat(gridDimension) + CGFloat(plus)
         
         row.constrainToSize(CGSizeMake(gameBoardViewWidth, rowHeight))
         
@@ -171,13 +171,13 @@ class gameView {
 
         allRows[rowIndex].addSubview(square)
 
-        square.setTranslatesAutoresizingMaskIntoConstraints(false)
+        square.translatesAutoresizingMaskIntoConstraints = false
         
-        var plusWidth = Int(6.25) * Int(gridDimension)
-        var plusHeight = Int(4.5) * Int(gridDimension)
+        let plusWidth = Int(6.25) * Int(gridDimension)
+        let plusHeight = Int(4.5) * Int(gridDimension)
         
-        var squareWidth : CGFloat = gameBoardViewWidth / CGFloat(gridDimension) + CGFloat(plusWidth)
-        var squareHeight : CGFloat = gameBoardViewHeight / CGFloat(gridDimension) + CGFloat(plusHeight)
+        let squareWidth : CGFloat = gameBoardViewWidth / CGFloat(gridDimension) + CGFloat(plusWidth)
+        let squareHeight : CGFloat = gameBoardViewHeight / CGFloat(gridDimension) + CGFloat(plusHeight)
         
         square.constrainToSize(CGSizeMake(squareWidth, squareHeight))
 
@@ -214,7 +214,7 @@ class gameView {
         square.clipsToBounds = false
         square.addSubview(stripe)
         
-        stripe.setTranslatesAutoresizingMaskIntoConstraints(false)
+        stripe.translatesAutoresizingMaskIntoConstraints = false
         addStripePosition(stripe, square: square, stripeIndex: stripeIndex)
         
         stripe.setImage(UIImage(named: "\(position[stripe]!.rawValue)_stripeBackground"), forState: .Normal)
@@ -223,8 +223,8 @@ class gameView {
     }
     
     func addStripePosition(stripe : UIButton, square : UIView, stripeIndex : Int) {
-        var stripeWidth : CGFloat = (gameBoardViewWidth / CGFloat(gridDimension) / 100 * 18.5)
-        var stripeHeight : CGFloat = (gameBoardViewHeight / CGFloat(gridDimension) / 100 * 20)
+        let stripeWidth : CGFloat = (gameBoardViewWidth / CGFloat(gridDimension) / 100 * 18.5)
+        let stripeHeight : CGFloat = (gameBoardViewHeight / CGFloat(gridDimension) / 100 * 20)
         
         if stripeIndex == 0 {
             stripe.constrainToHeight(stripeHeight)
@@ -254,28 +254,30 @@ class gameView {
     }
     
     func hideDoubleStripes () {
-        var squaresArrayToUseHere : [UIView] = allSquares
+        let squaresArrayToUseHere : [UIView] = allSquares
         
         var buttonsToHide : [UIButton] = []
-        var lastRow = allRows.last!
+//        var lastRow = allRows.last!
         
         for square in squaresArrayToUseHere {
-            var rightButtonsToHide : UIButton = square.subviews[1] as! UIButton
-            var bottomButtonsToHide : UIButton = square.subviews[2] as! UIButton
+            let rightButtonsToHide : UIButton = square.subviews[1] as! UIButton
+            let bottomButtonsToHide : UIButton = square.subviews[2] as! UIButton
             
             buttonsToHide += [rightButtonsToHide, bottomButtonsToHide]
         }
         
         for row in allRows {
-            var rightButtonsNotToHide : UIButton = row.subviews.last!.subviews[1] as! UIButton
+            let rightButtonsNotToHide : UIButton = row.subviews.last!.subviews[1] as! UIButton
             
-            buttonsToHide.remove(rightButtonsNotToHide)
+            buttonsToHide.removeObject(rightButtonsNotToHide)
+//            buttonsToHide.remove(rightButtonsNotToHide)
             
             if row == allRows.last! {
                 for subview in row.subviews{
-                    var bottomButtonsNotToHide : UIButton = subview.subviews[2] as! UIButton
+                    let bottomButtonsNotToHide : UIButton = subview.subviews[2] as! UIButton
                     
-                    buttonsToHide.remove(bottomButtonsNotToHide)
+//                    buttonsToHide.remove(bottomButtonsNotToHide)
+                    buttonsToHide.removeObject(bottomButtonsNotToHide)
                 }
             }
         }
@@ -290,7 +292,7 @@ class gameView {
         for squareObject in currentGame["allScoredSquares"] as! [[String : AnyObject]] {
 
             
-            var square: UIView = allRows[squareObject["rowIndex"] as! Int].subviews[squareObject["squareIndex"] as! Int] as! UIView
+            let square: UIView = allRows[squareObject["rowIndex"] as! Int].subviews[squareObject["squareIndex"] as! Int] 
             
             if squareObject["userId"] as? NSString == PFUser.currentUser()!.objectId {
                 addSquareBackgroundImage(square, content: "fullSquareBlue")
@@ -301,9 +303,9 @@ class gameView {
     }
     
     func addSquareBackgroundImage(square : UIView, content : String ) {
-        var image = UIImage(named: "\(content)")
-        var imageV = UIImageView(image: image)
-        imageV.setTranslatesAutoresizingMaskIntoConstraints(false)
+        let image = UIImage(named: "\(content)")
+        let imageV = UIImageView(image: image)
+        imageV.translatesAutoresizingMaskIntoConstraints = false
         
         square.insertSubview(imageV, atIndex: 4)
 
@@ -324,7 +326,7 @@ class gameView {
         }
         
         if stripe != oldStripe {
-            var image = UIImage(named: "\(position[stripe]!.rawValue)_currentBlueStripe") as UIImage?
+            let image = UIImage(named: "\(position[stripe]!.rawValue)_currentBlueStripe") as UIImage?
             stripe.setImage(image, forState: .Normal)
 
             animateStripe(stripe, duration: duration, delay: 0, startFloat: 0.0001)
@@ -345,7 +347,7 @@ class gameView {
             oldDoubleStripe.backgroundColor = UIColor.clearColor()
             
         } else if stripe == oldStripe && stripe.selected == false {
-            var image = UIImage(named: "\(position[stripe]!.rawValue)_currentBlueStripe") as UIImage?
+            let image = UIImage(named: "\(position[stripe]!.rawValue)_currentBlueStripe") as UIImage?
             stripe.setImage(image, forState: .Normal)
             animateStripe(stripe, duration: duration, delay: 0, startFloat: 0.4)
             stripe.selected = true
@@ -380,7 +382,7 @@ class gameView {
     func addSubmitBtn(submitBtn : UIButton) {        
         gameController.view.addSubview(submitBtn)
         
-        submitBtn.setTranslatesAutoresizingMaskIntoConstraints(false)
+        submitBtn.translatesAutoresizingMaskIntoConstraints = false
         submitBtn.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: gameController.view, withConstant: -5)
         submitBtn.pinAttribute(.Left, toAttribute: .Left, ofItem: gameController.view, withConstant: 5)
 
@@ -398,7 +400,7 @@ class gameView {
     func addSpecialsBtn(specialsBtn : UIButton) {
         gameController.view.addSubview(specialsBtn)
         
-        specialsBtn.setTranslatesAutoresizingMaskIntoConstraints(false)
+        specialsBtn.translatesAutoresizingMaskIntoConstraints = false
         specialsBtn.pinAttribute(.Right, toAttribute: .Right, ofItem: gameController.view, withConstant: -5)
         specialsBtn.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: gameController.view, withConstant: -5)
         
@@ -435,7 +437,7 @@ class gameView {
     func removeStylingWhenSubmit(stripeToSubmit : UIButton, points : Int) {
         stripeToSubmit.userInteractionEnabled = false
         
-        var image = UIImage(named: "\(position[stripeToSubmit]!.rawValue)_blueStripe") as UIImage?
+        let image = UIImage(named: "\(position[stripeToSubmit]!.rawValue)_blueStripe") as UIImage?
         stripeToSubmit.setImage(image, forState: .Normal)
         
         loadingView().hideActivityIndicatorWhenScoring(loadingContainer, points: points)
@@ -444,7 +446,7 @@ class gameView {
         for square in allSquares {
             for s in square.subviews {
                 if s.isKindOfClass(UIButton) {
-                    var stripe = s as! UIButton
+                    let stripe = s as! UIButton
                     if stripe.selected != true {
                         stripe.userInteractionEnabled = true
                     } else {
@@ -456,13 +458,13 @@ class gameView {
     }
     
     func selectDoubleStripe(stripe : UIButton) -> UIButton {
-        var squareOfStripeTag = stripe.superview!.tag
-        var rowOfStripe = stripe.superview!.superview!
+        let squareOfStripeTag = stripe.superview!.tag
+        let rowOfStripe = stripe.superview!.superview!
         var doubleStripe = UIButton()
         
         if squareOfStripeTag > 0 {
             if position[stripe] == .Left {
-                var doubleStripe: UIButton = rowOfStripe.subviews[squareOfStripeTag - 1].subviews[1] as! UIButton
+                let doubleStripe: UIButton = rowOfStripe.subviews[squareOfStripeTag - 1].subviews[1] as! UIButton
                 doubleStripe.selected = true
                 
                 return doubleStripe
@@ -471,7 +473,7 @@ class gameView {
         
         if rowOfStripe.tag > 0 {
             if position[stripe] == .Top {
-                var doubleStripe: UIButton = allRows[rowOfStripe.tag - 1].subviews[squareOfStripeTag].subviews[2] as! UIButton
+                let doubleStripe: UIButton = allRows[rowOfStripe.tag - 1].subviews[squareOfStripeTag].subviews[2] as! UIButton
                 doubleStripe.selected = true
                 
                 return doubleStripe
@@ -517,7 +519,7 @@ class gameView {
         }
         
         for square in newScoredSquaresArray {
-            println(square["userId"]!)
+            print(square["userId"]!)
             
             switch square["userId"] as? NSString == PFUser.currentUser()!.objectId {
             case true:
@@ -534,8 +536,8 @@ class gameView {
                 opponentPoints += 1
             }
             
-            println(userPoints)
-            println(opponentPoints)
+            print(userPoints)
+            print(opponentPoints)
         }
         
 
@@ -556,7 +558,7 @@ class gameView {
                 opponentSelectedStripes += [stripe]
             }
             
-            var randomFloat = Float.random(min: 109.90, max: 110.055)
+            var randomFloat = Float.random(109.90, max: 110.055)
             stripe.transform = CGAffineTransformMakeRotation(CGFloat(randomFloat))
 
             stripe.selected = true
@@ -567,14 +569,13 @@ class gameView {
     }
     
     func selectLastPlayedStripe() {
-        var lastStripeObject : AnyObject = currentGame["lastStripe"] as! NSArray
+        let lastStripeObject : AnyObject = currentGame["lastStripe"] as! NSArray
         var lastStripe = UIButton()
         
         if lastStripeObject.count > 0 {
-            lastStripeObject = lastStripeObject[0]
-            var rowIndex = lastStripeObject.objectForKey("rowIndex") as! Int
-            var squareIndex = lastStripeObject.objectForKey("squareIndex") as! Int
-            var stripeIndex = lastStripeObject.objectForKey("stripeIndex") as! Int
+            let rowIndex = lastStripeObject[0].objectForKey("rowIndex") as! Int
+            let squareIndex = lastStripeObject[0].objectForKey("squareIndex") as! Int
+            let stripeIndex = lastStripeObject[0].objectForKey("stripeIndex") as! Int
             
             lastStripe = allRows[rowIndex].subviews[squareIndex].subviews[stripeIndex] as! UIButton
             
@@ -623,7 +624,7 @@ class gameView {
         for square in allSquares {
             for openStripe in square.subviews {
                 if openStripe.isKindOfClass(UIButton) {
-                    var stripe = openStripe as! UIButton
+                    let stripe = openStripe as! UIButton
                     stripe.userInteractionEnabled = false
                 }
             }
@@ -637,7 +638,7 @@ class gameView {
     
     func animateSpecialStripes() {
         for stripe in opponentSelectedStripes {
-            stripe.pulseToSize(1.1, duration: 0.2, repeat: true)
+            stripe.pulseToSize(1.1, duration: 0.2, `repeat`: true)
         }
     }
 

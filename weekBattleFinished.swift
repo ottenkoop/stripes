@@ -37,7 +37,7 @@ class weekBattleFinished {
             textView = addDrawNotification()
         }
         
-        var scoreView = addScoreBoard(oppName, oppPoints: oppPoints, uPoints: uPoints)
+        let scoreView = addScoreBoard(oppName, oppPoints: oppPoints, uPoints: uPoints)
         addYesBtn()
         addResetBtn()
         addRestartText()
@@ -52,7 +52,7 @@ class weekBattleFinished {
         background.frame = uiView.frame
         background.backgroundColor = UIColor.colorWithRGBHexWithAlpha(0x444444, alpha: 0.2)
         
-        container.setTranslatesAutoresizingMaskIntoConstraints(false)
+        container.translatesAutoresizingMaskIntoConstraints = false
         
         container.layer.borderWidth = 1.0
         container.layer.borderColor = UIColor.colorWithRGBHex(0x979797, alpha: 1.0).CGColor
@@ -64,7 +64,7 @@ class weekBattleFinished {
         background.addSubview(container)
         background.bringSubviewToFront(container)
         
-        container.pulseToSize(1.1, duration: 0.4, repeat: false)
+        container.pulseToSize(1.1, duration: 0.4, `repeat`: false)
         
         if (UIInterfaceOrientationIsPortrait(overViewControl.interfaceOrientation)) {
             containerWidth = uiView.bounds.width - 20
@@ -87,7 +87,7 @@ class weekBattleFinished {
         container.addSubview(centerInformationText)
         container.bringSubviewToFront(centerInformationText)
         
-        centerInformationText.setTranslatesAutoresizingMaskIntoConstraints(false)
+        centerInformationText.translatesAutoresizingMaskIntoConstraints = false
         centerInformationText.pinAttribute(.Left, toAttribute: .Left, ofItem: container)
         centerInformationText.pinAttribute(.Right, toAttribute: .Right, ofItem: container)
         centerInformationText.pinAttribute(.Top, toAttribute: .Top, ofItem: container, withConstant: 75)
@@ -101,16 +101,16 @@ class weekBattleFinished {
         
         container.addSubview(titleLabel)
         
-        titleLabel.setTranslatesAutoresizingMaskIntoConstraints(false)
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
         titleLabel.pinAttribute(.Top, toAttribute: .Top, ofItem: container, withConstant: 10)
         titleLabel.centerInContainerOnAxis(.CenterX)
     }
     
     func addWinNotification() -> UIView {
-        var textView = UIView()
-        var awesomeTextLabel = UILabel()
-        var wonTextLabel = UILabel()
+        let textView = UIView()
+        let awesomeTextLabel = UILabel()
+        let wonTextLabel = UILabel()
         
         awesomeTextLabel.text = "Awesome!"
         wonTextLabel.text = "You've won this round."
@@ -122,7 +122,7 @@ class weekBattleFinished {
 
         centerInformationText.addSubview(textView)
         
-        textView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        textView.translatesAutoresizingMaskIntoConstraints = false
         textView.constrainToHeight(150)
 //        textView.pinAttribute(.Top, toAttribute: .Bottom, ofItem: centerInformationText, withConstant: 10)
         textView.pinAttribute(.Left, toAttribute: .Left, ofItem: container)
@@ -138,9 +138,9 @@ class weekBattleFinished {
     }
     
     func addLostNotification() -> UIView {
-        var textView = UIView()
-        var UhOhTextLabel = UILabel()
-        var lostTextLabel = UILabel()
+        let textView = UIView()
+        let UhOhTextLabel = UILabel()
+        let lostTextLabel = UILabel()
         
         UhOhTextLabel.text = "Uh Oh!"
         lostTextLabel.text = "You've lost this round."
@@ -154,7 +154,7 @@ class weekBattleFinished {
         
         centerInformationText.addSubview(textView)
         
-        textView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        textView.translatesAutoresizingMaskIntoConstraints = false
         textView.constrainToHeight(150)
 //        textView.pinAttribute(.Top, toAttribute: .Bottom, ofItem: titleLabel, withConstant: 10)
         textView.pinAttribute(.Left, toAttribute: .Left, ofItem: container)
@@ -170,9 +170,9 @@ class weekBattleFinished {
     }
     
     func addDrawNotification() -> UIView {
-        var textView = UIView()
-        var drawTextLabel = UILabel()
-        var textLabel = UILabel()
+        let textView = UIView()
+        let drawTextLabel = UILabel()
+        let textLabel = UILabel()
         
         drawTextLabel.text = "It's a draw."
         textLabel.text = "Well, at least you didn't lose."
@@ -184,7 +184,7 @@ class weekBattleFinished {
         
         centerInformationText.addSubview(textView)
         
-        textView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        textView.translatesAutoresizingMaskIntoConstraints = false
         textView.constrainToHeight(150)
 //        textView.pinAttribute(.Top, toAttribute: .Bottom, ofItem: titleLabel, withConstant: 10)
         textView.pinAttribute(.Left, toAttribute: .Left, ofItem: container)
@@ -201,7 +201,7 @@ class weekBattleFinished {
     
     func setupTextLabel(labels : [UILabel]) {
         for label in labels {
-            label.setTranslatesAutoresizingMaskIntoConstraints(false)
+            label.translatesAutoresizingMaskIntoConstraints = false
             label.constrainToHeight(40)
             label.textColor = UIColor.colorWithRGBHex(0x0079FF, alpha: 1.0)
             label.font = UIFont(name: "HanziPen SC", size: 24)
@@ -209,24 +209,24 @@ class weekBattleFinished {
     }
     
     func addScoreBoard(oppName : NSString, oppPoints : Int, uPoints : Int) -> UIView {
-        var finalScoreView = UIView()
-        var uNameLabel = UILabel()
-        var uPointsLabel = UILabel()
-        var oppNameLabel = UILabel()
-        var oppPointsLabel = UILabel()
+        let finalScoreView = UIView()
+        let uNameLabel = UILabel()
+        let uPointsLabel = UILabel()
+        let oppNameLabel = UILabel()
+        let oppPointsLabel = UILabel()
         
         var userName = ""
 //        var userFullName = (PFUser.currentUser()["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
-        var userFullName : NSArray = ["FirstName", "LastName"]
-        var lastUName = userFullName.lastObject as! String
-        var lastULetter = lastUName[lastUName.startIndex]
+        let userFullName : NSArray = ["FirstName", "LastName"]
+        let lastUName = userFullName.lastObject as! String
+        let lastULetter = lastUName[lastUName.startIndex]
         
         userName = "\(userFullName[0]) \(lastULetter)."
         
         var opponentName = ""
-        var oppFullName = (oppName as NSString).componentsSeparatedByString(" ") as NSArray
-        var lastName = oppFullName.lastObject as! String
-        var lastLetter = lastName[lastName.startIndex]
+        let oppFullName = (oppName as NSString).componentsSeparatedByString(" ") as NSArray
+        let lastName = oppFullName.lastObject as! String
+        let lastLetter = lastName[lastName.startIndex]
         
         opponentName = "\(oppFullName[0]) \(lastLetter)."
         
@@ -247,7 +247,7 @@ class weekBattleFinished {
         finalScoreView.addSubview(oppNameLabel)
         finalScoreView.addSubview(oppPointsLabel)
         
-        finalScoreView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        finalScoreView.translatesAutoresizingMaskIntoConstraints = false
         finalScoreView.constrainToHeight(150)
 
         finalScoreView.pinAttribute(.Left, toAttribute: .Left, ofItem: container, withConstant: 20)
@@ -258,8 +258,8 @@ class weekBattleFinished {
         oppNameLabel.font = UIFont(name: "HanziPen SC", size: 32)
         uNameLabel.font = UIFont(name: "HanziPen SC", size: 32)
         
-        uPointsLabel.setTranslatesAutoresizingMaskIntoConstraints(false)
-        oppPointsLabel.setTranslatesAutoresizingMaskIntoConstraints(false)
+        uPointsLabel.translatesAutoresizingMaskIntoConstraints = false
+        oppPointsLabel.translatesAutoresizingMaskIntoConstraints = false
         
         uPointsLabel.textColor = UIColor.colorWithRGBHex(0x0079FF, alpha: 1.0)
         oppPointsLabel.textColor = UIColor.colorWithRGBHex(0xFF0000, alpha: 1.0)
@@ -287,7 +287,7 @@ class weekBattleFinished {
     }
 
     func addYesBtn() -> UIButton {
-        yesButton.setTranslatesAutoresizingMaskIntoConstraints(false)
+        yesButton.translatesAutoresizingMaskIntoConstraints = false
         yesButton.setImage(UIImage(named: "yesBtn"), forState: .Normal)
         
         container.addSubview(yesButton)
@@ -300,7 +300,7 @@ class weekBattleFinished {
     }
     
     func addResetBtn() -> UIButton {
-        resetBtn.setTranslatesAutoresizingMaskIntoConstraints(false)
+        resetBtn.translatesAutoresizingMaskIntoConstraints = false
         resetBtn.setImage(UIImage(named: "noBtn"), forState: .Normal)
         
         container.addSubview(resetBtn)
@@ -313,13 +313,13 @@ class weekBattleFinished {
     }
     
     func addRestartText() {
-        var restartText = UILabel()
+        let restartText = UILabel()
         
         restartText.text = "Play again?"
         container.addSubview(restartText)
         
         restartText.font = UIFont(name: "HanziPen SC", size: 28)
-        restartText.setTranslatesAutoresizingMaskIntoConstraints(false)
+        restartText.translatesAutoresizingMaskIntoConstraints = false
         restartText.pinAttribute(.Bottom, toAttribute: .Top, ofItem: yesButton, withConstant: -10)
         
         restartText.centerInContainerOnAxis(.CenterX)

@@ -62,25 +62,25 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func addTimer() {
-        var titleView = UILabel()
+        let titleView = UILabel()
         
         var dayText = UILabel()
         var hourText = UILabel()
         var minuteText = UILabel()
         var secondsText = UILabel()
         
-        var margin = (navigationController!.navigationBar.bounds.height) + (UIApplication.sharedApplication().statusBarFrame.size.height)
+        let margin = (navigationController!.navigationBar.bounds.height) + (UIApplication.sharedApplication().statusBarFrame.size.height)
         
         self.view.addSubview(timerView)
         
         timerView.addSubview(titleView)
-        timerView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        timerView.translatesAutoresizingMaskIntoConstraints = false
         timerView.constrainToHeight(60)
         timerView.backgroundColor = UIColor.whiteColor()
         
         titleView.text = "Time left this round:"
         titleView.font = UIFont(name: "HanziPen SC", size: 12)
-        titleView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        titleView.translatesAutoresizingMaskIntoConstraints = false
         titleView.centerInContainerOnAxis(.CenterX)
         titleView.pinAttribute(.Top, toAttribute: .Top, ofItem: timerView, withConstant: 5)
         
@@ -94,10 +94,10 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func addTimerViews() {
-        var dayTimerView = UIView()
-        var hourTimerView = UIView()
-        var minuteTimerView = UIView()
-        var secondsTimerView = UIView()
+        let dayTimerView = UIView()
+        let hourTimerView = UIView()
+        let minuteTimerView = UIView()
+        let secondsTimerView = UIView()
         
         timerView.addSubview(dayTimerView)
         timerView.addSubview(hourTimerView)
@@ -108,9 +108,9 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func styleTimerViews(views : [UIView]) {
-        for (index, view) in enumerate(views) {
+        for (index, view) in views.enumerate() {
             
-            view.setTranslatesAutoresizingMaskIntoConstraints(false)
+            view.translatesAutoresizingMaskIntoConstraints = false
             view.constrainToSize(CGSizeMake((screenWidth / 4) - 3, 40))
             view.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: timerView)
             
@@ -133,50 +133,50 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         minuteTimer.centerInView(views[2])
         secondsTimer.centerInView(views[3])
         
-        updateCountdown()
+//        updateCountdown()
     }
     
     func styleTimerLabels(views : [UILabel]) {
         for view in views {
             view.font = UIFont(name: "HanziPen SC", size: 30)
             view.textColor = UIColor.colorWithRGBHex(0x0079FF, alpha: 1.0)
-            view.setTranslatesAutoresizingMaskIntoConstraints(false)
+            view.translatesAutoresizingMaskIntoConstraints = false
             view.constrainToSize(CGSizeMake(75, 50))
         }
     }
 
-    func updateCountdown() {
-        var date = NSDate()
-        var monday = NSDate().dateAtStartOfWeek().dateByAddingDays(1)
-        
-        var dayString:NSString = "\(date.daysBeforeDate(monday)) days"
-        var hourString:NSString = "\(date.hoursBeforeDate(date.dateAtEndOfDay())) hours"
-        var minuteString:NSString = "\(59 - date.minute()) min"
-        var secondsString:NSString = "\(59 - date.seconds()) sec"
-        
-        var dayTimerString = NSMutableAttributedString()
-        var hourTimerString = NSMutableAttributedString()
-        var minuteTimerString = NSMutableAttributedString()
-        var secondsTimerString = NSMutableAttributedString()
-        
-        dayTimerString = NSMutableAttributedString(string: dayString as String, attributes: [NSFontAttributeName:UIFont(name: "HanziPen SC", size: 18.0)!])
-        hourTimerString = NSMutableAttributedString(string: hourString as String, attributes: [NSFontAttributeName:UIFont(name: "HanziPen SC", size: 18.0)!])
-        minuteTimerString = NSMutableAttributedString(string: minuteString as String, attributes: [NSFontAttributeName:UIFont(name: "HanziPen SC", size: 18.0)!])
-        secondsTimerString = NSMutableAttributedString(string: secondsString as String, attributes: [NSFontAttributeName:UIFont(name: "HanziPen SC", size: 18.0)!])
-
-        // style the label.
-        styleTimerString(dayTimerString, stringLength: dayString.length, attributeLength: 4)
-        styleTimerString(hourTimerString, stringLength: hourString.length, attributeLength: 5)
-        styleTimerString(minuteTimerString, stringLength: minuteString.length, attributeLength: 3)
-        styleTimerString(secondsTimerString, stringLength: secondsString.length, attributeLength: 3)
-
-        //Apply to the label
-        dayTimer.attributedText = dayTimerString
-        hourTimer.attributedText = hourTimerString
-        minuteTimer.attributedText = minuteTimerString
-        secondsTimer.attributedText = secondsTimerString
-
-    }
+//    func updateCountdown() {
+//        let date = NSDate()
+//        let monday = NSDate().dateAtStartOfWeek().dateByAddingDays(1)
+//        
+//        let dayString:NSString = "\(date.daysBeforeDate(monday)) days"
+//        let hourString:NSString = "\(date.hoursBeforeDate(date.dateAtEndOfDay())) hours"
+//        let minuteString:NSString = "\(59 - date.minute()) min"
+//        let secondsString:NSString = "\(59 - date.seconds()) sec"
+//        
+//        var dayTimerString = NSMutableAttributedString()
+//        var hourTimerString = NSMutableAttributedString()
+//        var minuteTimerString = NSMutableAttributedString()
+//        var secondsTimerString = NSMutableAttributedString()
+//        
+//        dayTimerString = NSMutableAttributedString(string: dayString as String, attributes: [NSFontAttributeName:UIFont(name: "HanziPen SC", size: 18.0)!])
+//        hourTimerString = NSMutableAttributedString(string: hourString as String, attributes: [NSFontAttributeName:UIFont(name: "HanziPen SC", size: 18.0)!])
+//        minuteTimerString = NSMutableAttributedString(string: minuteString as String, attributes: [NSFontAttributeName:UIFont(name: "HanziPen SC", size: 18.0)!])
+//        secondsTimerString = NSMutableAttributedString(string: secondsString as String, attributes: [NSFontAttributeName:UIFont(name: "HanziPen SC", size: 18.0)!])
+//
+//        // style the label.
+//        styleTimerString(dayTimerString, stringLength: dayString.length, attributeLength: 4)
+//        styleTimerString(hourTimerString, stringLength: hourString.length, attributeLength: 5)
+//        styleTimerString(minuteTimerString, stringLength: minuteString.length, attributeLength: 3)
+//        styleTimerString(secondsTimerString, stringLength: secondsString.length, attributeLength: 3)
+//
+//        //Apply to the label
+//        dayTimer.attributedText = dayTimerString
+//        hourTimer.attributedText = hourTimerString
+//        minuteTimer.attributedText = minuteTimerString
+//        secondsTimer.attributedText = secondsTimerString
+//
+//    }
     
     func styleTimerString(MuString: NSMutableAttributedString, stringLength: Int, attributeLength: Int) {
         MuString.addAttribute(NSFontAttributeName, value: UIFont(name: "HanziPen SC", size: 30.0)!, range: NSRange(location: 0,length: 2))
@@ -186,7 +186,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func deleteObjectFromSection() {
-        var game : PFObject = gamesWithUserTurn[currentGameIndex] as PFObject
+//        var game : PFObject = gamesWithUserTurn[currentGameIndex] as PFObject
 
         gamesWithUserTurn.removeAtIndex(currentGameIndex)
         loadTableViewContent()
@@ -194,20 +194,20 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     
     func addNewGameBtn() {
         let newGameBtn = UIButton()
-        var navBar = navigationController?.navigationBar
+        let navBar = navigationController?.navigationBar
         
         newGameBtn.backgroundColor = UIColor.colorWithRGBHex(0x5AB103)
         newGameBtn.setTitle("New Game", forState: .Normal)
         newGameBtn.addTarget(self, action: "newGame", forControlEvents: .TouchUpInside)
         
         self.view.addSubview(newGameBtn)
-        newGameBtn.setTranslatesAutoresizingMaskIntoConstraints(false)
+        newGameBtn.translatesAutoresizingMaskIntoConstraints = false
 
         newGameBtn.pinAttribute(.Top, toAttribute: .Bottom, ofItem: navBar, withConstant: 0)
     }
     
     func addRefreshTableDrag() {
-        var refreshControl = UIRefreshControl()
+        let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: "refresh:", forControlEvents: .ValueChanged)
         
         gameTableView.addSubview(refreshControl)
@@ -226,7 +226,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         self.gameTableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "cell")
         self.view.addSubview(gameTableView)
         
-        gameTableView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        gameTableView.translatesAutoresizingMaskIntoConstraints = false
         gameTableView.separatorColor = UIColor.colorWithRGBHex(0xD2D2D2, alpha: 0.4)
         gameTableView.rowHeight = 60.0
         
@@ -288,7 +288,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        var cell = gameTableView.dequeueReusableCellWithIdentifier("cell") as? UITableViewCell
+        var cell = gameTableView.dequeueReusableCellWithIdentifier("cell")
 
         if cell != nil {
             cell = UITableViewCell(style: UITableViewCellStyle.Value1, reuseIdentifier: "CELL")
@@ -317,9 +317,9 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func addCustomCellContent(cell : UITableViewCell, weekBattle : PFObject ) {
-        var oppName = UILabel()
-        var pointsView = UILabel()
-        var userName = UILabel()
+        let oppName = UILabel()
+        let pointsView = UILabel()
+        let userName = UILabel()
         var oppPoints : Int = 0
         var uPoints : Int = 0
         var oppFullName = []
@@ -336,8 +336,8 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         }
 
         if oppFullName.count > 1 {
-            var lastName = oppFullName.lastObject as! String
-            var lastLetter = lastName[lastName.startIndex]
+            let lastName = oppFullName.lastObject as! String
+            let lastLetter = lastName[lastName.startIndex]
             
             oppName.text = "\(oppFullName[0]) \(lastLetter)."
         } else {
@@ -351,9 +351,9 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         cell.contentView.addSubview(pointsView)
         cell.contentView.addSubview(userName)
         
-        oppName.setTranslatesAutoresizingMaskIntoConstraints(false)
-        userName.setTranslatesAutoresizingMaskIntoConstraints(false)
-        pointsView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        oppName.translatesAutoresizingMaskIntoConstraints = false
+        userName.translatesAutoresizingMaskIntoConstraints = false
+        pointsView.translatesAutoresizingMaskIntoConstraints = false
         
         oppName.font = UIFont (name: "HanziPen SC", size: 20)
         oppName.pinAttribute(.Left, toAttribute: .Left, ofItem: cell, withConstant: 20)
@@ -371,10 +371,10 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         switch indexPath.section {
         case 0:
-            var game : PFObject = gamesWithUserTurn[Int(indexPath.row)] as PFObject
+            let game : PFObject = gamesWithUserTurn[Int(indexPath.row)] as PFObject
             openGame(game)
         case 1:
-            var game : PFObject = gamesWithOpponentTurn[Int(indexPath.row)] as PFObject
+            let game : PFObject = gamesWithOpponentTurn[Int(indexPath.row)] as PFObject
         
             openGame(game)
         default:
@@ -413,23 +413,24 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
                 let alert = UIAlertView(title: "Connection Failed", message: "There seems to be an error with your internet connection.", delegate: self, cancelButtonTitle: "Try Again")
                 alert.show()
                 
-                println("Error: %@ %@", error, error!.userInfo!)
+                print("Error: %@ %@", error, error!.userInfo)
             }
         }
     }
     
     func openGame(weekBattle : PFObject) {
-        var containerToRemove = loadingView().showActivityIndicator(self.view)
-        var gameQuery = searchModule.findGame(weekBattle["currentGame"]!.objectId! as! NSString)
+        let containerToRemove = loadingView().showActivityIndicator(self.view)
+        let gameQuery = searchModule.findGame(weekBattle["currentGame"]!.objectId as! NSString)
         
         gameQuery.findObjectsInBackground().continueWithBlock {
             (task: BFTask!) -> AnyObject in
             if let error = task.error {
-                println("Error: \(error)")
+                print("Error: \(error)")
                 return task
             }
             
-            var game : PFObject = task.result![0] as! PFObject
+            let game = task.result! as! PFObject
+            
 
             let currentGame = PFObject(className: "currentGame")
             
@@ -472,13 +473,15 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
-    func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [AnyObject]? {
-        var deleteAction = UITableViewRowAction(style: .Default, title: "Resign") { (action, indexPath) -> Void in
+    @available(iOS 8.0, *)
+    func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [UITableViewRowAction]? {
+        let row = indexPath.row
+        let deleteAction = UITableViewRowAction(style: .Default, title: "Resign") { (action, indexPath) -> Void in
             tableView.editing = true
             
             switch indexPath.section {
             case 0:
-                var game : PFObject = self.gamesWithUserTurn.at(indexPath.row)[0] as PFObject
+                let game : PFObject = self.gamesWithUserTurn[row] as PFObject
                 pushNotificationHandler.userResignedGame(game)
                 self.gamesWithUserTurn.removeAtIndex(indexPath.self.row)
                 self.gameTableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Automatic)
@@ -486,7 +489,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
                 game.deleteEventually()
                 
             case 1:
-                var game : PFObject = self.gamesWithOpponentTurn.at(indexPath.row)[0] as PFObject
+                let game : PFObject = self.gamesWithOpponentTurn[row] as PFObject
                 pushNotificationHandler.userResignedGame(game)
                 self.gamesWithOpponentTurn.removeAtIndex(indexPath.row)
                 self.gameTableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Automatic)
@@ -505,7 +508,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func setBadgeNumber () {
-        var currentInstallation = PFInstallation.currentInstallation()
+        let currentInstallation = PFInstallation.currentInstallation()
         
         if gamesWithUserTurn.count != 0 {
             currentInstallation.badge = gamesWithUserTurn.count
@@ -522,8 +525,8 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     
     func addNavigationItems() {
         navigationItem.title = "Connecting..."
-        var addNewGameBtn = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "newGame")
-        var settingsMenu = UIBarButtonItem(image: UIImage(named: "settingsIcon"), style: .Plain, target: self, action: "openSettings")
+        let addNewGameBtn = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "newGame")
+        let settingsMenu = UIBarButtonItem(image: UIImage(named: "settingsIcon"), style: .Plain, target: self, action: "openSettings")
         
         navigationItem.rightBarButtonItem = addNewGameBtn
         navigationItem.leftBarButtonItem = settingsMenu
@@ -536,14 +539,14 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func openSettings() {
-        println("Henk")
+        print("Henk")
 //        let settingsV = settingsView()
 //        
 //        navigationController!.pushViewController(settingsV, animated: true)
     }
     
     func newGame() {
-        var btns = newGamePopup().openPopup(self)
+        let btns = newGamePopup().openPopup(self)
         
         btns[0].addTarget(self, action: "faceBookFriendGame:", forControlEvents: .TouchUpInside)
         btns[1].addTarget(self, action: "searchingForUsername:", forControlEvents: .TouchUpInside)
@@ -555,7 +558,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func faceBookFriendGame(fButton : UIButton!) {
-        var newGame = addNewGameController()
+        let newGame = addNewGameController()
         
         newGame.showFaceBookFriends = true
         
@@ -564,7 +567,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func searchingForUsername(uButton : UIButton!) {
-        var newGame = addNewGameController()
+        let newGame = addNewGameController()
         
         newGame.showFaceBookFriends = false
         
@@ -574,10 +577,10 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     
     func randomGame(rButton : UIButton!) {
         SVProgressHUD.show()
-        var query = PFUser.query()
+        let query = PFUser.query()
         query!.whereKey("lookingForGame", equalTo: true)
         
-        var usersLookingForGame = query!.findObjects() as! NSArray
+        let usersLookingForGame = query!.findObjects() as! NSArray
         
         if usersLookingForGame.count == 0 {
             let alert = UIAlertView(title: "", message: "Searching for an opponent. This may take a while.", delegate: self, cancelButtonTitle: "Ok")
@@ -586,8 +589,8 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
             PFUser.currentUser()!.saveInBackground()
             SVProgressHUD.dismiss()
         } else {
-            var int = Int(arc4random_uniform(UInt32(usersLookingForGame.count)))
-            var opponent = usersLookingForGame[int] as! PFUser
+            let int = Int(arc4random_uniform(UInt32(usersLookingForGame.count)))
+            let opponent = usersLookingForGame[int] as! PFUser
             Game.addGame(opponent, grid: 3)
 
             SVProgressHUD.dismiss()
@@ -635,7 +638,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         self.view.addSubview(bannerView)
         self.bannerView.delegate = self
         
-        bannerView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        bannerView.translatesAutoresizingMaskIntoConstraints = false
         bannerView.constrainToHeight(bannerView.bounds.height)
         bannerView.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: self.view)
         bannerView.pinAttribute(.Left, toAttribute: .Left, ofItem: self.view)

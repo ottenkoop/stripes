@@ -29,7 +29,7 @@ class specialsPopup {
     }
     
     func addContainerView(uiView : UIView) {
-        container.setTranslatesAutoresizingMaskIntoConstraints(false)
+        container.translatesAutoresizingMaskIntoConstraints = false
         container.constrainToSize(CGSizeMake(uiView.bounds.width - 20, uiView.bounds.height - 100))
         
         container.layer.borderWidth = 1.0
@@ -38,7 +38,7 @@ class specialsPopup {
         container.layer.cornerRadius = 8
         
         uiView.addSubview(container)
-        container.pulseToSize(1.1, duration: 0.2, repeat: false)
+        container.pulseToSize(1.1, duration: 0.2, `repeat`: false)
         
         container.pinAttribute(.Top, toAttribute: .Top, ofItem: uiView, withConstant: 70)
         container.centerInContainerOnAxis(.CenterX)
@@ -47,7 +47,7 @@ class specialsPopup {
     }
     
     func addTitleLabel() {
-        var titleLabel = UILabel()
+        let titleLabel = UILabel()
         
         titleLabel.text = "Specials"
         titleLabel.textColor = UIColor.colorWithRGBHex(0x0079FF, alpha: 1.0)
@@ -55,13 +55,13 @@ class specialsPopup {
         
         container.addSubview(titleLabel)
         
-        titleLabel.setTranslatesAutoresizingMaskIntoConstraints(false)
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.pinAttribute(.Top, toAttribute: .Top, ofItem: container, withConstant: 5)
         titleLabel.centerInContainerOnAxis(.CenterX)
     }
     
     func addSpecial1Btn() {
-        special1Btn.setTranslatesAutoresizingMaskIntoConstraints(false)
+        special1Btn.translatesAutoresizingMaskIntoConstraints = false
         special1Btn.setImage(UIImage(named: "special1Background"), forState: .Normal)
         
         container.addSubview(special1Btn)
@@ -72,7 +72,7 @@ class specialsPopup {
     }
     
     func addSpecial2Btn() {
-        special2Btn.setTranslatesAutoresizingMaskIntoConstraints(false)
+        special2Btn.translatesAutoresizingMaskIntoConstraints = false
 //        special2Btn.setImage(UIImage(named: ""), forState: .Normal)
         
         special2Btn.layer.borderWidth = 1.0
@@ -88,7 +88,7 @@ class specialsPopup {
     }
     
     func addCancelBtn() {
-        cancelBtn.setTranslatesAutoresizingMaskIntoConstraints(false)
+        cancelBtn.translatesAutoresizingMaskIntoConstraints = false
         cancelBtn.setImage(UIImage(named: "cancelBtniPhone"), forState: .Normal)
         
 //        if (UIInterfaceOrientationIsPortrait() {

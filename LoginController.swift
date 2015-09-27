@@ -30,7 +30,7 @@ class LoginViewController: UIViewController, UIAlertViewDelegate, PFLogInViewCon
     func addLogoView () {
         self.view.addSubview(logoView)
         
-        logoView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        logoView.translatesAutoresizingMaskIntoConstraints = false
         logoView.constrainToSize(CGSizeMake(175, 225))
         logoView.centerInContainerOnAxis(NSLayoutAttribute.CenterX)
         logoView.pinAttribute(.Top, toAttribute: .Top, ofItem: self.view, withConstant: 40)
@@ -41,7 +41,7 @@ class LoginViewController: UIViewController, UIAlertViewDelegate, PFLogInViewCon
 
         fbLoginView.addTarget(self, action: "fbButtonAction:", forControlEvents: .TouchUpInside)
         fbLoginView.setImage(UIImage(named: "faceBookLogin"), forState: .Normal)
-        fbLoginView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        fbLoginView.translatesAutoresizingMaskIntoConstraints = false
         fbLoginView.constrainToSize(CGSizeMake(280, 50))
         fbLoginView.centerInContainerOnAxis(.CenterX)
         fbLoginView.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: logoView, withConstant: 75)
@@ -52,7 +52,7 @@ class LoginViewController: UIViewController, UIAlertViewDelegate, PFLogInViewCon
         
         loginBtn.addTarget(self, action: "loginButtonTapped:", forControlEvents: UIControlEvents.TouchUpInside)
         loginBtn.setImage(UIImage(named: "stripesLoginButton"), forState: .Normal)
-        loginBtn.setTranslatesAutoresizingMaskIntoConstraints(false)
+        loginBtn.translatesAutoresizingMaskIntoConstraints = false
         loginBtn.constrainToSize(CGSizeMake(280, 50))
         loginBtn.centerInContainerOnAxis(.CenterX)
         loginBtn.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: fbLoginView, withConstant: 75)
@@ -63,7 +63,7 @@ class LoginViewController: UIViewController, UIAlertViewDelegate, PFLogInViewCon
         
         registerBtn.setImage(UIImage(named: "registerButton"), forState: .Normal)
         registerBtn.addTarget(self, action: "registerButtonTapped:", forControlEvents: UIControlEvents.TouchUpInside)
-        registerBtn.setTranslatesAutoresizingMaskIntoConstraints(false)
+        registerBtn.translatesAutoresizingMaskIntoConstraints = false
         registerBtn.centerInContainerOnAxis(.CenterX)
         registerBtn.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: self.view, withConstant: -10)
         registerBtn.pinAttribute(.Left, toAttribute: .Left, ofItem: self.view, withConstant: 10)
@@ -71,9 +71,9 @@ class LoginViewController: UIViewController, UIAlertViewDelegate, PFLogInViewCon
     }
     
     func loginButtonTapped(sender:UIButton!) {
-        var logInController = PFLogInViewController()
+        let logInController = PFLogInViewController()
         logInController.delegate = self
-        logInController.fields = PFLogInFields.DismissButton | PFLogInFields.UsernameAndPassword | PFLogInFields.PasswordForgotten | PFLogInFields.LogInButton
+        logInController.fields = [PFLogInFields.DismissButton, PFLogInFields.UsernameAndPassword, PFLogInFields.PasswordForgotten, PFLogInFields.LogInButton]
         logInController.logInView!.logo = nil
         
         styleLoginAndSignupField(logInController.logInView!.logInButton!, image: "loginBtn")
@@ -86,9 +86,9 @@ class LoginViewController: UIViewController, UIAlertViewDelegate, PFLogInViewCon
     }
     
     func registerButtonTapped(sender:UIButton!) {
-        var signupController = PFSignUpViewController()
+        let signupController = PFSignUpViewController()
         signupController.delegate = self
-        signupController.fields = PFSignUpFields.DismissButton | PFSignUpFields.UsernameAndPassword | PFSignUpFields.Email | PFSignUpFields.SignUpButton
+        signupController.fields = [PFSignUpFields.DismissButton, PFSignUpFields.UsernameAndPassword, PFSignUpFields.Email, PFSignUpFields.SignUpButton]
         signupController.signUpView!.logo = nil
 
         styleLoginAndSignupField(signupController.signUpView!.signUpButton!, image: "registerButton")
@@ -116,7 +116,7 @@ class LoginViewController: UIViewController, UIAlertViewDelegate, PFLogInViewCon
     }
     
     func styleLoginAndSignupField(button : UIButton, image : NSString) {
-        button.setTranslatesAutoresizingMaskIntoConstraints(false)
+        button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("", forState: .Normal)
         button.centerInContainerOnAxis(.CenterX)
         button.constrainToWidth(280)
@@ -126,7 +126,7 @@ class LoginViewController: UIViewController, UIAlertViewDelegate, PFLogInViewCon
 //--FacebookLogin Handlers
     
     func fbButtonAction(sender: UIButton!) {
-        var permissions = ["public_profile", "email", "user_friends"]
+        let permissions = ["public_profile", "email", "user_friends"]
         
         PFFacebookUtils.logInWithPermissions(permissions, block: {
             (user: PFUser?, error: NSError?) -> Void in

@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import HockeySDK
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -56,17 +55,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func registerForRemoteNotification() {
         if (UIDevice.currentDevice().systemVersion as NSString).floatValue >= 8.0 {
-            let notificationTypes : UIUserNotificationType = UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound
-            let notificationSettings : UIUserNotificationSettings = UIUserNotificationSettings(forTypes: notificationTypes, categories: nil)
+            if #available(iOS 8.0, *) {
+                let notificationTypes : UIUserNotificationType = [UIUserNotificationType.Alert, UIUserNotificationType.Badge, UIUserNotificationType.Sound]
+                let notificationSettings : UIUserNotificationSettings = UIUserNotificationSettings(forTypes: notificationTypes, categories: nil)
+                UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)
+            }
             
-            UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)
         } else {
-            UIApplication.sharedApplication().registerForRemoteNotificationTypes(UIRemoteNotificationType.Badge | UIRemoteNotificationType.Sound | UIRemoteNotificationType.Alert)
+            UIApplication.sharedApplication().registerForRemoteNotificationTypes([UIRemoteNotificationType.Badge, UIRemoteNotificationType.Sound, UIRemoteNotificationType.Alert])
         }
     }
     
+    @available(iOS 8.0, *)
     func application(application: UIApplication, didRegisterUserNotificationSettings notificationSettings: UIUserNotificationSettings) {
-        UIApplication.sharedApplication().registerForRemoteNotifications()
+        if #available(iOS 8.0, *) {
+            UIApplication.sharedApplication().registerForRemoteNotifications()
+        } else {
+            // Fallback on earlier versions
+        }
     }
     
     func application(application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData) {
@@ -83,7 +89,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: NSError) {
-        println(error.localizedDescription)
+        print(error.localizedDescription)
     }
 
     //    func application(application: UIApplication,
@@ -109,7 +115,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
         
-        var notification:NSDictionary = userInfo["aps"] as! NSDictionary
+        let notification:NSDictionary = userInfo["aps"] as! NSDictionary
         
         if (notification.objectForKey("content-available") != nil) {
             if notification.objectForKey("content-available") as! Int == 1 {
@@ -122,7 +128,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     }
     
-    func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject?) -> Bool {
+    func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {
         return FBAppCall.handleOpenURL(url, sourceApplication:sourceApplication, withSession:PFFacebookUtils.session())
     }
     

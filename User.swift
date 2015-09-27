@@ -27,7 +27,7 @@ class User: PFObject {
     }
     
     class func updateUserFullName() {
-        var user = PFUser.currentUser()!
+        let user = PFUser.currentUser()!
         
         user["fullName"] = user["username"]
         PFUser.currentUser()!["fullName"] = user["username"]
@@ -37,7 +37,7 @@ class User: PFObject {
     }
     
     class func findUser (opponentName : String) -> PFQuery {
-        var opponentUser = PFUser.query()
+        let opponentUser = PFUser.query()
         opponentUser!.whereKey("fullName", equalTo: "\(opponentName)")
         
         return opponentUser!

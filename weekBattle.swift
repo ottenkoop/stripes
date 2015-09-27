@@ -10,7 +10,7 @@
 class weekBattle: PFObject {
     
     class func newBattle(newGame : PFObject) {
-        var weekBattle = PFObject(className:"weekBattle")
+        let weekBattle = PFObject(className:"weekBattle")
         
         weekBattle["userFullName"] = PFUser.currentUser()!["fullName"]
         weekBattle["user2FullName"] = newGame["user2FullName"]

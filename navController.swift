@@ -14,12 +14,12 @@ class navController: UINavigationController {
         return true
     }
     
-    override func supportedInterfaceOrientations() -> Int {
+    override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
         if UIDevice.currentDevice().userInterfaceIdiom == .Phone {
-            return Int(UIInterfaceOrientationMask.Portrait.rawValue)
+            return UIInterfaceOrientationMask.Portrait
             
         } else {
-            return UIInterfaceOrientationMask.LandscapeRight.rawValue.hashValue | UIInterfaceOrientationMask.LandscapeLeft.rawValue.hashValue
+            return UIInterfaceOrientationMask.LandscapeRight.rawValue.hashValue | UIInterfaceOrientationMask.LandscapeLeft.rawValue.hashValue as! UIInterfaceOrientationMask
         }
     }
 }

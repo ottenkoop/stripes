@@ -42,7 +42,7 @@ class newGamePopup {
         // first el always 1btn, etc..
         buttonArray = [faceBookFriend, userSearch, randomOpp, cancelBtn]
         
-        buttonArea.spaceViews(buttonsToSpace as! [AnyObject], onAxis: .Vertical)
+        buttonArea.spaceViews(buttonsToSpace as [AnyObject], onAxis: .Vertical)
         
         return buttonArray
     }
@@ -51,7 +51,7 @@ class newGamePopup {
         background.frame = uiView.frame
         background.backgroundColor = UIColor.colorWithRGBHexWithAlpha(0x444444, alpha: 0.2)
         
-        container.setTranslatesAutoresizingMaskIntoConstraints(false)
+        container.translatesAutoresizingMaskIntoConstraints = false
 
         container.layer.borderWidth = 1.0
         container.layer.borderColor = UIColor.colorWithRGBHex(0x979797, alpha: 1.0).CGColor
@@ -62,7 +62,7 @@ class newGamePopup {
         
         background.addSubview(container)
 
-        container.pulseToSize(1.1, duration: 0.2, repeat: false)
+        container.pulseToSize(1.1, duration: 0.2, `repeat`: false)
         
         if (UIInterfaceOrientationIsPortrait(overViewControl.interfaceOrientation)) {
             container.constrainToSize(CGSizeMake(uiView.bounds.width - 20, uiView.bounds.height - 100))
@@ -78,7 +78,7 @@ class newGamePopup {
     }
 
     func addTitleLabel() {
-        var titleLabel = UILabel()
+        let titleLabel = UILabel()
         
         titleLabel.text = "New Battle"
         titleLabel.textColor = UIColor.colorWithRGBHex(0x0079FF, alpha: 1.0)
@@ -87,8 +87,8 @@ class newGamePopup {
         container.addSubview(titleLabel)
         container.addSubview(buttonArea)
         
-        titleLabel.setTranslatesAutoresizingMaskIntoConstraints(false)
-        buttonArea.setTranslatesAutoresizingMaskIntoConstraints(false)
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        buttonArea.translatesAutoresizingMaskIntoConstraints = false
         
         titleLabel.pinAttribute(.Top, toAttribute: .Top, ofItem: container, withConstant: 5)
         titleLabel.centerInContainerOnAxis(.CenterX)
@@ -100,7 +100,7 @@ class newGamePopup {
     }
     
     func addFaceBookFriendsBtn() {
-        faceBookFriend.setTranslatesAutoresizingMaskIntoConstraints(false)
+        faceBookFriend.translatesAutoresizingMaskIntoConstraints = false
         faceBookFriend.setImage(UIImage(named: "faceBookFriends"), forState: .Normal)
         
         buttonArea.addSubview(faceBookFriend)
@@ -110,7 +110,7 @@ class newGamePopup {
     }
     
     func addUserNameBtn() {
-        userSearch.setTranslatesAutoresizingMaskIntoConstraints(false)
+        userSearch.translatesAutoresizingMaskIntoConstraints = false
         userSearch.setImage(UIImage(named: "userSearchBtn"), forState: .Normal)
         
         buttonArea.addSubview(userSearch)
@@ -120,7 +120,7 @@ class newGamePopup {
     }
     
     func addRandomOppBtn() {
-        randomOpp.setTranslatesAutoresizingMaskIntoConstraints(false)
+        randomOpp.translatesAutoresizingMaskIntoConstraints = false
         randomOpp.setImage(UIImage(named: "randomSearchBtn"), forState: .Normal)
         
         buttonArea.addSubview(randomOpp)
@@ -130,7 +130,7 @@ class newGamePopup {
     }
     
     func addCancelBtn() {
-        cancelBtn.setTranslatesAutoresizingMaskIntoConstraints(false)
+        cancelBtn.translatesAutoresizingMaskIntoConstraints = false
         cancelBtn.setImage(UIImage(named: "cancelBtniPhone"), forState: .Normal)
         
         container.addSubview(cancelBtn)

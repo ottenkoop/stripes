@@ -62,7 +62,7 @@ class gameEngineController: UIViewController {
         
         loadSquaresFromBackEnd()
 
-        for (rowIndex, row) in enumerate(userBoard.board) {
+        for (rowIndex, row) in userBoard.board.enumerate() {
             addRow(rowIndex, row: row)
         }
         
@@ -90,17 +90,17 @@ class gameEngineController: UIViewController {
     func addRow(rowIndex : Int, row : NSArray) {
         gameBoardView.addRow(rowIndex)
         
-        for (squareIndex, square) in enumerate(row) {
+        for (squareIndex, square) in row.enumerate() {
             addSquare(rowIndex, squareIndex: squareIndex, square: square as! Square)
         }
     }
     
     func addSquare(rowIndex : Int, squareIndex : Int, square : Square) {
-        var squareView = gameBoardView.addSquare(rowIndex, squareIndex: squareIndex)
-        var buttonsPerSquare = [0,1,2,3]
+        let squareView = gameBoardView.addSquare(rowIndex, squareIndex: squareIndex)
+        let buttonsPerSquare = [0,1,2,3]
         
         for stripeIndex in buttonsPerSquare {
-            var stripe = gameBoardView.addStripe(stripeIndex, square: squareView)
+            let stripe = gameBoardView.addStripe(stripeIndex, square: squareView)
             
             stripe.addTarget(self, action: "stripePressed:", forControlEvents: .TouchUpInside)
             stripe.tag = stripeIndex
@@ -126,14 +126,14 @@ class gameEngineController: UIViewController {
             gameBoardView.removeSpecialAnimation()
         }
         
-        var oldStripe = stripeToSubmit
-        var oldDoubleStripe = doubleStripeToSubmit
+        let oldStripe = stripeToSubmit
+        let oldDoubleStripe = doubleStripeToSubmit
 
         scoredSquaresArray = []
         doubleStripeToSubmit = UIButton()
         stripeToSubmit = stripe
         
-        var doubleStripe = gameBoardView.selectDoubleStripe(stripeToSubmit)
+        let doubleStripe = gameBoardView.selectDoubleStripe(stripeToSubmit)
         
         gameBoardView.selectCurrentStripe(stripe, oldStripe: oldStripe, doubleStripe: doubleStripe, oldDoubleStripe: oldDoubleStripe, submitBtn: submitBtn, specialUsed: specialUsed)
         
@@ -178,7 +178,7 @@ class gameEngineController: UIViewController {
     }
     
     func openSpecials(button : UIButton!) {
-        var specialsBtns = specialsPopup().openPopup(self.view)
+        let specialsBtns = specialsPopup().openPopup(self.view)
         
         specialsBtns[0].addTarget(self, action: "special1Clicked:", forControlEvents: .TouchUpInside)
         specialsBtns[1].addTarget(self, action: "special2Clicked:", forControlEvents: .TouchUpInside)
@@ -227,7 +227,7 @@ class gameEngineController: UIViewController {
     }
     
     func gameHasFinished() {
-        var finishBtn = UIButton()
+        let finishBtn = UIButton()
         finishBtn.addTarget(self, action: "gameFinished:", forControlEvents: .TouchUpInside)
         
         2.0.waitSecondsAndDo({

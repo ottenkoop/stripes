@@ -35,7 +35,7 @@ class Square {
     }
     
     func isSquareGettingSelected(stripe : StripeType) -> Bool {
-        var newContent = content | stripe.rawValue
+        let newContent = content | stripe.rawValue
         
         return newContent == 15
     }
@@ -77,8 +77,8 @@ class Board {
     }
     
     func loadSquareFromBackend(boardArray : [[Int]]) {
-        for (rowIndex, row) in enumerate(boardArray) {
-            for (index, square) in enumerate(row) {
+        for (rowIndex, row) in boardArray.enumerate() {
+            for (index, square) in row.enumerate() {
                 board[rowIndex][index].loadSquareFromBackend(UInt8(square))
             }
         }
@@ -97,7 +97,7 @@ class Board {
             }
         }
 
-        if values.min() < 15 {
+        if values.minElement() < 15 {
             return false
         } else {
             return true
@@ -107,7 +107,7 @@ class Board {
     func toString (board : [[Square]]) -> [[Int]] {
         var newArray : [[Int]] = [[Int]]()
         
-        for (index, b) in enumerate(board) {
+        for (index, b) in board.enumerate() {
             var row : [Int] = []
 
             for s in b {
