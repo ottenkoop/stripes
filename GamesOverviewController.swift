@@ -14,13 +14,15 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     let bannerView = ADBannerView()
     var gameTableView : UITableView = UITableView()
     var cell : UITableViewCell?
+    var interstitialAd:ADInterstitialAd!
+    var interstitialAdView: UIView = UIView()
 
     //    TimerView is disabled for now
-    var timerView : UIView = UIView()
-    var dayTimer = UILabel()
-    var hourTimer = UILabel()
-    var minuteTimer = UILabel()
-    var secondsTimer = UILabel()
+//    var timerView : UIView = UIView()
+//    var dayTimer = UILabel()
+//    var hourTimer = UILabel()
+//    var minuteTimer = UILabel()
+//    var secondsTimer = UILabel()
     
     let screenWidth : CGFloat = UIScreen.mainScreen().bounds.size.width
     let screenHeight : CGFloat = UIScreen.mainScreen().bounds.size.height
@@ -33,19 +35,22 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         super.viewDidLoad()
         self.gameTableView.backgroundColor = UIColor(patternImage: UIImage(named: "gameBackground")!)
 
-//        addTimer()
         addRefreshTableDrag()
         addTableView()
         addNavigationItems()
+        loadTableViewContent()
         
         addBannerView()
-        
         addUserFacebookInfo()
         
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadTableViewContent", name: "reloadGameTableView", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "resetLookingForGame", name: "resetLookingForGame", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "deleteObjectFromSection", name: "deleteObjectFromYourTurnSection", object: nil)
+        
+        //iAD interstitial
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: ("runAd:"),    name:UIApplicationWillEnterForegroundNotification, object: nil)
+
     }
     
     func addUserFacebookInfo() {
@@ -60,123 +65,6 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
             })
         }
     }
-    
-    func addTimer() {
-        let titleView = UILabel()
-        
-        var dayText = UILabel()
-        var hourText = UILabel()
-        var minuteText = UILabel()
-        var secondsText = UILabel()
-        
-        let margin = (navigationController!.navigationBar.bounds.height) + (UIApplication.sharedApplication().statusBarFrame.size.height)
-        
-        self.view.addSubview(timerView)
-        
-        timerView.addSubview(titleView)
-        timerView.translatesAutoresizingMaskIntoConstraints = false
-        timerView.constrainToHeight(60)
-        timerView.backgroundColor = UIColor.whiteColor()
-        
-        titleView.text = "Time left this round:"
-        titleView.font = UIFont(name: "HanziPen SC", size: 12)
-        titleView.translatesAutoresizingMaskIntoConstraints = false
-        titleView.centerInContainerOnAxis(.CenterX)
-        titleView.pinAttribute(.Top, toAttribute: .Top, ofItem: timerView, withConstant: 5)
-        
-        timerView.pinAttribute(.Top, toAttribute: .Top, ofItem: self.view, withConstant: margin)
-        timerView.pinAttribute(.Left, toAttribute: .Left, ofItem: self.view)
-        timerView.pinAttribute(.Right, toAttribute: .Right, ofItem: self.view)
-        
-        addTimerViews()
-        
-        var timer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "updateCountdown", userInfo: nil, repeats: true)
-    }
-    
-    func addTimerViews() {
-        let dayTimerView = UIView()
-        let hourTimerView = UIView()
-        let minuteTimerView = UIView()
-        let secondsTimerView = UIView()
-        
-        timerView.addSubview(dayTimerView)
-        timerView.addSubview(hourTimerView)
-        timerView.addSubview(minuteTimerView)
-        timerView.addSubview(secondsTimerView)
-        
-        styleTimerViews([dayTimerView, hourTimerView, minuteTimerView, secondsTimerView])
-    }
-    
-    func styleTimerViews(views : [UIView]) {
-        for (index, view) in views.enumerate() {
-            
-            view.translatesAutoresizingMaskIntoConstraints = false
-            view.constrainToSize(CGSizeMake((screenWidth / 4) - 3, 40))
-            view.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: timerView)
-            
-            if index == 0 {
-                view.pinAttribute(.Left, toAttribute: .Left, ofItem: timerView, withConstant: 10)
-            } else {
-                view.pinAttribute(.Left, toAttribute: .Right, ofItem: views[index - 1], withConstant: 2)
-            }
-        }
-        
-        views[0].addSubview(dayTimer)
-        views[1].addSubview(hourTimer)
-        views[2].addSubview(minuteTimer)
-        views[3].addSubview(secondsTimer)
-
-        styleTimerLabels([dayTimer, hourTimer, minuteTimer, secondsTimer])
-        
-        dayTimer.centerInView(views[0])
-        hourTimer.centerInView(views[1])
-        minuteTimer.centerInView(views[2])
-        secondsTimer.centerInView(views[3])
-        
-//        updateCountdown()
-    }
-    
-    func styleTimerLabels(views : [UILabel]) {
-        for view in views {
-            view.font = UIFont(name: "HanziPen SC", size: 30)
-            view.textColor = UIColor.colorWithRGBHex(0x0079FF, alpha: 1.0)
-            view.translatesAutoresizingMaskIntoConstraints = false
-            view.constrainToSize(CGSizeMake(75, 50))
-        }
-    }
-
-//    func updateCountdown() {
-//        let date = NSDate()
-//        let monday = NSDate().dateAtStartOfWeek().dateByAddingDays(1)
-//        
-//        let dayString:NSString = "\(date.daysBeforeDate(monday)) days"
-//        let hourString:NSString = "\(date.hoursBeforeDate(date.dateAtEndOfDay())) hours"
-//        let minuteString:NSString = "\(59 - date.minute()) min"
-//        let secondsString:NSString = "\(59 - date.seconds()) sec"
-//        
-//        var dayTimerString = NSMutableAttributedString()
-//        var hourTimerString = NSMutableAttributedString()
-//        var minuteTimerString = NSMutableAttributedString()
-//        var secondsTimerString = NSMutableAttributedString()
-//        
-//        dayTimerString = NSMutableAttributedString(string: dayString as String, attributes: [NSFontAttributeName:UIFont(name: "HanziPen SC", size: 18.0)!])
-//        hourTimerString = NSMutableAttributedString(string: hourString as String, attributes: [NSFontAttributeName:UIFont(name: "HanziPen SC", size: 18.0)!])
-//        minuteTimerString = NSMutableAttributedString(string: minuteString as String, attributes: [NSFontAttributeName:UIFont(name: "HanziPen SC", size: 18.0)!])
-//        secondsTimerString = NSMutableAttributedString(string: secondsString as String, attributes: [NSFontAttributeName:UIFont(name: "HanziPen SC", size: 18.0)!])
-//
-//        // style the label.
-//        styleTimerString(dayTimerString, stringLength: dayString.length, attributeLength: 4)
-//        styleTimerString(hourTimerString, stringLength: hourString.length, attributeLength: 5)
-//        styleTimerString(minuteTimerString, stringLength: minuteString.length, attributeLength: 3)
-//        styleTimerString(secondsTimerString, stringLength: secondsString.length, attributeLength: 3)
-//
-//        //Apply to the label
-//        dayTimer.attributedText = dayTimerString
-//        hourTimer.attributedText = hourTimerString
-//        minuteTimer.attributedText = minuteTimerString
-//        secondsTimer.attributedText = secondsTimerString
-//
-//    }
     
     func styleTimerString(MuString: NSMutableAttributedString, stringLength: Int, attributeLength: Int) {
         MuString.addAttribute(NSFontAttributeName, value: UIFont(name: "HanziPen SC", size: 30.0)!, range: NSRange(location: 0,length: 2))
@@ -387,61 +275,66 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     func warnBlockingOperationOnMainThread() {
         
     }
+
+
     
     func loadTableViewContent() {
-        navigationItem.title = "Refreshing..."
-        var weekBattlesQuery = searchModule.findWeekBattles()
-        
-        weekBattlesQuery.findObjectsInBackgroundWithBlock {
-            (objects: [AnyObject]?, error: NSError?) -> Void in
-            if error == nil {
+//        navigationItem.title = "Refreshing..."
+        let weekBattlesQuery = searchModule.findWeekBattles()
+
+        weekBattlesQuery.findObjectsInBackground().continueWithBlock {
+            (task: BFTask!) -> AnyObject in
+            if task.error == nil {
                 self.gamesWithUserTurn = []
                 self.gamesWithOpponentTurn = []
                 
-                for object in objects as! [PFObject] {
+                for object in task.result as! [PFObject] {
                     if object["userOnTurn"]!.objectId == PFUser.currentUser()!.objectId {
                         self.gamesWithUserTurn += [object]
                     } else {
                         self.gamesWithOpponentTurn += [object]
                     }
                 }
-                
-                self.navigationItem.title = "Your battles"
-                self.gameTableView.reloadData()
+
+                self.reloadGameTableView()
                 self.setBadgeNumber()
-            } else {
-                let alert = UIAlertView(title: "Connection Failed", message: "There seems to be an error with your internet connection.", delegate: self, cancelButtonTitle: "Try Again")
-                alert.show()
-                
-                print("Error: %@ %@", error, error!.userInfo)
             }
+            return task
         }
     }
     
     func openGame(weekBattle : PFObject) {
         let containerToRemove = loadingView().showActivityIndicator(self.view)
-        let gameQuery = searchModule.findGame(weekBattle["currentGame"]!.objectId as! NSString)
+        let gameQuery = searchModule.findGame(weekBattle["currentGame"].objectId as! NSString)
         
         gameQuery.findObjectsInBackground().continueWithBlock {
             (task: BFTask!) -> AnyObject in
+            
             if let error = task.error {
                 print("Error: \(error)")
                 return task
             }
             
-            let game = task.result! as! PFObject
-            
-
             let currentGame = PFObject(className: "currentGame")
+
+            for object in task.result! as! [PFObject] {
+                currentGame["object"] = object
+            }
             
-            currentGame["object"] = game
-            currentGame.pin()
+            do {
+                try currentGame.pin()
+            } catch {
+                print("meh")
+            }
             
             let gC = gameEngineController()
             gC.weekBattleObject = [weekBattle]
+
+            dispatch_async(dispatch_get_main_queue(), {
+                self.navigationController!.pushViewController(gC, animated: true)
+                loadingView().hideActivityIndicatorWhenReturning(containerToRemove)
+            })
             
-            self.navigationController!.pushViewController(gC, animated: true)
-            loadingView().hideActivityIndicatorWhenReturning(containerToRemove)
             return task
         }
     }
@@ -449,31 +342,36 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        gameTableView.reloadData()
+        reloadGameTableView()
         setBadgeNumber()
         SVProgressHUD.dismiss()
         
-        emptyLocalPinnedObjects()
+//        emptyLocalPinnedObjects()
         
         navigationItem.leftBarButtonItem?.enabled = true
         navigationItem.rightBarButtonItem?.enabled = true
+    }
+    func reloadGameTableView() {
+        dispatch_async(dispatch_get_main_queue()) {
+            self.gameTableView.reloadData()
+            self.navigationItem.title = "Your Battles"
+        }
+        
     }
     
     func emptyLocalPinnedObjects() {
         let query = PFQuery(className:"currentGame")
         query.fromLocalDatastore()
         
-        query.findObjectsInBackgroundWithBlock {
-            (objects: [AnyObject]?, error: NSError?) -> Void in
-            if error == nil {
-                for object in objects! as! [PFObject] {
-                    object.unpinInBackground()
-                }
+        query.findObjectsInBackground().continueWithBlock {
+            (task: BFTask!) -> AnyObject in
+            for object in task.result! as! [PFObject] {
+                object.unpinInBackground()
             }
+            return task
         }
     }
     
-    @available(iOS 8.0, *)
     func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [UITableViewRowAction]? {
         let row = indexPath.row
         let deleteAction = UITableViewRowAction(style: .Default, title: "Resign") { (action, indexPath) -> Void in
@@ -539,7 +437,9 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func openSettings() {
-        print("Henk")
+        PFUser.currentUser()
+        let alert = UIAlertView(title: "", message: "Hi, \(PFUser.currentUser())", delegate: self, cancelButtonTitle: "Ok")
+        alert.show()
 //        let settingsV = settingsView()
 //        
 //        navigationController!.pushViewController(settingsV, animated: true)
@@ -580,7 +480,13 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         let query = PFUser.query()
         query!.whereKey("lookingForGame", equalTo: true)
         
-        let usersLookingForGame = query!.findObjects() as! NSArray
+        var usersLookingForGame = []
+        
+        do {
+            usersLookingForGame = try query!.findObjects()
+        } catch {
+            usersLookingForGame = []
+        }
         
         if usersLookingForGame.count == 0 {
             let alert = UIAlertView(title: "", message: "Searching for an opponent. This may take a while.", delegate: self, cancelButtonTitle: "Ok")
@@ -596,9 +502,6 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
             SVProgressHUD.dismiss()
             newGamePopup().removePopup(rButton)
             
-            var addNewGameBtn = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "newGame")
-            var settingsMenu = UIBarButtonItem(image: UIImage(named: "settingsIcon"), style: .Plain, target: self, action: "openSettings")
-            
             navigationItem.leftBarButtonItem?.enabled = true
             navigationItem.rightBarButtonItem?.enabled = true
         }
@@ -606,9 +509,6 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     
     func cancelBtnPressed(cButton : UIButton!) {
         newGamePopup().cancelPopup(cButton)
-        
-        var addNewGameBtn = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "newGame")
-        var settingsMenu = UIBarButtonItem(image: UIImage(named: "settingsIcon"), style: .Plain, target: self, action: "openSettings")
         
         navigationItem.leftBarButtonItem?.enabled = true
         navigationItem.rightBarButtonItem?.enabled = true
@@ -645,6 +545,40 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         bannerView.pinAttribute(.Right, toAttribute: .Right, ofItem: self.view)
         
         bannerView.alpha = 0.0
+    }
+    
+    func loadInterstitialAd() {
+        interstitialAd = ADInterstitialAd()
+        interstitialAd.delegate = self
+    }
+    
+    func interstitialAdWillLoad(interstitialAd: ADInterstitialAd!) {
+        
+    }
+    
+    func interstitialAdDidLoad(interstitialAd: ADInterstitialAd!) {
+        interstitialAdView = UIView()
+        interstitialAdView.frame = self.view.bounds
+        view.addSubview(interstitialAdView)
+        
+        interstitialAd.presentInView(interstitialAdView)
+        UIViewController.prepareInterstitialAds()
+    }
+    
+    func interstitialAdActionDidFinish(interstitialAd: ADInterstitialAd!) {
+        interstitialAdView.removeFromSuperview()
+    }
+    
+    func interstitialAdActionShouldBegin(interstitialAd: ADInterstitialAd!, willLeaveApplication willLeave: Bool) -> Bool {
+        return true
+    }
+    
+    func interstitialAd(interstitialAd: ADInterstitialAd!, didFailWithError error: NSError!) {
+        
+    }
+    
+    func interstitialAdDidUnload(interstitialAd: ADInterstitialAd!) {
+        interstitialAdView.removeFromSuperview()
     }
     
     override func didReceiveMemoryWarning() {

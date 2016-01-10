@@ -131,6 +131,7 @@ class LoginViewController: UIViewController, UIAlertViewDelegate, PFLogInViewCon
         PFFacebookUtils.logInWithPermissions(permissions, block: {
             (user: PFUser?, error: NSError?) -> Void in
             if user == nil {
+                print(error)
                 let alert = UIAlertView(title: "Facebook login failed", message: "Please check your Facebook settings on your phone.", delegate: self, cancelButtonTitle: "Ok")
                 alert.show()
         

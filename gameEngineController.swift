@@ -39,8 +39,8 @@ class gameEngineController: UIViewController {
         buildGame()
         addSubmitBtn()
         addSpecialsBtn()
-//        GameHandler.checkifGameIsFinished()
-        gameHasFinished()
+        GameHandler.checkifGameIsFinished()
+//        gameHasFinished()
     }
     
     func setCurrentGameVariables() {
@@ -230,7 +230,7 @@ class gameEngineController: UIViewController {
         let finishBtn = UIButton()
         finishBtn.addTarget(self, action: "gameFinished:", forControlEvents: .TouchUpInside)
         
-        2.0.waitSecondsAndDo({
+        1.0.waitSecondsAndDo({
             if self.gameBoardView.userPoints > self.gameBoardView.opponentPoints {
                 finishBtn.tag = 1
             } else if self.gameBoardView.userPoints < self.gameBoardView.opponentPoints {
@@ -244,8 +244,8 @@ class gameEngineController: UIViewController {
     }
     
     func checkIfTimesUp() {
-        var lastUpdate : NSDate = weekBattleObject[0].updatedAt!
-        var dateNow = NSDate()
+//        var lastUpdate : NSDate = weekBattleObject[0].updatedAt!
+//        var dateNow = NSDate()
         
         if weekBattleObject[0]["battleFinished"] as! Bool == true {
             //      TODO: ENABLE. TIME NOT WORKING IN SIMU. lastUpdate.dateAtStartOfWeek().dateByAddingDays(1).isEarlierThanDate(dateNow) && weekBattleObject[0]["userOnTurn"].objectId == PFUser.currentUser().objectId {
@@ -302,6 +302,7 @@ class gameEngineController: UIViewController {
     }
     
     func gameFinished(button : UIButton!) {
+//        print("henk");
         GameHandler.gameFinished(button)
     }
     

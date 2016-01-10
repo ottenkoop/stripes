@@ -15,8 +15,8 @@ class pushNotificationHandler: PFObject {
         let push = PFPush()
         
         var oppName = ""
-//        var oppFullName = (PFUser.currentUser()["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
-        let oppFullName : NSArray = ["Opponent", "lastName"]
+        let oppFullName = (PFUser.currentUser()!["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
+//        let oppFullName : NSArray = ["Opponent", "lastName"]
         let lastName = oppFullName.lastObject as! String
         let lastLetter = lastName[lastName.startIndex]
         
@@ -29,6 +29,8 @@ class pushNotificationHandler: PFObject {
         
         push.setQuery(query)
         push.setData(data as [NSObject : AnyObject])
+        print(push)
+        
         push.sendPushInBackground()
     }
     
@@ -37,8 +39,8 @@ class pushNotificationHandler: PFObject {
         let push = PFPush()
         
         var oppName = ""
-//        var oppFullName = (PFUser.currentUser()["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
-        let oppFullName : NSArray = ["Opponent", "lastName"]
+        var oppFullName = (PFUser.currentUser()!["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
+//        let oppFullName : NSArray = ["Opponent", "lastName"]
         let lastName = oppFullName.lastObject as! String
         let lastLetter = lastName[lastName.startIndex]
         
@@ -58,8 +60,8 @@ class pushNotificationHandler: PFObject {
         let push = PFPush()
         let query = PFInstallation.query()
         var oppName = ""
-//        var oppFullName = (PFUser.currentUser()["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
-        let oppFullName : NSArray = ["Opponent", "lastName"]
+        var oppFullName = (PFUser.currentUser()!["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
+//        let oppFullName : NSArray = ["Opponent", "lastName"]
         let lastName = oppFullName.lastObject as! String
         let lastLetter = lastName[lastName.startIndex]
         
@@ -103,8 +105,8 @@ class pushNotificationHandler: PFObject {
         let query = PFInstallation.query()
         
         var oppName = ""
-//        var oppFullName = (PFUser.currentUser()["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
-        let oppFullName : NSArray = ["Opponent", "lastName"]
+        var oppFullName = (PFUser.currentUser()!["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
+//        let oppFullName : NSArray = ["Opponent", "lastName"]
         let lastName = oppFullName.lastObject as! String
         let lastLetter = lastName[lastName.startIndex]
         

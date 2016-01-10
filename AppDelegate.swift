@@ -27,11 +27,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         PFFacebookUtils.initializeFacebook()
         PFAnalytics.trackAppOpenedWithLaunchOptionsInBackground(launchOptions, block: nil)
-//
-//        BITHockeyManager.sharedHockeyManager().configureWithIdentifier("0ca020e3c03e6f1f569fd4201ad5a1be")
-//        BITHockeyManager.sharedHockeyManager().startManager()
-//        BITHockeyManager.sharedHockeyManager().authenticator.authenticateInstallation()
-//        BITHockeyManager.sharedHockeyManager().testIdentifier()
         
         registerForRemoteNotification()
         
@@ -54,25 +49,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func registerForRemoteNotification() {
-        if (UIDevice.currentDevice().systemVersion as NSString).floatValue >= 8.0 {
-            if #available(iOS 8.0, *) {
-                let notificationTypes : UIUserNotificationType = [UIUserNotificationType.Alert, UIUserNotificationType.Badge, UIUserNotificationType.Sound]
-                let notificationSettings : UIUserNotificationSettings = UIUserNotificationSettings(forTypes: notificationTypes, categories: nil)
-                UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)
-            }
-            
-        } else {
-            UIApplication.sharedApplication().registerForRemoteNotificationTypes([UIRemoteNotificationType.Badge, UIRemoteNotificationType.Sound, UIRemoteNotificationType.Alert])
-        }
+        let notificationTypes : UIUserNotificationType = [UIUserNotificationType.Alert, UIUserNotificationType.Badge, UIUserNotificationType.Sound]
+        let notificationSettings : UIUserNotificationSettings = UIUserNotificationSettings(forTypes: notificationTypes, categories: nil)
+        UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)
     }
     
     @available(iOS 8.0, *)
     func application(application: UIApplication, didRegisterUserNotificationSettings notificationSettings: UIUserNotificationSettings) {
-        if #available(iOS 8.0, *) {
-            UIApplication.sharedApplication().registerForRemoteNotifications()
-        } else {
-            // Fallback on earlier versions
-        }
+        UIApplication.sharedApplication().registerForRemoteNotifications()
     }
     
     func application(application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData) {

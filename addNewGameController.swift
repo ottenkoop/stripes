@@ -1,6 +1,6 @@
-//
+
 //  addNewGameController.swift
-//  Tiles-swift
+//  SWIFT
 //
 //  Created by Koop Otten on 28/10/14.
 //  Copyright (c) 2014 KoDev. All rights reserved.
@@ -8,15 +8,15 @@
 
 import Foundation
 
-class addNewGameController : UIViewController, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate, UISearchBarDelegate, UISearchDisplayDelegate {
+class addNewGameController : UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
     var friendTableView : UITableView = UITableView()
     var cell : UITableViewCell!
     var searchBar : UISearchBar = UISearchBar()
-    var searchController : UISearchDisplayController!
+    var searchController : UISearchController!
     
     var allFriends : [AnyObject] = []
     var showFaceBookFriends : Bool = false
-    
+
     let screenWidth : CGFloat = UIScreen.mainScreen().bounds.size.width
     let screenHeight : CGFloat = UIScreen.mainScreen().bounds.size.height
     
@@ -25,11 +25,11 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
     override func viewDidLoad() {
         super.viewDidLoad()
         self.friendTableView.backgroundColor = UIColor(patternImage: UIImage(named: "gameBackground")!)
-        
+
         friendTableView.delegate = self
         friendTableView.dataSource = self
         
-        SVProgressHUD.show()
+//        SVProgressHUD.show()
         addTableView()
         loadTableViewContent()
         addNavigationItems()
@@ -45,7 +45,7 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
         friendTableView.pinAttribute(.Right, toAttribute: .Right, ofItem: self.view)
         friendTableView.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: self.view)
     }
-    
+
     func addSearchBar() {
         SVProgressHUD.dismiss()
         
@@ -54,23 +54,18 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
         searchBar.sizeToFit()
         
         friendTableView.tableHeaderView = searchBar
-        
-        searchController = UISearchDisplayController(searchBar: searchBar, contentsController: self)
-        searchController.searchResultsDataSource = self
-        searchController.searchResultsDelegate = self
-        searchController.searchResultsTableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "cell")
     }
     
     func searchBarSearchButtonClicked(searchBar: UISearchBar) {
         let userQuery = searchModule.findUsers(searchBar.text!)
         
-        userQuery.findObjectsInBackgroundWithBlock {
-            (objects: [AnyObject]?, error: NSError?) -> Void in
-            if error == nil {
-                self.allFriends = objects!
-                
-                self.searchDisplayController?.searchResultsTableView.reloadData()
+        userQuery.findObjectsInBackground().continueWithBlock {
+            (task: BFTask!) -> AnyObject in
+            if task.error == nil {
+                self.allFriends = task.result as! [AnyObject]
+                self.friendTableView.reloadData()
             }
+            return task
         }
     }
     
@@ -108,11 +103,11 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
                 }
             }
         } else {
-            // show search btn
+//             show search btn
             addSearchBar()
         }
     }
-    
+
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let count = allFriends.count as Int
         
@@ -122,8 +117,9 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
             return 0
         }
     }
-    
+
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        print("rloading")
         var cell = friendTableView.dequeueReusableCellWithIdentifier("cell")
         
         if cell != nil {
@@ -132,6 +128,7 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
         }
         
         let user : PFUser = allFriends[Int(indexPath.row)] as! PFUser
+        print(user)
         cell!.textLabel?.text = user["fullName"] as? String
     
         return cell!
@@ -141,7 +138,8 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
         SVProgressHUD.show()
 
         let opponent : PFUser = allFriends[Int(indexPath.row)] as! PFUser
-        let battleExists = checkIfBattleExists(opponent)
+//        let battleExists = checkIfBattleExists(opponent)
+        let battleExists = false
         
         if battleExists {
             let alert = UIAlertView(title: "Uh oh!", message: "This battle already exists.", delegate: self, cancelButtonTitle: "Return")
@@ -152,27 +150,27 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
             self.navigationController!.popViewControllerAnimated(true)
         }
     }
-    
-    func checkIfBattleExists(opp: PFUser) -> Bool {
-        var weekBattle : [AnyObject] = []
-        let predicate = NSPredicate(format: "user = %@ AND user2 = %@ OR user2 = %@ AND user = %@", PFUser.currentUser()!, opp, PFUser.currentUser()!, opp)
-        
-        let weekBattleQuery = PFQuery(className:"weekBattle", predicate: predicate)
-        
-        weekBattleQuery.findObjectsInBackground().continueWithBlock {
-            (task: BFTask!) -> AnyObject in
-            
-            weekBattle = task.result as! [AnyObject]
-            return task
-        }
-        
-        if weekBattle.isEmpty {
-            return false
-        } else {
-            return true
-        }
-    }
-    
+//
+//    func checkIfBattleExists(opp: PFUser) -> Bool {
+//        var weekBattle : [AnyObject] = []
+//        let predicate = NSPredicate(format: "user = %@ AND user2 = %@ OR user2 = %@ AND user = %@", PFUser.currentUser()!, opp, PFUser.currentUser()!, opp)
+//        
+//        let weekBattleQuery = PFQuery(className:"weekBattle", predicate: predicate)
+//        
+//        weekBattleQuery.findObjectsInBackground().continueWithBlock {
+//            (task: BFTask!) -> AnyObject in
+//            
+//            weekBattle = task.result as! [AnyObject]
+//            return task
+//        }
+//        
+//        if weekBattle.isEmpty {
+//            return false
+//        } else {
+//            return true
+//        }
+//    }
+//    
     func addNavigationItems() {
         navigationItem.title = "New Game"
         navigationController!.navigationBar.barTintColor = UIColor.whiteColor()

@@ -7,7 +7,7 @@ class Game: PFObject {
     
     class func addGame(opponent : PFUser, grid : Int) {
         let game = PFObject(className:"Game")
-        var board = Board(dimension: grid)
+//        var board = Board(dimension: grid)
         
 //        var opponentUser = PFUser.query()
 //        opponentUser.whereKey("fullName", equalTo: "\(opponentName)")
@@ -165,17 +165,33 @@ class Game: PFObject {
         let gameQuery = PFQuery(className:"Game")
         gameQuery.whereKey("objectId", equalTo:"\(gameId)")
         
-        let game : PFObject = gameQuery.findObjects()![0] as! PFObject
+        let game : PFObject = PFObject()
         
-        
+//        gameQuery.findObjectsInBackgroundWithBlock {
+//            (objects: [AnyObject]?, error: NSError?) -> Void in
+//            
+//            if error == nil {
+//                if let objects = objects as? [PFObject] {
+//                    game = objects.last!
+//                }
+//            }
+//        }
+     
         return game
     }
     
     class func getCurrentGameFromLocalDataStore() -> PFObject {
         let query = PFQuery(className:"currentGame")
         query.fromLocalDatastore()
-
-        let objects: [PFObject] = query.findObjects() as! [PFObject]
-        return objects.last!
+        
+        var objects = []
+        
+        do {
+            objects = try query.findObjects()
+        } catch {
+            objects = []
+        }
+        
+        return objects.lastObject as! PFObject
     }
 }

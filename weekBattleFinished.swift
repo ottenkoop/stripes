@@ -235,10 +235,10 @@ class weekBattleFinished {
         uPointsLabel.text = String(uPoints) as String
         oppPointsLabel.text = String(oppPoints) as String
         
-        uNameLabel.textAlignment = .Center
-        oppNameLabel.textAlignment = .Center
-        uPointsLabel.textAlignment = .Center
-        oppPointsLabel.textAlignment = .Center
+//        uNameLabel.textAlignment = .Center
+//        oppNameLabel.textAlignment = .Center
+//        uPointsLabel.textAlignment = .Center
+//        oppPointsLabel.textAlignment = .Center
 
         centerInformationText.addSubview(finalScoreView)
         
@@ -252,6 +252,7 @@ class weekBattleFinished {
 
         finalScoreView.pinAttribute(.Left, toAttribute: .Left, ofItem: container, withConstant: 20)
         finalScoreView.pinAttribute(.Right, toAttribute: .Right, ofItem: container, withConstant: -20)
+        finalScoreView.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: container, withConstant: -20)
         
         setupTextLabel([uNameLabel, oppNameLabel])
         oppNameLabel.textColor = UIColor.colorWithRGBHex(0xFF0000, alpha: 1.0)
@@ -320,7 +321,7 @@ class weekBattleFinished {
         
         restartText.font = UIFont(name: "HanziPen SC", size: 28)
         restartText.translatesAutoresizingMaskIntoConstraints = false
-        restartText.pinAttribute(.Bottom, toAttribute: .Top, ofItem: yesButton, withConstant: -10)
+        restartText.pinAttribute(.Bottom, toAttribute: .Top, ofItem: yesButton, withConstant: -20)
         
         restartText.centerInContainerOnAxis(.CenterX)
     }

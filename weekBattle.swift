@@ -33,7 +33,7 @@ class weekBattle: PFObject {
     }
     
     class func resetGame(grid : Int, game : PFObject) -> PFObject {
-        var board = Board(dimension: grid)
+//        var board = Board(dimension: grid)
         
         game["userBoard"] = []
         game["opponentBoard"] = []
@@ -51,7 +51,7 @@ class weekBattle: PFObject {
     }
     
     class func resetWeekBattle(weekBattle : PFObject, game: PFObject) {
-        var newGame = resetGame(3, game: game)
+//        _ = resetGame(3, game: game)
         
         weekBattle["userPoints"] = 0
         weekBattle["user2Points"] = 0

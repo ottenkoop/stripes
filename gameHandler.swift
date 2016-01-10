@@ -150,11 +150,16 @@ class gameHandler {
     }
     
     func gameFinished(button : UIButton!) {
+        print(gameObject["finished"] as! Bool ? "ja" : "neeeee hoor")
+        
         if gameObject["finished"] as! Bool == true {
             var nextGrid = [3, 4]
             nextGrid.removeObject(gameObject["grid"] as! Int)
 
             weekBattle.resetGame(nextGrid[0] as Int, game: gameObject)
+            
+            print("true")
+            
             
             gameObject.saveInBackgroundWithBlock {
                 (succeeded: Bool, err: NSError?) -> Void in
@@ -163,32 +168,30 @@ class gameHandler {
                     NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
                 }
             }
-            
         } else {
-            var oppName = ""
-//            var oppFullName = (PFUser.currentUser()["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
-            let oppFullName : NSArray = ["FirstName", "LastName"]
+            let oppFullName = (PFUser.currentUser()!["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
+            print(oppFullName.firstObject as! String)
             
-            let lastName = oppFullName.lastObject as! String
-            let lastLetter = lastName[lastName.startIndex]
-            
-            oppName = "\(oppFullName[0]) \(lastLetter)."
+            let firstName = oppFullName.firstObject as! String
             
             var userWonGame : Int = 0
 
             if button.tag == 1 {
-                pushNotificationHandler.gameFinishedNotification(gameObject, content: "You lost against \(oppName)! :( Try again.")
+                pushNotificationHandler.gameFinishedNotification(gameObject, content: "You lost against \(firstName)! :( Try again.")
                 userWonGame = 1
             } else if button.tag == 2 {
-                pushNotificationHandler.gameFinishedNotification(gameObject, content: "You won against \(oppName)! Good job!")
+                pushNotificationHandler.gameFinishedNotification(gameObject, content: "You won against \(firstName)! Good job!")
                 userWonGame = 2
             } else {
-                pushNotificationHandler.gameFinishedNotification(gameObject, content: "It's a draw against \(oppName)! At least you didn't lose.")
+                pushNotificationHandler.gameFinishedNotification(gameObject, content: "It's a draw against \(firstName)! At least you didn't lose.")
                 userWonGame = 0
             }
+        
+            let gameToSave = Game.gameFinished(gameObject, weekBattle: weekBattleObject[0], uWonGame: userWonGame)
             
             weekBattleObject[0].saveInBackgroundWithBlock(nil)
-            let gameToSave = Game.gameFinished(gameObject, weekBattle: weekBattleObject[0], uWonGame: userWonGame)
+            print("false")
+            print(gameToSave)
             
             gameToSave.saveInBackgroundWithBlock {
                 (succeeded: Bool, err: NSError?) -> Void in

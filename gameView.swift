@@ -1,4 +1,4 @@
-//
+    //
 //  GameViewController.swift
 //  Stripes
 //
@@ -460,7 +460,7 @@ class gameView {
     func selectDoubleStripe(stripe : UIButton) -> UIButton {
         let squareOfStripeTag = stripe.superview!.tag
         let rowOfStripe = stripe.superview!.superview!
-        var doubleStripe = UIButton()
+//        var doubleStripe = UIButton()
         
         if squareOfStripeTag > 0 {
             if position[stripe] == .Left {
@@ -506,8 +506,6 @@ class gameView {
                     userPoints += 1
                 case false:
                     opponentPoints += 1
-                default:
-                    0
                 }
                 
                 if uBoard.allBelongsToUser(s["rowIndex"] as! Int, y: s["squareIndex"] as! Int) {
@@ -526,8 +524,6 @@ class gameView {
                 userPoints += 1
             case false:
                 opponentPoints += 1
-            default:
-                0
             }
 
             if uBoard.allBelongsToUser(square["rowIndex"] as! Int, y: square["squareIndex"] as! Int) {
@@ -550,15 +546,15 @@ class gameView {
     func colorSelectedStripes(rowIndex : Int, squareIdx : Int, stripe: UIButton, boardObject : Board, userBoard : Bool) {
         if boardObject.board[rowIndex][squareIdx].isStripeSelected(position[stripe]!) {
             if userBoard {
-                var image = UIImage(named: "\(position[stripe]!.rawValue)_blueStripe") as UIImage?
+                let image = UIImage(named: "\(position[stripe]!.rawValue)_blueStripe") as UIImage?
                 stripe.setImage(image, forState: .Normal)
             } else {
-                var image = UIImage(named: "\(position[stripe]!.rawValue)_redStripe") as UIImage?
+                let image = UIImage(named: "\(position[stripe]!.rawValue)_redStripe") as UIImage?
                 stripe.setImage(image, forState: .Normal)
                 opponentSelectedStripes += [stripe]
             }
             
-            var randomFloat = Float.random(109.90, max: 110.055)
+            let randomFloat = Float.random(109.90, max: 110.055)
             stripe.transform = CGAffineTransformMakeRotation(CGFloat(randomFloat))
 
             stripe.selected = true
@@ -581,11 +577,11 @@ class gameView {
             
             lastStripe.backgroundColor = UIColor(patternImage: UIImage(named: "\(position[lastStripe]!.rawValue)_stripeBackground")!)
             
-            if lastStripeObject.objectForKey("userId") as? NSString == PFUser.currentUser()!.objectId {
-                lastStripe.setImage(UIImage(named: "\(position[lastStripe]!.rawValue)_currentBlueStripe"), forState: .Normal)
-            } else {
-                lastStripe.setImage(UIImage(named: "\(position[lastStripe]!.rawValue)_currentRedStripe"), forState: .Normal)
-            }
+//            if lastStripeObject.objectForKey("userId") as? NSString == PFUser.currentUser()!.objectId {
+//                lastStripe.setImage(UIImage(named: "\(position[lastStripe]!.rawValue)_currentBlueStripe"), forState: .Normal)
+//            } else {
+//                lastStripe.setImage(UIImage(named: "\(position[lastStripe]!.rawValue)_currentRedStripe"), forState: .Normal)
+//            }
             
             animateStripe(lastStripe, duration: 0.1, delay: 0.5, startFloat: 0.000001)
         }

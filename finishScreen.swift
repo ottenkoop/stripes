@@ -14,12 +14,15 @@ class finishScreen {
     var vController : UIViewController = UIViewController()
     var container : UIView = UIView()
     var textLabelView = UILabel()
+    var restartText = UILabel()
     var continuButton : UIButton = UIButton()
     var titleLabel = UILabel()
 
     
-    func openPopup(uiView: UIView, finishBtn : UIButton) -> NSArray {
+    func openPopup(uiView: UIView, finishBtn : UIButton) -> [UIButton] {
         addContainerView(uiView)
+        defaultContainerSetup()
+        addRestartText()
         
         switch finishBtn.tag {
         case 1:
@@ -32,13 +35,12 @@ class finishScreen {
             "what?"
         }
         
-        let buttonArray : NSArray = []
-//        addSpecial1Btn()
-//        addSpecial2Btn()
-//        addCancelBtn()
+        var buttonArray : [UIButton] = []
+        continuButton = finishBtn
+        addContinuButton()
+        scoreBoardView().addScoreBoard(container)
         
-//         first el always 1btn, etc..
-//        buttonArray = [special1Btn, special2Btn, cancelBtn]
+        buttonArray = [continuButton]
         
         return buttonArray
     }
@@ -75,29 +77,15 @@ class finishScreen {
     
     
     func gameDidFinishWithCurrentUserWinner() {
-        textLabelView.text = "Awesome! You've won this round."
-        var winBtn = defaultContainerSetup()
-
+        textLabelView.text = "Awesome! You've won the Game."
     }
     
     func gameDidFinishWithOpponentWinner() {
-//        container.view.backgroundColor = UIColor.redColor()
-//        textView.backgroundColor = UIColor.redColor()
-//        textView.text = "Uh oh! You've lost this time. Try again!"
-        
-//        var lostBtn = defaultContainerSetup(uiControl.view, userTurn: userTurn)
-//        
-//        return lostBtn
+        textLabelView.text = "Uh oh! You've lost this time. Try again!"
     }
     
     func gameDidFinishDraw() {
-//        var drawBtn = defaultContainerSetup(uiControl.view, userTurn: userTurn)
-
-//        container.view.backgroundColor = UIColor.orangeColor()
-//        textView.backgroundColor = UIColor.orangeColor()
-//        textView.text = "It's a draw. At least you didn't lose this game!"
-        
-//        return drawBtn
+        textLabelView.text = "It's a draw. At least you didn't lose!"
     }
     
     func defaultContainerSetup() -> UIButton {
@@ -115,31 +103,48 @@ class finishScreen {
         return btn
     }
     
-    func addContinuButton(uiView: UIView) -> UIButton {
-        continuButton.setTitle("Continue", forState: .Normal)
-        continuButton.backgroundColor = UIColor.blueColor()
-        
-        uiView.addSubview(continuButton)
-        
+    func addContinuButton() -> UIButton {
+//        continuButton.setTitle("Continue", forState: .Normal)
         continuButton.translatesAutoresizingMaskIntoConstraints = false
-        continuButton.constrainToSize(CGSizeMake(uiView.bounds.width - 10, 50))
+        continuButton.setImage(UIImage(named: "yesBtn"), forState: .Normal)
+        
+        container.addSubview(continuButton)
+        
+//        continuButton.addTarget(self, action: "btnTouched:", forControlEvents: UIControlEvents.TouchDown)
+        
+        continuButton.constrainToHeight(50)
         continuButton.centerInContainerOnAxis(.CenterX)
-        continuButton.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: uiView, withConstant: -10)
+        continuButton.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: container, withConstant: -10)
         
         return continuButton
     }
     
-    /*
-    Define UIColor from hex value
+    func addRestartText() {
+        restartText.text = "Play again?"
+        restartText.font = UIFont(name: "HanziPen SC", size: 28)
+        
+        container.addSubview(restartText)
+        
+
+        restartText.translatesAutoresizingMaskIntoConstraints = false
+        restartText.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: container, withConstant: -80)
+        
+        restartText.centerInContainerOnAxis(.CenterX)
+    }
     
-    @param rgbValue - hex color value
-    @param alpha - transparency level
-    */
-    func UIColorFromHex(rgbValue:UInt32, alpha:Double=1.0)->UIColor {
-        let red = CGFloat((rgbValue & 0xFF0000) >> 16)/256.0
-        let green = CGFloat((rgbValue & 0xFF00) >> 8)/256.0
-        let blue = CGFloat(rgbValue & 0xFF)/256.0
-        return UIColor(red:red, green:green, blue:blue, alpha:CGFloat(alpha))
+//    func addContainerInformationView() {
+//        container.addSubview(centerInformationText)
+//        container.bringSubviewToFront(centerInformationText)
+//        
+//        centerInformationText.translatesAutoresizingMaskIntoConstraints = false
+//        centerInformationText.pinAttribute(.Left, toAttribute: .Left, ofItem: container)
+//        centerInformationText.pinAttribute(.Right, toAttribute: .Right, ofItem: container)
+//        centerInformationText.pinAttribute(.Top, toAttribute: .Top, ofItem: container, withConstant: 75)
+//        centerInformationText.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: container, withConstant: -125)
+//    }
+    
+    func btnTouched(sender:UIButton!) {
+        print("jaaaa");
     }
     
 }
