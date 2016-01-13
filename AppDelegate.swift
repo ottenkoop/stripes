@@ -7,6 +7,9 @@
 //
 
 import UIKit
+import Fabric
+import Crashlytics
+
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -21,12 +24,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         gamesOverviewController = GameOverviewController()
         navigationController = navController()
         
-        ParseCrashReporting.enable()
         Parse.enableLocalDatastore()
         Parse.setApplicationId("Rfb6FpX2ewMytcvOLIHjsZs2faNMSTMBMZCz3BUo", clientKey: "Dk5u1t8oQwTUNyOKDPSSMtjjAB74g3TGkw6EJWyR")
         
         PFFacebookUtils.initializeFacebook()
         PFAnalytics.trackAppOpenedWithLaunchOptionsInBackground(launchOptions, block: nil)
+        
+        Fabric.with([Crashlytics.self])
+
         
         registerForRemoteNotification()
         
@@ -132,7 +137,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func applicationDidBecomeActive(application: UIApplication) {
         FBAppCall.handleDidBecomeActiveWithSession(PFFacebookUtils.session())
-        NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
     }
     
     func applicationWillTerminate(application: UIApplication) {

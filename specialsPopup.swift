@@ -91,13 +91,6 @@ class specialsPopup {
         cancelBtn.translatesAutoresizingMaskIntoConstraints = false
         cancelBtn.setImage(UIImage(named: "cancelBtniPhone"), forState: .Normal)
         
-//        if (UIInterfaceOrientationIsPortrait() {
-//            submitBtn.setImage(UIImage(named: "playBtniPhone"), forState: .Normal)
-//            submitBtn.constrainToSize(CGSizeMake(screenWidth - 75, 50))
-//        } else {
-//            submitBtn.setImage(UIImage(named: "playBtniPad"), forState: .Normal)
-//            submitBtn.constrainToSize(CGSizeMake(screenWidth - 75, 60))
-//        }
         
         container.addSubview(cancelBtn)
         

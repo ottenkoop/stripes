@@ -37,8 +37,8 @@ class gameEngineController: UIViewController {
         gameBoardView = gameView(gameControl: self)
         
         buildGame()
-        addSubmitBtn()
         addSpecialsBtn()
+        addSubmitBtn()
         GameHandler.checkifGameIsFinished()
 //        gameHasFinished()
     }
@@ -224,6 +224,7 @@ class gameEngineController: UIViewController {
         loadingView().hideActivityIndicatorWhenReturning(self.view)
 
         self.navigationController?.navigationBarHidden = false
+//        NSNotificationCenter.defaultCenter().postNotificationName("loadInterstitialAd", object: nil)
     }
     
     func gameHasFinished() {

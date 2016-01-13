@@ -8,8 +8,10 @@
 
 import Foundation
 import iAd
+import Crashlytics
 
-class GameOverviewController : UIViewController, UITableViewDelegate, UITableViewDataSource, ADBannerViewDelegate {
+
+class GameOverviewController : UIViewController, UITableViewDelegate, UITableViewDataSource, ADBannerViewDelegate, ADInterstitialAdDelegate {
     
     let bannerView = ADBannerView()
     var gameTableView : UITableView = UITableView()
@@ -43,14 +45,15 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         addBannerView()
         addUserFacebookInfo()
         
-        
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadTableViewContent", name: "reloadGameTableView", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "resetLookingForGame", name: "resetLookingForGame", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "deleteObjectFromSection", name: "deleteObjectFromYourTurnSection", object: nil)
         
-        //iAD interstitial
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: ("runAd:"),    name:UIApplicationWillEnterForegroundNotification, object: nil)
-
+        // iAD interstitial
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadInterstitialAd", name:"loadInterstitialAd", object: nil)
+//        loadInterstitialAd()
+        
+//        PFUser.currentUser()["isSpecial"]
     }
     
     func addUserFacebookInfo() {
@@ -74,8 +77,6 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func deleteObjectFromSection() {
-//        var game : PFObject = gamesWithUserTurn[currentGameIndex] as PFObject
-
         gamesWithUserTurn.removeAtIndex(currentGameIndex)
         loadTableViewContent()
     }
@@ -181,11 +182,6 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         if cell != nil {
             cell = UITableViewCell(style: UITableViewCellStyle.Value1, reuseIdentifier: "CELL")
             cell!.backgroundColor = UIColor.clearColor()
-
-//            var aView = UIImageView(image: UIImage(named: "disclosureIndicator"))
-//            aView.frame = CGRectMake(0, 0, 10, 20)
-////            cell!.accessoryView = aView
-//            cell!.selectionStyle = UITableViewCellSelectionStyle.Blue
         }
         
         switch indexPath.section {
@@ -212,7 +208,6 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         var uPoints : Int = 0
         var oppFullName = []
         
-        
         if weekBattle["user"]!.objectId == PFUser.currentUser()!.objectId {
             uPoints = weekBattle["userPoints"] as! Int
             oppPoints = weekBattle["user2Points"] as! Int
@@ -232,7 +227,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
             oppName.text = "\(oppFullName[0])"
         }
 
-        userName.text = "Me"
+        userName.text = "You"
         pointsView.text = "\(oppPoints)  :  \(uPoints)"
         
         cell.contentView.addSubview(oppName)
@@ -279,7 +274,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
 
     
     func loadTableViewContent() {
-//        navigationItem.title = "Refreshing..."
+        navigationItem.title = "Refreshing..."
         let weekBattlesQuery = searchModule.findWeekBattles()
 
         weekBattlesQuery.findObjectsInBackground().continueWithBlock {
@@ -305,6 +300,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     
     func openGame(weekBattle : PFObject) {
         let containerToRemove = loadingView().showActivityIndicator(self.view)
+        
         let gameQuery = searchModule.findGame(weekBattle["currentGame"].objectId as! NSString)
         
         gameQuery.findObjectsInBackground().continueWithBlock {
@@ -356,6 +352,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
             self.gameTableView.reloadData()
             self.navigationItem.title = "Your Battles"
         }
+        
         
     }
     
@@ -437,12 +434,9 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func openSettings() {
-        PFUser.currentUser()
-        let alert = UIAlertView(title: "", message: "Hi, \(PFUser.currentUser())", delegate: self, cancelButtonTitle: "Ok")
-        alert.show()
-//        let settingsV = settingsView()
-//        
-//        navigationController!.pushViewController(settingsV, animated: true)
+        let settingsC = settingsController()
+        
+        navigationController!.pushViewController(settingsC, animated: true)
     }
     
     func newGame() {
@@ -519,7 +513,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func bannerViewDidLoadAd(banner: ADBannerView!) {
-        self.bannerView.alpha = 1.0
+        self.bannerView.alpha = 0.0
     }
     
     func bannerViewActionDidFinish(banner: ADBannerView!) {
@@ -559,14 +553,17 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     func interstitialAdDidLoad(interstitialAd: ADInterstitialAd!) {
         interstitialAdView = UIView()
         interstitialAdView.frame = self.view.bounds
-        view.addSubview(interstitialAdView)
+        self.view.addSubview(interstitialAdView)
         
         interstitialAd.presentInView(interstitialAdView)
+        self.navigationController?.navigationBarHidden = true
+        
         UIViewController.prepareInterstitialAds()
     }
     
     func interstitialAdActionDidFinish(interstitialAd: ADInterstitialAd!) {
         interstitialAdView.removeFromSuperview()
+        self.navigationController?.navigationBarHidden = false
     }
     
     func interstitialAdActionShouldBegin(interstitialAd: ADInterstitialAd!, willLeaveApplication willLeave: Bool) -> Bool {
@@ -579,6 +576,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     
     func interstitialAdDidUnload(interstitialAd: ADInterstitialAd!) {
         interstitialAdView.removeFromSuperview()
+        self.navigationController?.navigationBarHidden = false
     }
     
     override func didReceiveMemoryWarning() {

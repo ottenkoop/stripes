@@ -45,7 +45,7 @@ class gameView {
         gameController.view.addSubview(gameBoardView)
         gameBoardView.translatesAutoresizingMaskIntoConstraints = false
         
-        if (UIInterfaceOrientationIsPortrait(gameController.interfaceOrientation)) {
+        if (UIInterfaceOrientationIsPortrait(UIApplication.sharedApplication().statusBarOrientation)) {
             
             gameBoardViewHeight = screenHeight - 185
             gameBoardViewWidth = screenWidth
@@ -97,7 +97,7 @@ class gameView {
     }
     
     func addScoreBoardPosition(labelPointsViews : [UILabel]) {
-        if (UIInterfaceOrientationIsPortrait(gameController.interfaceOrientation)) {
+        if (UIInterfaceOrientationIsPortrait(UIApplication.sharedApplication().statusBarOrientation)) {
             for label in labelPointsViews {
                 gameController.view.addSubview(label)
                 label.translatesAutoresizingMaskIntoConstraints = false
@@ -386,11 +386,11 @@ class gameView {
         submitBtn.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: gameController.view, withConstant: -5)
         submitBtn.pinAttribute(.Left, toAttribute: .Left, ofItem: gameController.view, withConstant: 5)
 
-        if (UIInterfaceOrientationIsPortrait(gameController.interfaceOrientation)) {
-            submitBtn.setImage(UIImage(named: "playBtniPhone"), forState: .Normal)
+        if (UIInterfaceOrientationIsPortrait(UIApplication.sharedApplication().statusBarOrientation)) {
             submitBtn.constrainToSize(CGSizeMake(screenWidth - 75, 50))
+            submitBtn.setImage(UIImage(named: "playBtnIphone"), forState: .Normal)
         } else {
-            submitBtn.setImage(UIImage(named: "playBtniPad"), forState: .Normal)
+            submitBtn.setImage(UIImage(named: "PlayBtniPad"), forState: .Normal)
             submitBtn.constrainToSize(CGSizeMake(screenWidth - 75, 60))
         }
         
@@ -412,7 +412,7 @@ class gameView {
             specialsLeft = currentGame["opponentSpecialsLeft"] as! Int
         }
 
-        if (UIInterfaceOrientationIsPortrait(gameController.interfaceOrientation)) {
+        if (UIInterfaceOrientationIsPortrait(UIApplication.sharedApplication().statusBarOrientation)) {
             specialsBtn.constrainToSize(CGSizeMake(61, 50))
         } else {
             specialsBtn.constrainToSize(CGSizeMake(61, 60))
