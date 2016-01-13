@@ -8,11 +8,12 @@
 
 import UIKit
 
-class LoginViewController: UIViewController, UIAlertViewDelegate {
+class LoginViewController: UIViewController, UIAlertViewDelegate, PFLogInViewControllerDelegate, PFSignUpViewControllerDelegate {
     
-    private var fbLoginView = UIButton.buttonWithType(UIButtonType.System) as UIButton
+    private var fbLoginView = UIButton()
     private var logoView = UIImageView(image: UIImage(named: "logo"))
-    private var registerBtn = UIButton.buttonWithType(UIButtonType.System) as UIButton
+    private var loginBtn = UIButton()
+    private var registerBtn = UIButton()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,6 +21,7 @@ class LoginViewController: UIViewController, UIAlertViewDelegate {
         
         addLogoView()
         addFacebookLogin()
+        addLoginBtn()
         addRegisterBtn()
         
         navigationController!.navigationBarHidden = true
@@ -28,80 +30,132 @@ class LoginViewController: UIViewController, UIAlertViewDelegate {
     func addLogoView () {
         self.view.addSubview(logoView)
         
-        logoView.setTranslatesAutoresizingMaskIntoConstraints(false)
-        logoView.constrainToSize(CGSizeMake(150, 200))
+        logoView.translatesAutoresizingMaskIntoConstraints = false
+        logoView.constrainToSize(CGSizeMake(175, 225))
         logoView.centerInContainerOnAxis(NSLayoutAttribute.CenterX)
-        logoView.pinAttribute(.Top, toAttribute: .Top, ofItem: self.view, withConstant: 50)
+        logoView.pinAttribute(.Top, toAttribute: .Top, ofItem: self.view, withConstant: 40)
     }
     
     func addFacebookLogin () {
-        fbLoginView.addTarget(self, action: "fbButtonAction:", forControlEvents: UIControlEvents.TouchUpInside)
-        fbLoginView.setTitle("Facebook", forState: .Normal)
         self.view.addSubview(fbLoginView)
 
-        fbLoginView.setTranslatesAutoresizingMaskIntoConstraints(false)
-        fbLoginView.centerInContainerOnAxis(NSLayoutAttribute.CenterX)
-        fbLoginView.pinAttribute(NSLayoutAttribute.Bottom, toAttribute: NSLayoutAttribute.Bottom, ofItem: logoView, withConstant: 150)
-        fbLoginView.setTitleColor(UIColor.blueColor(), forState: UIControlState.Normal)
-        fbLoginView.constrainToSize(CGSizeMake(218, 50))
-        fbLoginView.layer.borderColor = UIColor.blueColor().CGColor
-        fbLoginView.layer.borderWidth = 2
-        fbLoginView.layer.cornerRadius = 23
-        
+        fbLoginView.addTarget(self, action: "fbButtonAction:", forControlEvents: .TouchUpInside)
+        fbLoginView.setImage(UIImage(named: "faceBookLogin"), forState: .Normal)
+        fbLoginView.translatesAutoresizingMaskIntoConstraints = false
+        fbLoginView.constrainToSize(CGSizeMake(280, 50))
+        fbLoginView.centerInContainerOnAxis(.CenterX)
+        fbLoginView.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: logoView, withConstant: 75)
     }
     
-    func addRegisterBtn () {
-        registerBtn.setTitle("Register", forState: UIControlState.Normal)
-        registerBtn.addTarget(self, action: "buttonAction:", forControlEvents: UIControlEvents.TouchUpInside)
+    func addLoginBtn() {
+        self.view.addSubview(loginBtn)
         
+        loginBtn.addTarget(self, action: "loginButtonTapped:", forControlEvents: UIControlEvents.TouchUpInside)
+        loginBtn.setImage(UIImage(named: "stripesLoginButton"), forState: .Normal)
+        loginBtn.translatesAutoresizingMaskIntoConstraints = false
+        loginBtn.constrainToSize(CGSizeMake(280, 50))
+        loginBtn.centerInContainerOnAxis(.CenterX)
+        loginBtn.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: fbLoginView, withConstant: 75)
+    }
+    
+    func addRegisterBtn() {
         self.view.addSubview(registerBtn)
         
-        addStyleAndPositionToRegisterBtn()
+        registerBtn.setImage(UIImage(named: "registerButton"), forState: .Normal)
+        registerBtn.addTarget(self, action: "registerButtonTapped:", forControlEvents: UIControlEvents.TouchUpInside)
+        registerBtn.translatesAutoresizingMaskIntoConstraints = false
+        registerBtn.centerInContainerOnAxis(.CenterX)
+        registerBtn.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: self.view, withConstant: -10)
+        registerBtn.pinAttribute(.Left, toAttribute: .Left, ofItem: self.view, withConstant: 10)
+        registerBtn.pinAttribute(.Right, toAttribute: .Right, ofItem: self.view, withConstant: -10)
     }
     
-    func addStyleAndPositionToRegisterBtn () {
-        registerBtn.setTranslatesAutoresizingMaskIntoConstraints(false)
-        registerBtn.backgroundColor = UIColor.grayColor()
-        registerBtn.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
-        registerBtn.constrainToSize(CGSizeMake(218, 50))
-        registerBtn.layer.cornerRadius = 2
-        registerBtn.centerInContainerOnAxis(NSLayoutAttribute.CenterX)
-        registerBtn.pinAttribute(NSLayoutAttribute.Bottom, toAttribute: NSLayoutAttribute.Bottom, ofItem: fbLoginView, withConstant: 75)
+    func loginButtonTapped(sender:UIButton!) {
+        let logInController = PFLogInViewController()
+        logInController.delegate = self
+        logInController.fields = [PFLogInFields.DismissButton, PFLogInFields.UsernameAndPassword, PFLogInFields.PasswordForgotten, PFLogInFields.LogInButton]
+        logInController.logInView!.logo = nil
+        
+        styleLoginAndSignupField(logInController.logInView!.logInButton!, image: "loginBtn")
+
+        if (UIDevice.currentDevice().systemVersion as NSString).floatValue >= 8.0 {
+            logInController.logInView!.logInButton!.pinAttribute(.Top, toAttribute: .Bottom, ofItem: logInController.logInView!.passwordField, withConstant: 10)
+        }
+        
+        self.presentViewController(logInController, animated:true, completion: nil)
     }
     
-    func buttonAction(sender:UIButton!){
-        println("HENK tapped")
+    func registerButtonTapped(sender:UIButton!) {
+        let signupController = PFSignUpViewController()
+        signupController.delegate = self
+        signupController.fields = [PFSignUpFields.DismissButton, PFSignUpFields.UsernameAndPassword, PFSignUpFields.Email, PFSignUpFields.SignUpButton]
+        signupController.signUpView!.logo = nil
+
+        styleLoginAndSignupField(signupController.signUpView!.signUpButton!, image: "registerButton")
+        
+        if (UIDevice.currentDevice().systemVersion as NSString).floatValue >= 8.0 {
+            signupController.signUpView!.signUpButton!.pinAttribute(.Top, toAttribute: .Bottom, ofItem: signupController.signUpView!.emailField, withConstant: 10)
+        }
+
+        self.presentViewController(signupController, animated:true, completion: nil)
+    }
+    
+    func logInViewController(logInController: PFLogInViewController, didLogInUser user: PFUser) {
+        self.dismissViewControllerAnimated(true, completion: nil)
+        
+        loadingView().showActivityIndicator(self.view)
+        openGameOverviewController()
+    }
+    
+    func signUpViewController(signUpController: PFSignUpViewController, didSignUpUser user: PFUser) {
+        self.dismissViewControllerAnimated(true, completion: nil)
+        
+        loadingView().showActivityIndicator(self.view)
+        User.updateUserFullName()
+        openGameOverviewController()
+    }
+    
+    func styleLoginAndSignupField(button : UIButton, image : NSString) {
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle("", forState: .Normal)
+        button.centerInContainerOnAxis(.CenterX)
+        button.constrainToWidth(280)
+        button.setBackgroundImage(UIImage(named: "\(image)"), forState: .Normal)
     }
 
 //--FacebookLogin Handlers
     
     func fbButtonAction(sender: UIButton!) {
-        var permissions = ["public_profile", "email", "user_friends"]
+        let permissions = ["public_profile", "email", "user_friends"]
         
-        PFFacebookUtils.logInWithPermissions(permissions, {
-            (user: PFUser!, error: NSError!) -> Void in
-            
+        PFFacebookUtils.logInWithPermissions(permissions, block: {
+            (user: PFUser?, error: NSError?) -> Void in
             if user == nil {
+                print(error)
                 let alert = UIAlertView(title: "Facebook login failed", message: "Please check your Facebook settings on your phone.", delegate: self, cancelButtonTitle: "Ok")
                 alert.show()
-            } else if user.isNew {
+        
+            } else if user!.isNew {
                 NSLog("User signed up and logged in through Facebook!")
                 User.requestFaceBookLoggedInUserInfo()
                 self.openGameOverviewController()
+                NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
             } else {
                 NSLog("User logged in through Facebook!")
                 User.requestFaceBookLoggedInUserInfo()
                 self.openGameOverviewController()
+                NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
             }
         })
     }
     
     func openGameOverviewController() {
-        navigationController!.pushViewController(GameOverviewController(), animated: true)
+        self.navigationController!.pushViewController(GameOverviewController(), animated: true)
+        self.navigationController!.navigationBarHidden = false
         
         let currentInstallation:PFInstallation = PFInstallation.currentInstallation()
         currentInstallation["user"] = PFUser.currentUser()
-        currentInstallation.saveInBackgroundWithTarget(nil, selector: nil)
+        currentInstallation.saveInBackground()
     }
     
     override func didReceiveMemoryWarning() {

@@ -4,17 +4,24 @@ import Foundation
 
 class searchModule: PFObject {
     
-    class func findGame() -> PFQuery {
-        let predicate = NSPredicate(format: "user = %@ OR user2 = %@", PFUser.currentUser(), PFUser.currentUser())
-        var game = PFQuery(className: "Game", predicate: predicate)
+    class func findGame(gameId : NSString) -> PFQuery {
+        let query = PFQuery(className:"Game")
+        query.whereKey("objectId", equalTo:"\(gameId)")
+        
+        return query
+    }
+    
+    class func findWeekBattles() -> PFQuery {
+        let predicate = NSPredicate(format: "user = %@ OR user2 = %@", PFUser.currentUser()!, PFUser.currentUser()!)
+        let game = PFQuery(className: "weekBattle", predicate: predicate)
         
         return game
     }
     
-    class func findPlayedStripes(game: PFObject) -> PFQuery {
-        let predicate = NSPredicate(format: "belongsToGame = %@", game)
-        var playedStripesQuery = PFQuery(className: "Stripe", predicate: predicate)
+    class func findUsers(searchString : String) -> PFQuery {
+        let usersQuery = PFUser.query()
         
-        return playedStripesQuery
+        usersQuery!.whereKey("fullName", matchesRegex: searchString, modifiers: "i")
+        return usersQuery!
     }
 }

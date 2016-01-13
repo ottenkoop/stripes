@@ -1,6 +1,6 @@
-//
+
 //  addNewGameController.swift
-//  Tiles-swift
+//  SWIFT
 //
 //  Created by Koop Otten on 28/10/14.
 //  Copyright (c) 2014 KoDev. All rights reserved.
@@ -8,57 +8,94 @@
 
 import Foundation
 
-class addNewGameController : UIViewController, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate {
-    var friendTableView : UITableView = UITableView()
-    var cell : UITableViewCell?
+class addNewGameController: UITableViewController, UISearchResultsUpdating, UISearchBarDelegate  {
+    let searchController = UISearchController(searchResultsController: nil)
+    
+    var cell : UITableViewCell!
+    var searchBar : UISearchBar = UISearchBar()
     
     var allFriends : [AnyObject] = []
-    
+    var showFaceBookFriends : Bool = false
+
     let screenWidth : CGFloat = UIScreen.mainScreen().bounds.size.width
     let screenHeight : CGFloat = UIScreen.mainScreen().bounds.size.height
     
     var opponentName : String = ""
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor.whiteColor()
+        self.tableView.backgroundColor = UIColor(patternImage: UIImage(named: "gameBackground")!)
         
-        friendTableView.delegate = self
-        friendTableView.dataSource = self
+        SVProgressHUD.show()
         
+        addNavigationItems()
         addTableView()
         loadTableViewContent()
-        addNavigationItems()
     }
     
     func addTableView() {
-        self.friendTableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "cell")
-        self.view.addSubview(friendTableView)
+        self.tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "cell")
         
-        
-        friendTableView.setTranslatesAutoresizingMaskIntoConstraints(false)
-        friendTableView.constrainToSize(CGSizeMake(screenWidth, screenHeight))
-        friendTableView.pinAttribute(.Top, toAttribute: .Top, ofItem: self.view)
-        friendTableView.pinAttribute(.Left, toAttribute: .Left, ofItem: self.view)
+        self.searchController.searchResultsUpdater = self
+        searchController.searchBar.searchBarStyle = UISearchBarStyle.Default
+        searchController.dimsBackgroundDuringPresentation = false
+        searchController.searchBar.sizeToFit()
+        definesPresentationContext = true
+        self.tableView.tableHeaderView = searchController.searchBar
     }
+
+    func addSearchBar() {
+        searchController.searchBar.delegate = self
+    }
+
     
-    func loadTableViewContent () {
-        var friendsRequest : FBRequest = FBRequest.requestForMyFriends()
-        
-        friendsRequest.startWithCompletionHandler {
-            (connection : FBRequestConnection!, result : AnyObject!, error : NSError!) -> Void in
+    func loadTableViewContent() {
+        if showFaceBookFriends {
+            let friendsRequest : FBRequest = FBRequest.requestForMyFriends()
             
-            if error == nil {
-                var resultdict = result as NSDictionary
-                self.allFriends = resultdict.objectForKey("data") as NSArray
+            friendsRequest.startWithCompletionHandler {
+                (connection : FBRequestConnection!, result : AnyObject!, error : NSError!) -> Void in
                 
-                self.friendTableView.reloadData()
+                if error == nil {
+                    let friendObjects : NSArray = result.objectForKey("data") as! NSArray
+                    let friendIds : NSMutableArray = NSMutableArray(capacity: friendObjects.count)
+                    
+                    for friendObject in friendObjects as! [NSDictionary] {
+                        friendIds.addObject(friendObject.objectForKey("id")!)
+                    }
+                    
+                    let friendQuery : PFQuery = PFUser.query()!
+                    friendQuery.whereKey("fbId", containedIn: friendIds as [AnyObject])
+                    
+                    friendQuery.findObjectsInBackground().continueWithBlock {
+                        (task: BFTask!) -> AnyObject in
+                        if task.error == nil {
+                            self.allFriends = task.result! as! [AnyObject]
+                            self.tableView.reloadData()
+                        }
+                        
+                        return task
+                    }
+                    
+                    1.0.waitSecondsAndDo({
+                        self.tableView.reloadData()
+                        SVProgressHUD.dismiss()
+                    })
+                    
+                } else {
+                    self.addSearchBar()
+                    self.showFaceBookFriends = false
+                    SVProgressHUD.dismiss()
+                }
             }
+        } else {
+//             show search btn
+            addSearchBar()
+            SVProgressHUD.dismiss()
         }
     }
-    
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+
+    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let count = allFriends.count as Int
         
         if count > 0 {
@@ -67,68 +104,89 @@ class addNewGameController : UIViewController, UITableViewDelegate, UITableViewD
             return 0
         }
     }
-    
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        var cell = friendTableView.dequeueReusableCellWithIdentifier("cell") as? UITableViewCell
+
+    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        var cell = self.tableView.dequeueReusableCellWithIdentifier("cell")
         
         if cell != nil {
             cell = UITableViewCell(style: UITableViewCellStyle.Value1, reuseIdentifier: "CELL")
+            cell!.backgroundColor = UIColor.clearColor()
         }
         
-        let user : AnyObject = allFriends[Int(indexPath.row)]
-      
-        cell!.textLabel.text = String(user.name as NSString)
-        
+        let user : PFUser = allFriends[Int(indexPath.row)] as! PFUser
+        cell!.textLabel?.text = user["fullName"] as? String
+    
         return cell!
     }
     
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        var cell = friendTableView.cellForRowAtIndexPath(indexPath)
-        var oppName = cell!.textLabel.text
-        
-        opponentName = oppName!
-        
-        var sheet : UIActionSheet = UIActionSheet()
-        let title = "Select a grid"
-        
-        sheet.title = title
-        sheet.delegate = self
-        sheet.addButtonWithTitle("3x3")
-        sheet.addButtonWithTitle("4x4")
-        sheet.addButtonWithTitle("5x5")
-        sheet.addButtonWithTitle("Cancel")
-        sheet.cancelButtonIndex = 3
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        SVProgressHUD.show()
 
-        sheet.showInView(self.view)
+        let opponent : PFUser = allFriends[Int(indexPath.row)] as! PFUser
+        let battleExists = checkIfBattleExists(opponent)
+//        let battleExists = false
+        
+        if battleExists {
+            let alert = UIAlertView(title: "Uh oh!", message: "This battle already exists.", delegate: self, cancelButtonTitle: "Return")
+            alert.show()
+            SVProgressHUD.dismiss()
+        } else {
+            Game.addGame(opponent, grid: 3)
+            self.navigationController!.popViewControllerAnimated(true)
+        }
     }
     
-    func actionSheet(sheet: UIActionSheet!, clickedButtonAtIndex buttonIndex: Int) {
-        println(sheet.buttonTitleAtIndex(buttonIndex))
-        if buttonIndex == 0 {
-            Game.addGame("\(opponentName)", grid: 3)
-            self.navigationController!.popViewControllerAnimated(true)
-        } else if buttonIndex == 1 {
-            Game.addGame("\(opponentName)", grid: 4)
-            self.navigationController!.popViewControllerAnimated(true)
-        } else if buttonIndex == 2 {
-            Game.addGame("\(opponentName)", grid: 5)
-            self.navigationController!.popViewControllerAnimated(true)
+    func updateSearchResultsForSearchController(searchController: UISearchController) {
+        if searchController.searchBar.text?.characters.count > 1 {
+            let userQuery = searchModule.findUsers(searchController.searchBar.text!)
+
+            userQuery.findObjectsInBackground().continueWithBlock {
+                (task: BFTask!) -> AnyObject in
+                if task.error == nil {
+                    self.allFriends.removeAll(keepCapacity: false)
+                    self.allFriends = task.result as! [AnyObject]
+
+                }
+                
+                return task
+            }
+            
+            self.tableView.reloadData()
+        }
+        else {
+            allFriends.removeAll(keepCapacity: false)
+            self.tableView.reloadData()
+        }
+        
+    }
+    
+    func searchBarSearchButtonClicked(searchBar: UISearchBar) {
+        self.tableView.reloadData()
+        
+    }
+
+    func checkIfBattleExists(opp: PFUser) -> Bool {
+        var weekBattle : [AnyObject] = []
+        let predicate = NSPredicate(format: "user = %@ AND user2 = %@ OR user2 = %@ AND user = %@", PFUser.currentUser()!, opp, PFUser.currentUser()!, opp)
+        
+        let weekBattleQuery = PFQuery(className:"weekBattle", predicate: predicate)
+        
+        weekBattleQuery.findObjectsInBackground().continueWithBlock {
+            (task: BFTask!) -> AnyObject in
+            
+            weekBattle = task.result as! [AnyObject]
+            return task
+        }
+        
+        if weekBattle.isEmpty {
+            return false
         } else {
-            sheet.dismissWithClickedButtonIndex(3, animated: true)
+            return true
         }
     }
     
     func addNavigationItems() {
-       navigationItem.title = "New Game" 
+        navigationItem.title = showFaceBookFriends ? "Facebook friends" : "Find player"
+        navigationController!.navigationBar.barTintColor = UIColor.whiteColor()
     }
 }
-
-
-
-
-
-
-
-
-
-

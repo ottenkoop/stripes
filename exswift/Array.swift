@@ -15,8 +15,8 @@ internal extension Array {
     /**
         Checks if self contains a list of items.
     
-        :param: items Items to search for
-        :returns: true if self contains all the items
+        - parameter items: Items to search for
+        - returns: true if self contains all the items
     */
     func contains <T: Equatable> (items: T...) -> Bool {
         return items.all { self.indexOf($0) >= 0 }
@@ -25,8 +25,8 @@ internal extension Array {
     /**
         Difference of self and the input arrays.
     
-        :param: values Arrays to subtract
-        :returns: Difference of self and the input arrays
+        - parameter values: Arrays to subtract
+        - returns: Difference of self and the input arrays
     */
     func difference <T: Equatable> (values: [T]...) -> [T] {
 
@@ -54,15 +54,15 @@ internal extension Array {
     /**
         Intersection of self and the input arrays.
     
-        :param: values Arrays to intersect
-        :returns: Array of unique values contained in all the dictionaries and self
+        - parameter values: Arrays to intersect
+        - returns: Array of unique values contained in all the dictionaries and self
     */
     func intersection <U: Equatable> (values: [U]...) -> Array {
 
         var result = self
         var intersection = Array()
 
-        for (i, value) in enumerate(values) {
+        for (i, value) in values.enumerate() {
 
             //  the intersection is computed by intersecting a couple per loop:
             //  self n values[0], (self n values[0]) n values[1], ...
@@ -75,7 +75,7 @@ internal extension Array {
             //  to intersect in the next loop
             value.each { (item: U) -> Void in
                 if result.contains(item) {
-                    intersection.append(item as Element)
+                    intersection.append(item as! Element)
                 }
             }
 
@@ -88,8 +88,8 @@ internal extension Array {
     /**
         Union of self and the input arrays.
         
-        :param: values Arrays
-        :returns: Union array of unique values
+        - parameter values: Arrays
+        - returns: Union array of unique values
     */
     func union <U: Equatable> (values: [U]...) -> Array {
 
@@ -98,7 +98,7 @@ internal extension Array {
         for array in values {
             for value in array {
                 if !result.contains(value) {
-                    result.append(value as Element)
+                    result.append(value as! Element)
                 }
             }
         }
@@ -110,30 +110,30 @@ internal extension Array {
     /**
         First element of the array.
         
-        :returns: First element of the array if not empty
+        - returns: First element of the array if not empty
     */
-    @availability(*, unavailable, message="use the 'first' property instead") func first () -> Element? {
+    @available(*, unavailable, message="use the 'first' property instead") func first () -> Element? {
         return first
     }
 
     /**
         Last element of the array.
     
-        :returns: Last element of the array if not empty
+        - returns: Last element of the array if not empty
     */
-    @availability(*, unavailable, message="use the 'last' property instead") func last () -> Element? {
+    @available(*, unavailable, message="use the 'last' property instead") func last () -> Element? {
         return last
     }
 
     /**
         Index of the first occurrence of item, if found.
     
-        :param: item The item to search for
-        :returns: Index of the matched item or nil
+        - parameter item: The item to search for
+        - returns: Index of the matched item or nil
     */
     func indexOf <U: Equatable> (item: U) -> Int? {
         if item is Element {
-            return find(unsafeBitCast(self, [U].self), item)
+            return unsafeBitCast(self, [U].self).indexOf(item)
         }
 
         return nil
@@ -142,11 +142,11 @@ internal extension Array {
     /**
         Index of the first item that meets the condition.
     
-        :param: condition A function which returns a boolean if an element satisfies a given condition or not.
-        :returns: Index of the first matched item or nil
+        - parameter condition: A function which returns a boolean if an element satisfies a given condition or not.
+        - returns: Index of the first matched item or nil
     */
     func indexOf (condition: Element -> Bool) -> Int? {
-        for (index, element) in enumerate(self) {
+        for (index, element) in self.enumerate() {
             if condition(element) {
                 return index
             }
@@ -158,13 +158,13 @@ internal extension Array {
     /**
         Gets the index of the last occurrence of item, if found.
     
-        :param: item The item to search for
-        :returns: Index of the matched item or nil
+        - parameter item: The item to search for
+        - returns: Index of the matched item or nil
     */
     func lastIndexOf <U: Equatable> (item: U) -> Int? {
         if item is Element {
-            for (index, value) in enumerate(lazy(self).reverse()) {
-                if value as U == item {
+            for (index, value) in lazy(self).reverse().enumerate() {
+                if value as! U == item {
                     return count - 1 - index
                 }
             }
@@ -178,8 +178,8 @@ internal extension Array {
     /**
         Gets the object at the specified index, if it exists.
         
-        :param: index
-        :returns: Object at index in self
+        - parameter index:
+        - returns: Object at index in self
     */
     func get (index: Int) -> Element? {
 
@@ -201,8 +201,8 @@ internal extension Array {
     /**
         Gets the objects in the specified range.
     
-        :param: range
-        :returns: Subarray in range
+        - parameter range:
+        - returns: Subarray in range
     */
     func get (range: Range<Int>) -> Array {
         return self[rangeAsArray: range]
@@ -212,8 +212,8 @@ internal extension Array {
         Returns an array of grouped elements, the first of which contains the first elements
         of the given arrays, the 2nd contains the 2nd elements of the given arrays, and so on.
     
-        :param: arrays Arrays to zip
-        :returns: Array of grouped elements
+        - parameter arrays: Arrays to zip
+        - returns: Array of grouped elements
     */
     func zip (arrays: [Any]...) -> [[Any?]] {
 
@@ -240,9 +240,9 @@ internal extension Array {
         Produces an array of arrays, each containing n elements, each offset by step.
         If the final partition is not n elements long it is dropped.
     
-        :param: n The number of elements in each partition.
-        :param: step The number of elements to progress between each partition.  Set to n if not supplied.
-        :returns: Array partitioned into n element arrays, starting step elements apart.
+        - parameter n: The number of elements in each partition.
+        - parameter step: The number of elements to progress between each partition.  Set to n if not supplied.
+        - returns: Array partitioned into n element arrays, starting step elements apart.
     */
     func partition (var n: Int, var step: Int? = nil) -> [Array] {
         var result = [Array]()
@@ -256,7 +256,7 @@ internal extension Array {
         if n < 1    { n = 0 }    // Allow 0 if user wants [[],[],[]] for some reason.
         if n > count { return [[]] }
 
-        for i in stride(from: 0, through: count - n, by: step!) {
+        for i in 0.stride(through: count - n, by: step!) {
             result += [self[i..<(i + n)]]
         }
 
@@ -266,12 +266,12 @@ internal extension Array {
     /**
         Produces an array of arrays, each containing n elements, each offset by step.
         
-        :param: n The number of elements in each partition.
-        :param: step The number of elements to progress between each partition.  Set to n if not supplied.
-        :param: pad An array of elements to pad the last partition if it is not long enough to
+        - parameter n: The number of elements in each partition.
+        - parameter step: The number of elements to progress between each partition.  Set to n if not supplied.
+        - parameter pad: An array of elements to pad the last partition if it is not long enough to
                     contain n elements. If nil is passed or there are not enough pad elements
                     the last partition may less than n elements long.
-        :returns: Array partitioned into n element arrays, starting step elements apart.
+        - returns: Array partitioned into n element arrays, starting step elements apart.
     */
     func partition (var n: Int, var step: Int? = nil, pad: Array?) -> [Array] {
         var result = [Array]()
@@ -291,7 +291,7 @@ internal extension Array {
             n = 0
         }
         
-        for i in stride(from: 0, to: count, by: step!) {
+        for i in 0.stride(to: count, by: step!) {
             var end = i + n
             
             if end > count {
@@ -316,9 +316,9 @@ internal extension Array {
     /**
         Produces an array of arrays, each containing n elements, each offset by step.
     
-        :param: n The number of elements in each partition.
-        :param: step The number of elements to progress between each partition. Set to n if not supplied.
-        :returns: Array partitioned into n element arrays, starting step elements apart.
+        - parameter n: The number of elements in each partition.
+        - parameter step: The number of elements to progress between each partition. Set to n if not supplied.
+        - returns: Array partitioned into n element arrays, starting step elements apart.
     */
     func partitionAll (var n: Int, var step: Int? = nil) -> [Array] {
         var result = [Array]()
@@ -331,7 +331,7 @@ internal extension Array {
         if step < 1 { step = 1 } // Less than 1 results in an infinite loop.
         if n < 1    { n = 0 }    // Allow 0 if user wants [[],[],[]] for some reason.
 
-        for i in stride(from: 0, to: count, by: step!) {
+        for i in 0.stride(to: count, by: step!) {
             result += [self[i..(i + n)]]
         }
 
@@ -341,8 +341,8 @@ internal extension Array {
     /**
         Applies cond to each element in array, splitting it each time cond returns a new value.
         
-        :param: cond Function which takes an element and produces an equatable result.
-        :returns: Array partitioned in order, splitting via results of cond.
+        - parameter cond: Function which takes an element and produces an equatable result.
+        - returns: Array partitioned in order, splitting via results of cond.
     */
     func partitionBy <T: Equatable> (cond: (Element) -> T) -> [Array] {
         var result = [Array]()
@@ -351,7 +351,7 @@ internal extension Array {
         for item in self {
             let value = cond(item)
 
-            if value == lastValue? {
+            if value == lastValue {
                 let index: Int = result.count - 1
                 result[index] += [item]
             } else {
@@ -378,7 +378,7 @@ internal extension Array {
     /**
         Shuffles the values of the array into a new one
         
-        :returns: Shuffled copy of self
+        - returns: Shuffled copy of self
     */
     func shuffled () -> Array {
         var shuffled = self
@@ -391,8 +391,8 @@ internal extension Array {
     /**
         Returns a random subarray of given length.
     
-        :param: n Length
-        :returns: Random subarray of length n
+        - parameter n: Length
+        - returns: Random subarray of length n
     */
     func sample (size n: Int = 1) -> Array {
         if n >= count {
@@ -406,33 +406,33 @@ internal extension Array {
     /**
         Max value in the current array (if Array.Element implements the Comparable protocol).
     
-        :returns: Max value
+        - returns: Max value
     */
     func max <U: Comparable> () -> U {
 
-        return maxElement(map {
-            return $0 as U
-        })
+        return map {
+            return $0 as! U
+        }.maxElement()!
 
     }
 
     /**
         Min value in the current array (if Array.Element implements the Comparable protocol).
     
-        :returns: Min value
+        - returns: Min value
     */
     func min <U: Comparable> () -> U {
 
-        return minElement(map {
-            return $0 as U
-        })
+        return map {
+            return $0 as! U
+        }.minElement()!
 
     }
 
     /**
         Iterates on each element of the array.
     
-        :param: call Function to call for each element
+        - parameter call: Function to call for each element
     */
     func each (call: (Element) -> ()) {
 
@@ -445,11 +445,11 @@ internal extension Array {
     /**
         Iterates on each element of the array with its index.
     
-        :param: call Function to call for each element
+        - parameter call: Function to call for each element
     */
     func each (call: (Int, Element) -> ()) {
 
-        for (index, item) in enumerate(self) {
+        for (index, item) in self.enumerate() {
             call(index, item)
         }
 
@@ -458,7 +458,7 @@ internal extension Array {
     /**
         Iterates on each element of the array from Right to Left.
     
-        :param: call Function to call for each element
+        - parameter call: Function to call for each element
     */
     func eachRight (call: (Element) -> ()) {
         reverse().each(call)
@@ -467,10 +467,10 @@ internal extension Array {
     /**
         Iterates on each element of the array, with its index, from Right to Left.
     
-        :param: call Function to call for each element
+        - parameter call: Function to call for each element
     */
     func eachRight (call: (Int, Element) -> ()) {
-        for (index, item) in enumerate(reverse()) {
+        for (index, item) in reverse().enumerate() {
             call(count - index - 1, item)
         }
     }
@@ -478,8 +478,8 @@ internal extension Array {
     /**
         Checks if test returns true for any element of self.
     
-        :param: test Function to call for each element
-        :returns: true if test returns true for any element of self
+        - parameter test: Function to call for each element
+        - returns: true if test returns true for any element of self
     */
     func any (test: (Element) -> Bool) -> Bool {
         for item in self {
@@ -494,8 +494,8 @@ internal extension Array {
     /**
         Checks if test returns true for all the elements in self
     
-        :param: test Function to call for each element
-        :returns: True if test returns true for all the elements in self
+        - parameter test: Function to call for each element
+        - returns: True if test returns true for all the elements in self
     */
     func all (test: (Element) -> Bool) -> Bool {
         for item in self {
@@ -510,8 +510,8 @@ internal extension Array {
     /**
         Opposite of filter.
     
-        :param: exclude Function invoked to test elements for the exclusion from the array
-        :returns: Filtered array
+        - parameter exclude: Function invoked to test elements for the exclusion from the array
+        - returns: Filtered array
     */
     func reject (exclude: (Element -> Bool)) -> Array {
         return filter {
@@ -522,8 +522,8 @@ internal extension Array {
     /**
         Returns an array containing the first n elements of self.
     
-        :param: n Number of elements to take
-        :returns: First n elements
+        - parameter n: Number of elements to take
+        - returns: First n elements
     */
     func take (n: Int) -> Array {
         return self[0..<Swift.max(0, n)]
@@ -532,14 +532,14 @@ internal extension Array {
     /**
         Returns the elements of the array up until an element does not meet the condition.
     
-        :param: condition A function which returns a boolean if an element satisfies a given condition or not.
-        :returns: Elements of the array up until an element does not meet the condition
+        - parameter condition: A function which returns a boolean if an element satisfies a given condition or not.
+        - returns: Elements of the array up until an element does not meet the condition
     */
     func takeWhile (condition: (Element) -> Bool) -> Array {
 
         var lastTrue = -1
 
-        for (index, value) in enumerate(self) {
+        for (index, value) in self.enumerate() {
             if condition(value) {
                 lastTrue = index
             } else {
@@ -553,8 +553,8 @@ internal extension Array {
     /**
         Returns the first element in the array to meet the condition.
     
-        :param: condition A function which returns a boolean if an element satisfies a given condition or not.
-        :returns: The first element in the array to meet the condition
+        - parameter condition: A function which returns a boolean if an element satisfies a given condition or not.
+        - returns: The first element in the array to meet the condition
     */
     func takeFirst (condition: (Element) -> Bool) -> Element? {
         
@@ -571,8 +571,8 @@ internal extension Array {
     /**
         Returns an array containing the the last n elements of self.
     
-        :param: n Number of elements to take
-        :returns: Last n elements
+        - parameter n: Number of elements to take
+        - returns: Last n elements
     */
     func tail (n: Int) -> Array {
         return self[(count - n)..<count]
@@ -581,8 +581,8 @@ internal extension Array {
     /**
         Subarray from n to the end of the array.
     
-        :param: n Number of elements to skip
-        :returns: Array from n to the end
+        - parameter n: Number of elements to skip
+        - returns: Array from n to the end
     */
     func skip (n: Int) -> Array {
         return n > count ? [] : self[n..<count]
@@ -591,14 +591,14 @@ internal extension Array {
     /**
         Skips the elements of the array up until the condition returns false.
 
-        :param: condition A function which returns a boolean if an element satisfies a given condition or not
-        :returns: Elements of the array starting with the element which does not meet the condition
+        - parameter condition: A function which returns a boolean if an element satisfies a given condition or not
+        - returns: Elements of the array starting with the element which does not meet the condition
     */
     func skipWhile (condition: (Element) -> Bool) -> Array {
 
         var lastTrue = -1
 
-        for (index, value) in enumerate(self) {
+        for (index, value) in self.enumerate() {
             if condition(value) {
                 lastTrue = index
             } else {
@@ -613,14 +613,14 @@ internal extension Array {
         Costructs an array removing the duplicate values in self
         if Array.Element implements the Equatable protocol.
     
-        :returns: Array of unique values
+        - returns: Array of unique values
     */
     func unique <T: Equatable> () -> [T] {
         var result = [T]()
 
         for item in self {
-            if !result.contains(item as T) {
-                result.append(item as T)
+            if !result.contains(item as! T) {
+                result.append(item as! T)
             }
         }
 
@@ -632,8 +632,8 @@ internal extension Array {
         running each element of self through groupingFunction. The corresponding
         value of each key is an array of the elements responsible for generating the key.
     
-        :param: groupingFunction
-        :returns: Grouped dictionary
+        - parameter groupingFunction:
+        - returns: Grouped dictionary
     */
     func groupBy <U> (groupingFunction group: (Element) -> U) -> [U: Array] {
 
@@ -658,8 +658,8 @@ internal extension Array {
         Similar to groupBy, instead of returning a list of values,
         returns the number of values for each group.
     
-        :param: groupingFunction
-        :returns: Grouped dictionary
+        - parameter groupingFunction:
+        - returns: Grouped dictionary
     */
     func countBy <U> (groupingFunction group: (Element) -> U) -> [U: Int] {
 
@@ -681,8 +681,8 @@ internal extension Array {
     /**
         Returns the number of elements which meet the condition
 
-        :param: test Function to call for each element
-        :returns: the number of elements meeting the condition
+        - parameter test: Function to call for each element
+        - returns: the number of elements meeting the condition
     */
     func countWhere (test: (Element) -> Bool) -> Int {
 
@@ -700,12 +700,12 @@ internal extension Array {
     /**
         Joins the array elements with a separator.
 
-        :param: separator
+        - parameter separator:
         :return: Joined object if self is not empty and its elements are instances of C, nil otherwise
     */
-    func implode <C: ExtensibleCollectionType> (separator: C) -> C? {
+    func implode <C: RangeReplaceableCollectionType> (separator: C) -> C? {
         if Element.self is C.Type {
-            return Swift.join(separator, unsafeBitCast(self, [C].self))
+            return unsafeBitCast(self, [C].self).joinWithSeparator(separator)
         }
 
         return nil
@@ -716,8 +716,8 @@ internal extension Array {
         Creates an array with values generated by running each value of self 
         through the mapFunction and discarding nil return values.
     
-        :param: mapFunction
-        :returns: Mapped array
+        - parameter mapFunction:
+        - returns: Mapped array
     */
     func mapFilter <V> (mapFunction map: (Element) -> (V)?) -> [V] {
         
@@ -761,8 +761,8 @@ internal extension Array {
     /**
         Creates an array with the elements at the specified indexes.
     
-        :param: indexes Indexes of the elements to get
-        :returns: Array with the elements at indexes
+        - parameter indexes: Indexes of the elements to get
+        - returns: Array with the elements at indexes
     */
     func at (indexes: Int...) -> Array {
         return indexes.map { self.get($0)! }
@@ -771,8 +771,8 @@ internal extension Array {
     /**
         Converts the array to a dictionary with the keys supplied via the keySelector.
     
-        :param: keySelector
-        :returns: A dictionary
+        - parameter keySelector:
+        - returns: A dictionary
     */
     func toDictionary <U> (keySelector:(Element) -> U) -> [U: Element] {
         var result: [U: Element] = [:]
@@ -786,7 +786,7 @@ internal extension Array {
     /**
         Flattens a nested Array self to an array of OutType objects.
     
-        :returns: Flattened array
+        - returns: Flattened array
     */
     func flatten <OutType> () -> [OutType] {
         var result = [OutType]()
@@ -802,7 +802,7 @@ internal extension Array {
     /**
         Flattens a nested Array self to an array of AnyObject.
     
-        :returns: Flattened array
+        - returns: Flattened array
     */
     func flattenAny () -> [AnyObject] {
         var result = [AnyObject]()
@@ -821,17 +821,17 @@ internal extension Array {
     /**
         Sorts the array according to the given comparison function.
     
-        :param: isOrderedBefore Comparison function.
-        :returns: An array that is sorted according to the given function
+        - parameter isOrderedBefore: Comparison function.
+        - returns: An array that is sorted according to the given function
     */
-    func sortBy (isOrderedBefore: (T, T) -> Bool) -> [T] {
-        return sorted(isOrderedBefore)
+    func sortBy (isOrderedBefore: (Element, Element) -> Bool) -> [Element] {
+        return sort(isOrderedBefore)
     }
 
     /**
         Removes the last element from self and returns it.
     
-        :returns: The removed element
+        - returns: The removed element
     */
     mutating func pop () -> Element {
         return removeLast()
@@ -840,7 +840,7 @@ internal extension Array {
     /**
         Same as append.
         
-        :param: newElement Element to append
+        - parameter newElement: Element to append
     */
     mutating func push (newElement: Element) {
         return append(newElement)
@@ -849,7 +849,7 @@ internal extension Array {
     /**
         Returns the first element of self and removes it from the array.
     
-        :returns: The removed element
+        - returns: The removed element
     */
     mutating func shift () -> Element {
         return removeAtIndex(0)
@@ -858,7 +858,7 @@ internal extension Array {
     /**
         Prepends an object to the array.
     
-        :param: newElement Object to prepend
+        - parameter newElement: Object to prepend
     */
     mutating func unshift (newElement: Element) {
         insert(newElement, atIndex: 0)
@@ -867,8 +867,8 @@ internal extension Array {
     /**
         Inserts an array at a given index in self.
     
-        :param: newArray Array to insert
-        :param: atIndex Where to insert the array
+        - parameter newArray: Array to insert
+        - parameter atIndex: Where to insert the array
     */
     mutating func insert (newArray: Array, atIndex: Int) {
         self = take(atIndex) + newArray + skip(atIndex)
@@ -877,7 +877,7 @@ internal extension Array {
     /**
         Deletes all the items in self that are equal to element.
     
-        :param: element Element to remove
+        - parameter element: Element to remove
     */
     mutating func remove <U: Equatable> (element: U) {
         let anotherSelf = self
@@ -886,7 +886,7 @@ internal extension Array {
 
         anotherSelf.each {
             (index: Int, current: Element) in
-            if current as U != element {
+            if current as! U != element {
                 self.append(current)
             }
         }
@@ -895,8 +895,8 @@ internal extension Array {
     /**
         Constructs an array containing the values in the given range.
     
-        :param: range
-        :returns: Array of values
+        - parameter range:
+        - returns: Array of values
     */
     static func range <U: ForwardIndexType> (range: Range<U>) -> [U] {
         return [U](range)
@@ -905,10 +905,10 @@ internal extension Array {
     /**
         Returns the subarray in the given range.
         
-        :param: range Range of the subarray elements
-        :returns: Subarray or nil if the index is out of bounds
+        - parameter range: Range of the subarray elements
+        - returns: Subarray or nil if the index is out of bounds
     */
-    subscript (#rangeAsArray: Range<Int>) -> Array {
+    subscript (rangeAsArray rangeAsArray: Range<Int>) -> Array {
         //  Fix out of bounds indexes
         let start = Swift.max(0, rangeAsArray.startIndex)
         let end = Swift.min(rangeAsArray.endIndex, count)
@@ -917,14 +917,14 @@ internal extension Array {
             return []
         }
             
-        return Array(self[Range(start: start, end: end)] as Slice<T>)
+        return Array(self[Range(start: start, end: end)] as ArraySlice<Element>)
     }
 
     /**
         Returns a subarray whose items are in the given interval in self.
     
-        :param: interval Interval of indexes of the subarray elements
-        :returns: Subarray or nil if the index is out of bounds
+        - parameter interval: Interval of indexes of the subarray elements
+        - returns: Subarray or nil if the index is out of bounds
     */
     subscript (interval: HalfOpenInterval<Int>) -> Array {
         return self[rangeAsArray: Range(start: interval.start, end: interval.end)]
@@ -933,8 +933,8 @@ internal extension Array {
     /**
         Returns a subarray whose items are in the given interval in self.
     
-        :param: interval Interval of indexes of the subarray elements
-        :returns: Subarray or nil if the index is out of bounds
+        - parameter interval: Interval of indexes of the subarray elements
+        - returns: Subarray or nil if the index is out of bounds
     */
     subscript (interval: ClosedInterval<Int>) -> Array {
         return self[rangeAsArray: Range(start: interval.start, end: interval.end + 1)]
@@ -943,10 +943,10 @@ internal extension Array {
     /**
         Creates an array with the elements at indexes in the given list of integers.
     
-        :param: first First index
-        :param: second Second index
-        :param: rest Rest of indexes
-        :returns: Array with the items at the specified indexes
+        - parameter first: First index
+        - parameter second: Second index
+        - parameter rest: Rest of indexes
+        - returns: Array with the items at the specified indexes
     */
     subscript (first: Int, second: Int, rest: Int...) -> Array {
         let indexes = [first, second] + rest
@@ -985,9 +985,9 @@ public func | <T: Equatable> (first: Array<T>, second: Array<T>) -> Array<T> {
 /**
     Array duplication.
 
-    :param: array Array to duplicate
-    :param: n How many times the array must be repeated
-    :returns: Array of repeated values
+    - parameter array: Array to duplicate
+    - parameter n: How many times the array must be repeated
+    - returns: Array of repeated values
 */
 public func * <ItemType> (array: Array<ItemType>, n: Int) -> Array<ItemType> {
     var result = Array<ItemType>()
@@ -1002,9 +1002,9 @@ public func * <ItemType> (array: Array<ItemType>, n: Int) -> Array<ItemType> {
 /**
     Array items concatenation à la Ruby.
 
-    :param: array Array of Strings to join
-    :param: separator Separator to join the array elements
-    :returns: Joined string
+    - parameter array: Array of Strings to join
+    - parameter separator: Separator to join the array elements
+    - returns: Joined string
 */
 public func * (array: Array<String>, separator: String) -> String {
     return array.implode(separator)!
