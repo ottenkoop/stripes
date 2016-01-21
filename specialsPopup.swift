@@ -19,7 +19,7 @@ class specialsPopup {
         
         var buttonArray : NSArray = []
         addSpecial1Btn()
-        addSpecial2Btn()
+//        addSpecial2Btn()
         addCancelBtn()
         
         // first el always 1btn, etc..

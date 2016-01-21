@@ -11,19 +11,27 @@ import Foundation
 class User: PFObject {
     
     class func requestFaceBookLoggedInUserInfo() {
-//        TODO: FIX THIS
-//        var completionHandler = {(
-//            connection, result, error) in
+        FBSession.openActiveSessionWithReadPermissions(["public_profile", "email", "user_friends"], allowLoginUI: true, completionHandler: { (session:FBSession!, state:FBSessionState, error:NSError!) -> Void in
+            if (error==nil){
+                FBRequest.requestForMe().startWithCompletionHandler({ (connection:FBRequestConnection!, result:AnyObject!, error:NSError!) -> Void in
+                    
+                    if (error==nil) {
+                        let userInfo = result as! NSDictionary
+                        let currentUser = PFUser.currentUser()!
+                        
+                        print(userInfo)
 //
-//            if error == nil {
-//                PFUser.currentUser()!.setObject(result.name, forKey: "fullName")
-//                PFUser.currentUser()!.saveInBackground()
-//            }
-//        }
-//        
-//        FBRequestConnection.startWithGraphPath(
-//            "me", completionHandler: completionHandler
-//        );
+                        currentUser["email"] = userInfo.objectForKey("email") as! String
+                        currentUser["fullName"] = userInfo.objectForKey("name") as! String
+                        currentUser["fbId"] = userInfo.objectForKey("id") as! String
+                        currentUser["gender"] = userInfo.objectForKey("gender") as! String
+                        currentUser.saveInBackground()
+                    } else {
+                        print("error facebook info")
+                    }
+                })
+            }
+        })
     }
     
     class func updateUserFullName() {

@@ -37,6 +37,7 @@ class gameView {
         gameController = gameControl
         
         currentGame = Game.currentGame()
+        
         gridDimension = currentGame["grid"] as! Int
         
     }
@@ -384,10 +385,10 @@ class gameView {
         
         submitBtn.translatesAutoresizingMaskIntoConstraints = false
         submitBtn.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: gameController.view, withConstant: -5)
-        submitBtn.pinAttribute(.Left, toAttribute: .Left, ofItem: gameController.view, withConstant: 5)
+        submitBtn.pinAttribute(.Left, toAttribute: .Left, ofItem: gameController.view, withConstant: -10)
 
         if (UIInterfaceOrientationIsPortrait(UIApplication.sharedApplication().statusBarOrientation)) {
-            submitBtn.constrainToSize(CGSizeMake(screenWidth - 75, 50))
+            submitBtn.constrainToSize(CGSizeMake(screenWidth - 40, 50))
             submitBtn.setImage(UIImage(named: "playBtnIphone"), forState: .Normal)
         } else {
             submitBtn.setImage(UIImage(named: "PlayBtniPad"), forState: .Normal)

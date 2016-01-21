@@ -7,11 +7,6 @@ class Game: PFObject {
     
     class func addGame(opponent : PFUser, grid : Int) {
         let game = PFObject(className:"Game")
-//        var board = Board(dimension: grid)
-        
-//        var opponentUser = PFUser.query()
-//        opponentUser.whereKey("fullName", equalTo: "\(opponentName)")
-//        var user = opponentUser.findObjects()
         
         game["user"] = PFUser.currentUser()
         game["user2"] = opponent
@@ -32,9 +27,27 @@ class Game: PFObject {
         game.saveInBackgroundWithBlock {
             (succeeded: Bool, err: NSError?) -> Void in
             if succeeded {
-                weekBattle.newBattle(game)
+                NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
             }
         }
+    }
+    
+    class func resetGame(grid : Int, game : PFObject) -> PFObject {
+        //        var board = Board(dimension: grid)
+        
+        game["userBoard"] = []
+        game["opponentBoard"] = []
+        game["grid"] = grid
+        game["lastStripe"] = []
+        game["finished"] = false
+        game["userPoints"] = 0
+        game["opponentPoints"] = 0
+        game["userOnTurn"] = PFUser.currentUser()
+        game["userSpecialsLeft"] = 2
+        game["opponentSpecialsLeft"] = 2
+        game["allScoredSquares"] = []
+        
+        return game
     }
     
     class func saveSquare(game : PFObject, squaresArray : NSArray, userPoints : Int, oppPoints : Int, userBoard : Board, oppBoard : Board) -> PFObject {
@@ -79,7 +92,7 @@ class Game: PFObject {
         return objectToReturn
     }
     
-    class func updateUserGameBoardAndSwitchUserTurn(game : PFObject, weekBattle : PFObject, userBoard : Board, oppBoard : Board, lastStripe : UIButton) -> PFObject {
+    class func updateUserGameBoardAndSwitchUserTurn(game : PFObject, userBoard : Board, oppBoard : Board, lastStripe : UIButton) -> PFObject {
         let lastStripeObject = stripeHandler.createStripeObject(lastStripe.superview!.superview!.tag, squareIndex: lastStripe.superview!.tag, stripeIndex: lastStripe.tag)
         
         let userBoardArray = userBoard.toString(userBoard.board)
@@ -104,7 +117,7 @@ class Game: PFObject {
         }
         
         game["lastStripe"] = [lastStripeObject]
-        weekBattle["userOnTurn"] = opponentUser
+        game["userOnTurn"] = opponentUser
         
         if firstStripe {
             pushNotificationHandler.sendNewGameNotification(opponentUser as PFUser)
@@ -112,51 +125,49 @@ class Game: PFObject {
             pushNotificationHandler.sendUserTurnNotification(opponentUser as PFUser)
         }
         
-        game.saveInBackground()
-        
-        return weekBattle
+        return game
     }
     
-    class func gameFinished(game : PFObject, weekBattle : PFObject, uWonGame : Int) -> PFObject {
-        if weekBattle["user"]!.objectId == PFUser.currentUser()!.objectId {
-            weekBattle["userOnTurn"] = weekBattle["user2"]
+    class func gameFinished(game : PFObject, uWonGame : Int) -> PFObject {
+        if game["user"]!.objectId == PFUser.currentUser()!.objectId {
+            game["userOnTurn"] = game["user2"]
             game["finished"] = true
             game["lastStripe"] = []
             
             if uWonGame == 1 {
-                var points = weekBattle["userPoints"] as! Int
+                var points = game["userPoints"] as! Int
                 points += 1
-                weekBattle["userPoints"] = points
+                game["userPoints"] = points
             } else if uWonGame == 2 {
-                var points = weekBattle["user2Points"] as! Int
+                var points = game["opponentPoints"] as! Int
                 points += 1
-                weekBattle["user2Points"] = points
+                game["opponentPoints"] = points
             }
             
         } else {
-            weekBattle["userOnTurn"] = weekBattle["user"]
+            game["userOnTurn"] = game["user"]
             game["finished"] = true
             game["lastStripe"] = []
             
             if uWonGame == 1 {
-                var points = weekBattle["user2Points"] as! Int
+                var points = game["opponentPoints"] as! Int
                 points += 1
-                weekBattle["user2Points"] = points
+                game["opponentPoints"] = points
             } else if uWonGame == 2 {
-                var points = weekBattle["userPoints"] as! Int
+                var points = game["userPoints"] as! Int
                 points += 1
-                weekBattle["userPoints"] = points
+                game["userPoints"] = points
             }
         }
         
-        game.saveInBackground()
-        return weekBattle
+        return game
     }
     
     class func currentGame() -> PFObject {
-        let currentGame = getCurrentGameFromLocalDataStore()
+        let currentGamesArray = getCurrentGamesFromLocalDataStore()
+        let game = currentGamesArray[0] as! PFObject
         
-        return currentGame["object"] as! PFObject
+        return game["object"] as! PFObject
     }
     
     class func getCurrentGameFromParse(weekBattle : PFObject) -> PFObject {
@@ -180,18 +191,20 @@ class Game: PFObject {
         return game
     }
     
-    class func getCurrentGameFromLocalDataStore() -> PFObject {
-        let query = PFQuery(className:"currentGame")
+    class func getCurrentGamesFromLocalDataStore() -> NSArray {
+        let query = PFQuery(className:"userGame")
         query.fromLocalDatastore()
         
-        var objects = []
+        query.whereKey("isCurrentGame", equalTo: true)
         
+        var currentGame = []
+
         do {
-            objects = try query.findObjects()
+            currentGame = try query.findObjects()
         } catch {
-            objects = []
+            currentGame = []
         }
         
-        return objects.lastObject as! PFObject
+        return currentGame
     }
 }

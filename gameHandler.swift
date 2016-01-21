@@ -18,17 +18,15 @@ class gameHandler {
     var opponentBoard = Board(dimension: 0)
     
     var gameObject : PFObject = PFObject(className: "currentGame")
-    var weekBattleObject : [PFObject] = []
     var gridDimension : Int = 0
     
-    init (gameBoardV: gameView, localBoard : Board, uBoard : Board, oppBoard : Board, weekB : [AnyObject], dimension : Int, submitButton : UIButton) {
+    init (gameBoardV: gameView, localBoard : Board, uBoard : Board, oppBoard : Board, dimension : Int, submitButton : UIButton) {
         gameBoardView = gameBoardV
         
         localGameBoard = localBoard
         userBoard = uBoard
         opponentBoard = oppBoard
         gameObject = Game.currentGame()
-        weekBattleObject = weekB as! [PFObject]
         
         gridDimension = dimension
         submitBtn = submitButton
@@ -130,14 +128,13 @@ class gameHandler {
             }
         }
         
-        let gameToSave = Game.updateUserGameBoardAndSwitchUserTurn(gameObject, weekBattle: weekBattleObject[0], userBoard: userBoard, oppBoard: opponentBoard, lastStripe: stripeToSubmit)
+        let gameToSave = Game.updateUserGameBoardAndSwitchUserTurn(gameObject, userBoard: userBoard, oppBoard: opponentBoard, lastStripe: stripeToSubmit)
         
         gameToSave.saveInBackgroundWithBlock {
             (succeeded: Bool, err: NSError?) -> Void in
-            
             if succeeded {
-                NSNotificationCenter.defaultCenter().postNotificationName("popViewController", object: nil)
                 NSNotificationCenter.defaultCenter().postNotificationName("deleteObjectFromYourTurnSection", object: nil)
+                NSNotificationCenter.defaultCenter().postNotificationName("popViewController", object: nil)
             }
         }
     }
@@ -156,7 +153,7 @@ class gameHandler {
             var nextGrid = [3, 4]
             nextGrid.removeObject(gameObject["grid"] as! Int)
 
-            weekBattle.resetGame(nextGrid[0] as Int, game: gameObject)
+            Game.resetGame(nextGrid[0] as Int, game: gameObject)
             
             print("true")
             
@@ -164,8 +161,8 @@ class gameHandler {
             gameObject.saveInBackgroundWithBlock {
                 (succeeded: Bool, err: NSError?) -> Void in
                 if succeeded {
-                    NSNotificationCenter.defaultCenter().postNotificationName("popViewController", object: nil)
                     NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
+                    NSNotificationCenter.defaultCenter().postNotificationName("popViewController", object: nil)
                 }
             }
         } else {
@@ -187,11 +184,7 @@ class gameHandler {
                 userWonGame = 0
             }
         
-            let gameToSave = Game.gameFinished(gameObject, weekBattle: weekBattleObject[0], uWonGame: userWonGame)
-            
-            weekBattleObject[0].saveInBackgroundWithBlock(nil)
-            print("false")
-            print(gameToSave)
+            let gameToSave = Game.gameFinished(gameObject, uWonGame: userWonGame)
             
             gameToSave.saveInBackgroundWithBlock {
                 (succeeded: Bool, err: NSError?) -> Void in

@@ -32,24 +32,6 @@ class weekBattle: PFObject {
 //        })
     }
     
-    class func resetGame(grid : Int, game : PFObject) -> PFObject {
-//        var board = Board(dimension: grid)
-        
-        game["userBoard"] = []
-        game["opponentBoard"] = []
-        game["grid"] = grid
-        game["lastStripe"] = []
-        game["finished"] = false
-        game["userPoints"] = 0
-        game["opponentPoints"] = 0
-//        game["userOnTurn"] = PFUser.currentUser()
-        game["userSpecialsLeft"] = 2
-        game["opponentSpecialsLeft"] = 2
-        game["allScoredSquares"] = []
-        
-        return game
-    }
-    
     class func resetWeekBattle(weekBattle : PFObject, game: PFObject) {
 //        _ = resetGame(3, game: game)
         

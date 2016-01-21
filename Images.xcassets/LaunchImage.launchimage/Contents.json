@@ -19,9 +19,9 @@
     {
       "orientation" : "portrait",
       "idiom" : "iphone",
+      "filename" : "lauchIphone2x.png",
       "extent" : "full-screen",
       "minimum-system-version" : "7.0",
-      "filename" : "lauchIphone2x.png",
       "scale" : "2x"
     },
     {
@@ -36,17 +36,17 @@
     {
       "orientation" : "landscape",
       "idiom" : "ipad",
+      "filename" : "launchIpad.png",
       "extent" : "full-screen",
       "minimum-system-version" : "7.0",
-      "filename" : "launchIpad.png",
       "scale" : "1x"
     },
     {
       "orientation" : "landscape",
       "idiom" : "ipad",
+      "filename" : "launchIpad@2x.png",
       "extent" : "full-screen",
       "minimum-system-version" : "7.0",
-      "filename" : "launchIpad@2x.png",
       "scale" : "2x"
     }
   ],

@@ -14,7 +14,6 @@ class demoController: UIViewController {
 
 //    var userTurn = false
 //    var gameObject = PFObject(className:"currentGame")
-    var weekBattleObject : [PFObject] = []
 //
 //    var gridDimension : Int = 0
 //    internal var localGameBoard = Board(dimension: 0)

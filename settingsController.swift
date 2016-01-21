@@ -1,4 +1,3 @@
-
 //  settingsView.swift
 //  Stripes
 //
@@ -7,26 +6,21 @@
 //
 
 import Foundation
+import Crashlytics
 
 class settingsController : UITableViewController, UIActionSheetDelegate {
 //    let textCellIdentifier = "TextCell"
     var cell : UITableViewCell!
-    var generalInfoDic = [String:String]()
-    var otherInfoDic = [String:String]()
 //    var generalInfoDic = [String:String]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "cell")
-        
-        fillGeneralInfo()
+//        
+//        let editInfo = UIBarButtonItem(barButtonSystemItem: .Edit, target: self, action: "newGame")
+//        navigationItem.rightBarButtonItem = editInfo
     }
-    
-    func fillGeneralInfo() {
-        generalInfoDic["Logged in as"] = PFUser.currentUser()!["fullName"] as? String
-        generalInfoDic["Version number"] = PFInstallation.currentInstallation()["appVersion"] as? String
-        generalInfoDic["Special user"] = "OFCOURSE!"
-    }
+
     
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 3
@@ -39,9 +33,9 @@ class settingsController : UITableViewController, UIActionSheetDelegate {
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
         case 0:
-            return generalInfoDic.count
+            return 4
         case 1:
-            return 0
+            return 1
         default:
             return 0
         }
@@ -56,9 +50,9 @@ class settingsController : UITableViewController, UIActionSheetDelegate {
         case 0:
             return "General info"
         case 1:
-            return "Other shit"
+            return "Connect"
         default:
-            return "IDK"
+            return "Other"
         }
     }
 
@@ -73,13 +67,31 @@ class settingsController : UITableViewController, UIActionSheetDelegate {
 
         switch indexPath.section {
         case 0:
-            let key = Array(generalInfoDic.keys)[indexPath.row]
-            
-            cell!.textLabel?.text = key
-            label.text = generalInfoDic[key]!
-
+            switch indexPath.row {
+               case 0:
+                cell!.textLabel?.text = "Username"
+                label.text = PFUser.currentUser()!["fullName"] as? String
+               case 1:
+                cell!.textLabel?.text = "Email"
+                label.text = PFUser.currentUser()!["email"] as? String
+               case 2:
+                cell!.textLabel?.text = "Version number"
+                label.text = PFInstallation.currentInstallation()["appVersion"] as? String
+               case 3:
+                cell!.textLabel?.text = "Special user"
+                label.text = "OFCOURSE!"
+               default:
+                ""
+            }
         case 1:
-            cell!.textLabel?.text = "Egeltje"
+            if (PFUser.currentUser()!["fbId"] == nil) {
+                cell!.textLabel?.text = "Connect with Facebook"
+            } else {
+                cell!.textLabel?.text = "You are already connected with Facebook!"
+            }
+
+        case 2:
+            cell!.textLabel?.text = "test crash"
         default:
             cell!.textLabel?.text = "Niks"
             
@@ -92,6 +104,17 @@ class settingsController : UITableViewController, UIActionSheetDelegate {
         return cell!
     }
     
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        switch indexPath.section {
+        case 1:
+            User.requestFaceBookLoggedInUserInfo()
+        case 2:
+            Crashlytics.sharedInstance().crash()
+        default:
+            print("nee")
+        }
+    }
+    
     func logOut() {
         let sheet : UIActionSheet = UIActionSheet()
         
@@ -101,6 +124,13 @@ class settingsController : UITableViewController, UIActionSheetDelegate {
         sheet.cancelButtonIndex = 1
         
         sheet.showInView(self.view)
+    }
+    
+    override func tableView(tableView: UITableView, didDeselectRowAtIndexPath indexPath: NSIndexPath) {
+        var cell = self.tableView.dequeueReusableCellWithIdentifier("cell")
+        
+//        print(cell?.accessoryView?.textInputMode.)
+        
     }
     
 //    func actionSheet(sheet: UIActionSheet, clickedButtonAtIndex buttonIndex: Int) {

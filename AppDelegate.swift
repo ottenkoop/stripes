@@ -32,7 +32,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         Fabric.with([Crashlytics.self])
 
-        
         registerForRemoteNotification()
         
         window = UIWindow (frame: UIScreen.mainScreen().bounds)

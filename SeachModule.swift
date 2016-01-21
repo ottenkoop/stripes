@@ -11,9 +11,9 @@ class searchModule: PFObject {
         return query
     }
     
-    class func findWeekBattles() -> PFQuery {
+    class func findAllGamesForUser() -> PFQuery {
         let predicate = NSPredicate(format: "user = %@ OR user2 = %@", PFUser.currentUser()!, PFUser.currentUser()!)
-        let game = PFQuery(className: "weekBattle", predicate: predicate)
+        let game = PFQuery(className: "Game", predicate: predicate)
         
         return game
     }

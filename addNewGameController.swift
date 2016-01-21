@@ -47,7 +47,13 @@ class addNewGameController: UITableViewController, UISearchResultsUpdating, UISe
     func addSearchBar() {
         searchController.searchBar.delegate = self
     }
-
+    
+    func reloadGameTableView() {
+        dispatch_async(dispatch_get_main_queue()) {
+            self.tableView.reloadData()
+            SVProgressHUD.dismiss()
+        }
+    }
     
     func loadTableViewContent() {
         if showFaceBookFriends {
@@ -71,16 +77,11 @@ class addNewGameController: UITableViewController, UISearchResultsUpdating, UISe
                         (task: BFTask!) -> AnyObject in
                         if task.error == nil {
                             self.allFriends = task.result! as! [AnyObject]
-                            self.tableView.reloadData()
+                            self.reloadGameTableView()
                         }
                         
                         return task
                     }
-                    
-                    1.0.waitSecondsAndDo({
-                        self.tableView.reloadData()
-                        SVProgressHUD.dismiss()
-                    })
                     
                 } else {
                     self.addSearchBar()
@@ -113,8 +114,10 @@ class addNewGameController: UITableViewController, UISearchResultsUpdating, UISe
             cell!.backgroundColor = UIColor.clearColor()
         }
         
-        let user : PFUser = allFriends[Int(indexPath.row)] as! PFUser
-        cell!.textLabel?.text = user["fullName"] as? String
+        if allFriends.count > 0 {
+            let user : PFUser = allFriends[Int(indexPath.row)] as! PFUser
+            cell!.textLabel?.text = user["fullName"] as? String
+        }
     
         return cell!
     }
@@ -123,66 +126,67 @@ class addNewGameController: UITableViewController, UISearchResultsUpdating, UISe
         SVProgressHUD.show()
 
         let opponent : PFUser = allFriends[Int(indexPath.row)] as! PFUser
-        let battleExists = checkIfBattleExists(opponent)
-//        let battleExists = false
-        
-        if battleExists {
-            let alert = UIAlertView(title: "Uh oh!", message: "This battle already exists.", delegate: self, cancelButtonTitle: "Return")
-            alert.show()
-            SVProgressHUD.dismiss()
-        } else {
-            Game.addGame(opponent, grid: 3)
-            self.navigationController!.popViewControllerAnimated(true)
-        }
+        newGame(opponent)
     }
     
     func updateSearchResultsForSearchController(searchController: UISearchController) {
         if searchController.searchBar.text?.characters.count > 1 {
+            SVProgressHUD.show()
+            self.allFriends.removeAll(keepCapacity: false)
+            self.tableView.reloadData()
+            
             let userQuery = searchModule.findUsers(searchController.searchBar.text!)
-
             userQuery.findObjectsInBackground().continueWithBlock {
                 (task: BFTask!) -> AnyObject in
                 if task.error == nil {
-                    self.allFriends.removeAll(keepCapacity: false)
                     self.allFriends = task.result as! [AnyObject]
-
+                    self.reloadGameTableView()
                 }
                 
                 return task
             }
-            
-            self.tableView.reloadData()
         }
         else {
             allFriends.removeAll(keepCapacity: false)
             self.tableView.reloadData()
         }
-        
     }
     
     func searchBarSearchButtonClicked(searchBar: UISearchBar) {
         self.tableView.reloadData()
-        
     }
 
-    func checkIfBattleExists(opp: PFUser) -> Bool {
-        var weekBattle : [AnyObject] = []
-        let predicate = NSPredicate(format: "user = %@ AND user2 = %@ OR user2 = %@ AND user = %@", PFUser.currentUser()!, opp, PFUser.currentUser()!, opp)
+    func checkIfBattleExistsAndReturn(opp: PFUser) {
+//        var battleExists : Bool = false
+//        let predicate = NSPredicate(format: "user = %@ AND user2 = %@ OR user2 = %@ AND user = %@", PFUser.currentUser()!, opp, PFUser.currentUser()!, opp)
+//        
+//        let weekBattleQuery = PFQuery(className:"Game", predicate: predicate)
+//        
+//        weekBattleQuery.findObjectsInBackground().continueWithBlock {
+//            (task: BFTask!) -> AnyObject in
+//            if task.error == nil {
+//                if task.result.count > 0 {
+//                    battleExists = true
+//                } else {
+//                    battleExists = false
+//                }
+//            }
+//            return task
+//        }
+//        
+//        print(battleExists)
         
-        let weekBattleQuery = PFQuery(className:"weekBattle", predicate: predicate)
-        
-        weekBattleQuery.findObjectsInBackground().continueWithBlock {
-            (task: BFTask!) -> AnyObject in
-            
-            weekBattle = task.result as! [AnyObject]
-            return task
-        }
-        
-        if weekBattle.isEmpty {
-            return false
-        } else {
-            return true
-        }
+    }
+    
+    func newGame(opp:PFUser) {
+        Game.addGame(opp, grid: 3)
+        self.navigationController!.popViewControllerAnimated(true)
+    }
+    
+    func gameExists() {
+        let alert = UIAlertView(title: "Uh oh!", message: "This battle already exists.", delegate: self, cancelButtonTitle: "Return")
+        alert.show()
+        SVProgressHUD.dismiss()
     }
     
     func addNavigationItems() {
