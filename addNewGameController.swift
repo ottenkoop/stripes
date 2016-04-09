@@ -20,7 +20,7 @@ class addNewGameController: UITableViewController, UISearchResultsUpdating, UISe
     let screenWidth : CGFloat = UIScreen.mainScreen().bounds.size.width
     let screenHeight : CGFloat = UIScreen.mainScreen().bounds.size.height
     
-    var opponentName : String = ""
+    var opponent : PFUser = PFUser()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -123,10 +123,12 @@ class addNewGameController: UITableViewController, UISearchResultsUpdating, UISe
     }
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        SVProgressHUD.show()
-
-        let opponent : PFUser = allFriends[Int(indexPath.row)] as! PFUser
-        newGame(opponent)
+        let gameOptionBtns = newGameTypeOptionsPopup().openPopup(self.view)
+        opponent = allFriends[Int(indexPath.row)] as! PFUser
+        
+        gameOptionBtns[0].addTarget(self, action: "normalGame:", forControlEvents: .TouchUpInside)
+        gameOptionBtns[1].addTarget(self, action: "gameWithSpecials:", forControlEvents: .TouchUpInside)
+        gameOptionBtns[2].addTarget(self, action: "cancelBtnPressed:", forControlEvents: .TouchUpInside)
     }
     
     func updateSearchResultsForSearchController(searchController: UISearchController) {
@@ -155,38 +157,26 @@ class addNewGameController: UITableViewController, UISearchResultsUpdating, UISe
     func searchBarSearchButtonClicked(searchBar: UISearchBar) {
         self.tableView.reloadData()
     }
-
-    func checkIfBattleExistsAndReturn(opp: PFUser) {
-//        var battleExists : Bool = false
-//        let predicate = NSPredicate(format: "user = %@ AND user2 = %@ OR user2 = %@ AND user = %@", PFUser.currentUser()!, opp, PFUser.currentUser()!, opp)
-//        
-//        let weekBattleQuery = PFQuery(className:"Game", predicate: predicate)
-//        
-//        weekBattleQuery.findObjectsInBackground().continueWithBlock {
-//            (task: BFTask!) -> AnyObject in
-//            if task.error == nil {
-//                if task.result.count > 0 {
-//                    battleExists = true
-//                } else {
-//                    battleExists = false
-//                }
-//            }
-//            return task
-//        }
-//        
-//        print(battleExists)
+    
+    func normalGame(button : UIButton!) {
+        newGame(false)
+    }
+    
+    func gameWithSpecials(button : UIButton!) {
+        newGame(true)
+    }
+    
+    func cancelBtnPressed(cButton : UIButton!) {
+        newGameTypeOptionsPopup().hidePopup(cButton)
+        opponent = PFUser()
         
+        navigationItem.leftBarButtonItem?.enabled = true
+        navigationItem.rightBarButtonItem?.enabled = true
     }
     
-    func newGame(opp:PFUser) {
-        Game.addGame(opp, grid: 3)
+    func newGame(withSpecials:Bool) {
+        Game.addGame(opponent, gameWithSpecials: withSpecials, grid: 3)
         self.navigationController!.popViewControllerAnimated(true)
-    }
-    
-    func gameExists() {
-        let alert = UIAlertView(title: "Uh oh!", message: "This battle already exists.", delegate: self, cancelButtonTitle: "Return")
-        alert.show()
-        SVProgressHUD.dismiss()
     }
     
     func addNavigationItems() {

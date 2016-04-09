@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 class scoreBoardView {
-    var gameObject = Game.currentGame()
+    var gameObject = currentGame
     let finalScoreView = UIView()
     let uNameLabel = UILabel()
     let uPointsLabel = UILabel()

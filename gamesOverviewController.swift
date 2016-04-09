@@ -38,48 +38,17 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         
         addBannerView()
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadTableViewContent", name: "reloadGameTableView", object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "resetLookingForGame", name: "resetLookingForGame", object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "deleteObjectFromSection", name: "deleteObjectFromYourTurnSection", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(GameOverviewController.loadTableViewContent), name: "reloadGameTableView", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(User.resetLookingForGame), name: "resetLookingForGame", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(GameOverviewController.deleteObjectFromSection), name: "deleteObjectFromYourTurnSection", object: nil)
 
         
         // iAD interstitial
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadInterstitialAd", name:"loadInterstitialAd", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(GameOverviewController.loadInterstitialAd), name:"loadInterstitialAd", object: nil)
         
+        print( (PFUser.currentUser()!["fullName"] == nil || PFUser.currentUser()!["email"] == nil) && (PFUser.currentUser()!["fbId"] != nil))
         if (PFUser.currentUser()!["fullName"] == nil || PFUser.currentUser()!["email"] == nil) && (PFUser.currentUser()!["fbId"] != nil) {
             User.requestFaceBookLoggedInUserInfo()
-        }
-    }
-    
-    func pinAllGamesInBackground() {
-//        TODO: Pin all games in background and fill tableview for less requests and speed improvements
-        
-        if gamesWithUserTurn.count > 0 {
-            for game in gamesWithUserTurn {
-                let userGame = PFObject(className:"userGame")
-                userGame.objectId = game.objectId!
-                userGame["object"] = game
-                userGame["isCurrentGame"] = false
-                do {
-                    try userGame.pin()
-                } catch {
-                    print("didnt pin")
-                }
-            }
-        }
-        
-        if gamesWithOpponentTurn.count > 0 {
-            for game in gamesWithOpponentTurn {
-                let userGame = PFObject(className:"userGame")
-                userGame.objectId = game.objectId!
-                userGame["object"] = game
-                userGame["isCurrentGame"] = false
-                do {
-                    try userGame.pin()
-                } catch {
-                    print("didnt pin")
-                }
-            }
         }
     }
     
@@ -88,15 +57,8 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         loadTableViewContent()
     }
     
-    func resetCurrentGames() {
-        let currentGames = Game.getCurrentGamesFromLocalDataStore()
-        
-        if currentGames.count > 0 {
-            for game in currentGames as! [PFObject] {
-                game["isCurrentGame"] = false
-                game.pinInBackground()
-            }
-        }
+    func resetCurrentGame() {
+//        currentGame = PFObject()
     }
     
     func addNewGameBtn() {
@@ -105,7 +67,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         
         newGameBtn.backgroundColor = UIColor.colorWithRGBHex(0x5AB103)
         newGameBtn.setTitle("New Game", forState: .Normal)
-        newGameBtn.addTarget(self, action: "newGame", forControlEvents: .TouchUpInside)
+        newGameBtn.addTarget(self, action: #selector(GameOverviewController.newGame), forControlEvents: .TouchUpInside)
         
         self.view.addSubview(newGameBtn)
         newGameBtn.translatesAutoresizingMaskIntoConstraints = false
@@ -115,7 +77,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     
     func addRefreshTableDrag() {
         let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: "refresh:", forControlEvents: .ValueChanged)
+        refreshControl.addTarget(self, action: #selector(GameOverviewController.refresh(_:)), forControlEvents: .ValueChanged)
         
         gameTableView.addSubview(refreshControl)
     }
@@ -277,15 +239,14 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         switch indexPath.section {
         case 0:
-            let game : PFObject = gamesWithUserTurn[Int(indexPath.row)] as PFObject
-            openGame(game)
+            currentGame = gamesWithUserTurn[Int(indexPath.row)] as PFObject
         case 1:
-            let game : PFObject = gamesWithOpponentTurn[Int(indexPath.row)] as PFObject
-        
-            openGame(game)
+            currentGame = gamesWithOpponentTurn[Int(indexPath.row)] as PFObject
         default:
             fatalError("What did you think ??")
         }
+        
+        openGame()
         
         currentGameIndex = indexPath.row
     }
@@ -313,39 +274,17 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
                 }
                 self.reloadGameTableView()
                 self.setBadgeNumber()
-                self.pinAllGamesInBackground()
             }
             return task
         }
     }
     
-    func openGame(game : PFObject) {
+    func openGame() {
         let containerToRemove = loadingView().showActivityIndicator(self.view)
         navigationItem.leftBarButtonItem?.enabled = false
         navigationItem.rightBarButtonItem?.enabled = false
         
-        let query = PFQuery(className:"userGame")
-        query.fromLocalDatastore()
-        
-        query.getObjectInBackgroundWithId(game.objectId!).continueWithBlock {
-            (task: BFTask!) -> AnyObject in
-            if task.error == nil {
-                let currentGame = task.result as! PFObject
-                
-                currentGame["isCurrentGame"] = true
-                currentGame.pinInBackground().continueWithBlock {
-                    (task: BFTask!) -> AnyObject in
-                    if task.error == nil {
-                        self.pushGameEngineController(containerToRemove)
-                    }
-                    return task
-                }
-            } else {
-                self.hideLoadingIndicator(containerToRemove)
-            }
-            return task
-        }
-        
+        self.pushGameEngineController(containerToRemove)
     }
     
     func pushGameEngineController(containerToRemove: UIView) {
@@ -372,7 +311,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         navigationItem.leftBarButtonItem?.enabled = true
         navigationItem.rightBarButtonItem?.enabled = true
         
-        resetCurrentGames()
+        resetCurrentGame()
         reloadGameTableView()
         
         SVProgressHUD.dismiss()
@@ -516,7 +455,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         } else {
             let int = Int(arc4random_uniform(UInt32(usersLookingForGame.count)))
             let opponent = usersLookingForGame[int] as! PFUser
-            Game.addGame(opponent, grid: 3)
+            Game.addGame(opponent, gameWithSpecials: false, grid: 3)
 
             SVProgressHUD.dismiss()
             newGamePopup().removePopup(rButton)

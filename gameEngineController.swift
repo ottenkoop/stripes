@@ -44,10 +44,12 @@ class gameEngineController: UIViewController {
     }
     
     func setCurrentGameVariables() {
-        gameObject = Game.currentGame()
+        gameObject = currentGame
         gridDimension = gameObject["grid"] as! Int
         
-        userTurn = gameObject["userOnTurn"] as? PFUser == PFUser.currentUser() ? true : false
+        userTurn = gameObject["userOnTurn"].objectId! == PFUser.currentUser()!.objectId
+        print(userTurn)
+        
     }
     
     func buildGame() {
@@ -173,8 +175,10 @@ class gameEngineController: UIViewController {
     }
     
     func addSpecialsBtn() {
-        gameBoardView.addSpecialsBtn(specialsBtn)
-        specialsBtn.addTarget(self, action: "openSpecials:", forControlEvents: .TouchUpInside)
+        if (gameObject["gameWithSpecials"]! as! Bool) {
+            gameBoardView.addSpecialsBtn(specialsBtn)
+            specialsBtn.addTarget(self, action: "openSpecials:", forControlEvents: .TouchUpInside)
+        }
     }
     
     func openSpecials(button : UIButton!) {
@@ -213,8 +217,11 @@ class gameEngineController: UIViewController {
         GameHandler.placeStripeAndSavePoint(stripeToSubmit, doubleStripeToSubmit: doubleStripeToSubmit, scoredSquares : scoredSquaresArray, specialUsed: specialUsed)
         stripeToSubmit = UIButton()
         doubleStripeToSubmit = UIButton()
-        gameBoardView.addSpecialsBtn(specialsBtn)
-        specialUsed = false
+        
+        if gameObject["gameWithSpecials"] as! Bool {
+            gameBoardView.addSpecialsBtn(specialsBtn)
+            specialUsed = false
+        }
     }
     
     func placeStripeAndSwitchUserTurn() {

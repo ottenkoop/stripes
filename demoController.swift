@@ -31,6 +31,6 @@ class demoController: UIViewController {
     override func viewDidLoad() {
 //        self.view.backgroundColor = UIColor(patternImage: UIImage(named: "gameBackground")!)
         
-        print(Game.currentGame())
+        print(currentGame)
     }
 }

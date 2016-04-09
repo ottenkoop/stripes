@@ -3,13 +3,17 @@
 //    
 //}
 
+var currentGame : PFObject!
+var gamesListOverview : [PFObject] = [PFObject]()
+
 class Game: PFObject {
     
-    class func addGame(opponent : PFUser, grid : Int) {
+    class func addGame(opponent : PFUser, gameWithSpecials : Bool, grid : Int) {
         let game = PFObject(className:"Game")
         
         game["user"] = PFUser.currentUser()
         game["user2"] = opponent
+        game["gameWithSpecials"] = gameWithSpecials
         game["userPoints"] = 0
         game["opponentPoints"] = 0
         game["userSpecialsLeft"] = 2
@@ -161,50 +165,5 @@ class Game: PFObject {
         }
         
         return game
-    }
-    
-    class func currentGame() -> PFObject {
-        let currentGamesArray = getCurrentGamesFromLocalDataStore()
-        let game = currentGamesArray[0] as! PFObject
-        
-        return game["object"] as! PFObject
-    }
-    
-    class func getCurrentGameFromParse(weekBattle : PFObject) -> PFObject {
-        let gameId = weekBattle["currentGame"]!.objectId
-        
-        let gameQuery = PFQuery(className:"Game")
-        gameQuery.whereKey("objectId", equalTo:"\(gameId)")
-        
-        let game : PFObject = PFObject()
-        
-//        gameQuery.findObjectsInBackgroundWithBlock {
-//            (objects: [AnyObject]?, error: NSError?) -> Void in
-//            
-//            if error == nil {
-//                if let objects = objects as? [PFObject] {
-//                    game = objects.last!
-//                }
-//            }
-//        }
-     
-        return game
-    }
-    
-    class func getCurrentGamesFromLocalDataStore() -> NSArray {
-        let query = PFQuery(className:"userGame")
-        query.fromLocalDatastore()
-        
-        query.whereKey("isCurrentGame", equalTo: true)
-        
-        var currentGame = []
-
-        do {
-            currentGame = try query.findObjects()
-        } catch {
-            currentGame = []
-        }
-        
-        return currentGame
     }
 }

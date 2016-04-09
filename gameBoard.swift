@@ -49,10 +49,10 @@ class Board {
     var board : [[Square]] = []
     
     init (dimension : Int) {
-        for index in 0..<dimension {
+        for _ in 0..<dimension {
             var row : [Square] = []
             
-            for index2 in 0 ..< dimension {
+            for _ in 0 ..< dimension {
                 row.append (Square())
             }
             
@@ -107,7 +107,7 @@ class Board {
     func toString (board : [[Square]]) -> [[Int]] {
         var newArray : [[Int]] = [[Int]]()
         
-        for (index, b) in board.enumerate() {
+        for (_, b) in board.enumerate() {
             var row : [Int] = []
 
             for s in b {

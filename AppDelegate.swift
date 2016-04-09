@@ -9,7 +9,7 @@
 import UIKit
 import Fabric
 import Crashlytics
-
+//import ParseClient
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -25,10 +25,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         navigationController = navController()
         
         Parse.enableLocalDatastore()
-        Parse.setApplicationId("Rfb6FpX2ewMytcvOLIHjsZs2faNMSTMBMZCz3BUo", clientKey: "Dk5u1t8oQwTUNyOKDPSSMtjjAB74g3TGkw6EJWyR")
+        
+        let configuration = ParseClientConfiguration {
+            $0.applicationId = "Rfb6FpX2ewMytcvOLIHjsZs2faNMSTMBMZCz3BUo"
+            $0.clientKey = "Dk5u1t8oQwTUNyOKDPSSMtjjAB74g3TGkw6EJWyR"
+            $0.server = "https://parseapi.back4app.com"
+        }
+        
+        Parse.initializeWithConfiguration(configuration)
         
         PFFacebookUtils.initializeFacebook()
-        PFAnalytics.trackAppOpenedWithLaunchOptionsInBackground(launchOptions, block: nil)
+        PFAnalytics.trackAppOpenedWithLaunchOptions(launchOptions)
         
         Fabric.with([Crashlytics.self])
 

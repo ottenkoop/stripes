@@ -13,7 +13,7 @@ class gameView {
     private var gameController = UIViewController()
     private var gameBoardView = UIView()
     private var gridDimension = 0
-    private var currentGame = PFObject(className: "currentGame")
+//    private var currentGame = PFObject(className: "currentGame")
     private var loadingContainer = UIView()
     
     let screenWidth : CGFloat = UIScreen.mainScreen().bounds.size.width
@@ -36,7 +36,7 @@ class gameView {
     init (gameControl : UIViewController) {
         gameController = gameControl
         
-        currentGame = Game.currentGame()
+        currentGame = currentGame!
         
         gridDimension = currentGame["grid"] as! Int
         
@@ -509,10 +509,12 @@ class gameView {
                     opponentPoints += 1
                 }
                 
-                if uBoard.allBelongsToUser(s["rowIndex"] as! Int, y: s["squareIndex"] as! Int) {
-                    userPoints += 1
-                } else if oppBoard.allBelongsToUser(s["rowIndex"] as! Int, y: s["squareIndex"] as! Int) {
-                    opponentPoints += 1
+                if currentGame["gameWithSpecials"] as! Bool {
+                    if uBoard.allBelongsToUser(s["rowIndex"] as! Int, y: s["squareIndex"] as! Int) {
+                        userPoints += 1
+                    } else if oppBoard.allBelongsToUser(s["rowIndex"] as! Int, y: s["squareIndex"] as! Int) {
+                        opponentPoints += 1
+                    }
                 }
             }
         }
@@ -527,14 +529,13 @@ class gameView {
                 opponentPoints += 1
             }
 
-            if uBoard.allBelongsToUser(square["rowIndex"] as! Int, y: square["squareIndex"] as! Int) {
-                userPoints += 1
-            } else if oppBoard.allBelongsToUser(square["rowIndex"] as! Int, y: square["squareIndex"] as! Int) {
-                opponentPoints += 1
+            if currentGame["gameWithSpecials"] as! Bool {
+                if uBoard.allBelongsToUser(square["rowIndex"] as! Int, y: square["squareIndex"] as! Int) {
+                    userPoints += 1
+                } else if oppBoard.allBelongsToUser(square["rowIndex"] as! Int, y: square["squareIndex"] as! Int) {
+                    opponentPoints += 1
+                }
             }
-            
-            print(userPoints)
-            print(opponentPoints)
         }
         
 
@@ -635,7 +636,7 @@ class gameView {
     
     func animateSpecialStripes() {
         for stripe in opponentSelectedStripes {
-            stripe.pulseToSize(1.1, duration: 0.2, `repeat`: true)
+            stripe.pulseToSize(1.1, duration: 0.2, repeat: true)
         }
     }
 

@@ -26,7 +26,7 @@ class gameHandler {
         localGameBoard = localBoard
         userBoard = uBoard
         opponentBoard = oppBoard
-        gameObject = Game.currentGame()
+        gameObject = currentGame
         
         gridDimension = dimension
         submitBtn = submitButton
