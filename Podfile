@@ -1,0 +1,15 @@
+source 'https://github.com/CocoaPods/Specs.git'
+platform :ios, '8.0'
+
+link_with 'Stripes', 'StipesTests'
+
+pod 'Bolts'
+pod 'UIView-Autolayout', '~> 0.2.0'
+pod 'UIView+AnimationExtensions'
+pod 'SVProgressHUD'
+pod 'MGSwipeTableCell'
+pod 'ParseUI'
+pod 'Parse'
+pod 'ParseCrashReporting'
+pod 'ParseFacebookUtils'
+pod 'Facebook-iOS-SDK'

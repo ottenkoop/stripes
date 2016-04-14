@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   type = "0"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.SymbolicBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            symbolName = "warnBlockingOperationOnMainThread"
+            moduleName = "">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Stripes.GameOverviewController.warnBlockingOperationOnMainThread (Stripes.GameOverviewController)() -&gt; ()"
+                  moduleName = "Stripes"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/Koop/Documents/ios_projects/Stripes/Stripes/GamesOverviewController.swift"
+                  timestampString = "474737344.94387"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "281"
+                  endingLineNumber = "281"
+                  offsetFromSymbolStart = "8">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "@objc Stripes.GameOverviewController.warnBlockingOperationOnMainThread (Stripes.GameOverviewController)() -&gt; ()"
+                  moduleName = "Stripes"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/Koop/Documents/ios_projects/Stripes/Stripes/GamesOverviewController.swift"
+                  timestampString = "474737344.944077"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0"
+                  offsetFromSymbolStart = "0">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "warnBlockingOperationOnMainThread"
+                  moduleName = "Stripes"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/Koop/Documents/ios_projects/Stripes/Pods/Bolts/Bolts/Common/BFTask.m"
+                  timestampString = "474737344.944204"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "18"
+                  endingLineNumber = "18"
+                  offsetFromSymbolStart = "0">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>
