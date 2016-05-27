@@ -23,7 +23,7 @@ class settingsController : UITableViewController, UIActionSheetDelegate {
 
     
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 3
+        return 2
     }
     
     override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -78,8 +78,8 @@ class settingsController : UITableViewController, UIActionSheetDelegate {
                 cell!.textLabel?.text = "Version number"
                 label.text = PFInstallation.currentInstallation()["appVersion"] as? String
                case 3:
-                cell!.textLabel?.text = "Special user"
-                label.text = "OFCOURSE!"
+                cell!.textLabel?.text = "Games played"
+                label.text = PFUser.currentUser()!["gamesPlayed"] != nil ? String(PFUser.currentUser()!["gamesPlayed"]) : String(0)
                default:
                 ""
             }

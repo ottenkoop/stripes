@@ -40,7 +40,7 @@ class gameEngineController: UIViewController {
         addSpecialsBtn()
         addSubmitBtn()
         GameHandler.checkifGameIsFinished()
-//        gameHasFinished()
+        gameHasFinished()
     }
     
     func setCurrentGameVariables() {
@@ -249,6 +249,10 @@ class gameEngineController: UIViewController {
             
             finishScreen().openPopup(self.view, finishBtn: finishBtn)
         })
+        
+        if userTurn == false {
+            finishBtn.hidden = true
+        }
     }
     
     func gameFinished(button : UIButton!) {

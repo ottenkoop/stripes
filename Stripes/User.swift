@@ -19,8 +19,6 @@ class User: PFObject {
                         let userInfo = result as! NSDictionary
                         let currentUser = PFUser.currentUser()!
                         
-                        print(userInfo)
-//
                         currentUser["email"] = userInfo.objectForKey("email") as! String
                         currentUser["fullName"] = userInfo.objectForKey("name") as! String
                         currentUser["fbId"] = userInfo.objectForKey("id") as! String
@@ -32,6 +30,15 @@ class User: PFObject {
                 })
             }
         })
+    }
+    
+    class func fetchUserInfoInBackground() {
+        do {
+            try PFUser.currentUser()?.fetch()
+        } catch {
+            print("not refreshed")
+        }
+
     }
     
     class func updateUserFullName() {
@@ -54,6 +61,13 @@ class User: PFObject {
     class func resetLookingForGame() {
         PFUser.currentUser()!.setObject(false, forKey: "lookingForGame")
         PFUser.currentUser()!.saveInBackground()
+    }
+    
+    class func incrementGamesPlayedForUser() {
+        print("+1 games Played")
+        let gamesPlayed : Int = PFUser.currentUser()!["gamesPlayed"] != nil ? (PFUser.currentUser()!["gamesPlayed"] as! Int + 1) : 1
+        PFUser.currentUser()!["gamesPlayed"] = gamesPlayed
+        PFUser.currentUser()!.saveEventually()
     }
 
 }

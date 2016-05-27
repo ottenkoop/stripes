@@ -146,9 +146,7 @@ class gameHandler {
         }
     }
     
-    func gameFinished(button : UIButton!) {
-        print(gameObject["finished"] as! Bool ? "ja" : "neeeee hoor")
-        
+    func gameFinished(button : UIButton!) {        
         if gameObject["finished"] as! Bool == true {
             var nextGrid = [3, 4]
             nextGrid.removeObject(gameObject["grid"] as! Int)
@@ -163,6 +161,7 @@ class gameHandler {
                 if succeeded {
                     NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
                     NSNotificationCenter.defaultCenter().postNotificationName("popViewController", object: nil)
+                    User.incrementGamesPlayedForUser()
                 }
             }
         } else {
@@ -191,6 +190,7 @@ class gameHandler {
                 if succeeded {
                     NSNotificationCenter.defaultCenter().postNotificationName("deleteObjectFromYourTurnSection", object: nil)
                     NSNotificationCenter.defaultCenter().postNotificationName("popViewController", object: nil)
+                    User.incrementGamesPlayedForUser()
                 }
             }
         }

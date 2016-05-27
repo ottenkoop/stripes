@@ -24,4 +24,11 @@ class searchModule: PFObject {
         usersQuery!.whereKey("fullName", matchesRegex: searchString, modifiers: "i")
         return usersQuery!
     }
+    
+    class func findUserWithObjectId(searchString : String) -> PFQuery {
+        let usersQuery = PFUser.query()
+        
+        usersQuery!.whereKey("objectId", matchesRegex: searchString, modifiers: "i")
+        return usersQuery!
+    }
 }

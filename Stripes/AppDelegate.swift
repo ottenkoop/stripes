@@ -40,6 +40,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Fabric.with([Crashlytics.self])
 
         registerForRemoteNotification()
+        checkIfUserNeedsFetching()
         
         window = UIWindow (frame: UIScreen.mainScreen().bounds)
 
@@ -63,6 +64,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let notificationTypes : UIUserNotificationType = [UIUserNotificationType.Alert, UIUserNotificationType.Badge, UIUserNotificationType.Sound]
         let notificationSettings : UIUserNotificationSettings = UIUserNotificationSettings(forTypes: notificationTypes, categories: nil)
         UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)
+    }
+    
+    func checkIfUserNeedsFetching() {
+        if (PFUser.currentUser() != nil) && (PFUser.currentUser()!.dataAvailable) {
+            User.fetchUserInfoInBackground()
+        }
     }
     
     @available(iOS 8.0, *)

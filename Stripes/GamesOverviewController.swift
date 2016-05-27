@@ -18,6 +18,8 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     var cell : UITableViewCell?
     var interstitialAd:ADInterstitialAd!
     var interstitialAdView: UIView = UIView()
+    var loadingViewContainer: UIView = UIView()
+    var showAdToUser : Bool = false
     
     let screenWidth : CGFloat = UIScreen.mainScreen().bounds.size.width
     let screenHeight : CGFloat = UIScreen.mainScreen().bounds.size.height
@@ -46,19 +48,27 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         // iAD interstitial
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(GameOverviewController.loadInterstitialAd), name:"loadInterstitialAd", object: nil)
         
-        print( (PFUser.currentUser()!["fullName"] == nil || PFUser.currentUser()!["email"] == nil) && (PFUser.currentUser()!["fbId"] != nil))
         if (PFUser.currentUser()!["fullName"] == nil || PFUser.currentUser()!["email"] == nil) && (PFUser.currentUser()!["fbId"] != nil) {
             User.requestFaceBookLoggedInUserInfo()
         }
+        
+        var bla = PFUser.currentUser()!["gamesPlayed"] != nil ? (PFUser.currentUser()!["gamesPlayed"] as! Int + 1) : 1
+        
+        print(bla)
     }
     
     func deleteObjectFromSection() {
+        showAdToUser = true
+        
         gamesWithUserTurn.removeAtIndex(currentGameIndex)
+
         loadTableViewContent()
     }
     
     func resetCurrentGame() {
 //        currentGame = PFObject()
+        
+    
     }
     
     func addNewGameBtn() {
@@ -281,8 +291,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     
     func openGame() {
         let containerToRemove = loadingView().showActivityIndicator(self.view)
-        navigationItem.leftBarButtonItem?.enabled = false
-        navigationItem.rightBarButtonItem?.enabled = false
+        changeNavigationItemEnableStatus(false)
         
         self.pushGameEngineController(containerToRemove)
     }
@@ -298,8 +307,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     func hideLoadingIndicator(containerToRemove: UIView) {
         dispatch_async(dispatch_get_main_queue()) {
             loadingView().hideActivityIndicatorWhenReturning(containerToRemove)
-            self.navigationItem.leftBarButtonItem?.enabled = true
-            self.navigationItem.rightBarButtonItem?.enabled = true
+            self.changeNavigationItemEnableStatus(true)
         }
 
     }
@@ -308,13 +316,19 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         super.viewWillAppear(animated)
         
         setBadgeNumber()
-        navigationItem.leftBarButtonItem?.enabled = true
-        navigationItem.rightBarButtonItem?.enabled = true
+        changeNavigationItemEnableStatus(true)
         
-        resetCurrentGame()
+//        resetCurrentGame()
         reloadGameTableView()
         
         SVProgressHUD.dismiss()
+        
+//      enable for later; TO MAKE MORE MONEYSSSS
+//        if showAdToUser {
+//            self.navigationController?.navigationBarHidden = true
+//            NSNotificationCenter.defaultCenter().postNotificationName("loadInterstitialAd", object: nil)
+//        }
+        
     }
     
     func reloadGameTableView() {
@@ -411,8 +425,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         btns[2].addTarget(self, action: #selector(GameOverviewController.randomGame(_:)), forControlEvents: .TouchUpInside)
         btns[3].addTarget(self, action: #selector(GameOverviewController.cancelBtnPressed(_:)), forControlEvents: .TouchUpInside)
         
-        navigationItem.leftBarButtonItem?.enabled = false
-        navigationItem.rightBarButtonItem?.enabled = false
+        changeNavigationItemEnableStatus(false)
     }
     
     func faceBookFriendGame(fButton : UIButton!) {
@@ -460,24 +473,27 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
             SVProgressHUD.dismiss()
             newGamePopup().removePopup(rButton)
             
-            navigationItem.leftBarButtonItem?.enabled = true
-            navigationItem.rightBarButtonItem?.enabled = true
+            changeNavigationItemEnableStatus(true)
         }
     }
     
     func cancelBtnPressed(cButton : UIButton!) {
         newGamePopup().cancelPopup(cButton)
-        
-        navigationItem.leftBarButtonItem?.enabled = true
-        navigationItem.rightBarButtonItem?.enabled = true
+        changeNavigationItemEnableStatus(true)
     }
+    
+    func changeNavigationItemEnableStatus(status: Bool) {
+        navigationItem.leftBarButtonItem?.enabled = status
+        navigationItem.rightBarButtonItem?.enabled = status
+    }
+    
     
     //iAd
     func bannerViewWillLoadAd(banner: ADBannerView!) {
     }
     
     func bannerViewDidLoadAd(banner: ADBannerView!) {
-        self.bannerView.alpha = 0.0
+        self.bannerView.alpha = 1.0
     }
     
     func bannerViewActionDidFinish(banner: ADBannerView!) {
@@ -506,6 +522,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func loadInterstitialAd() {
+        showAdToUser = false
         interstitialAd = ADInterstitialAd()
         interstitialAd.delegate = self
     }
@@ -528,6 +545,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     func interstitialAdActionDidFinish(interstitialAd: ADInterstitialAd!) {
         interstitialAdView.removeFromSuperview()
         self.navigationController?.navigationBarHidden = false
+        loadingView().hideActivityIndicatorWhenReturning(loadingViewContainer)
     }
     
     func interstitialAdActionShouldBegin(interstitialAd: ADInterstitialAd!, willLeaveApplication willLeave: Bool) -> Bool {
@@ -535,12 +553,14 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func interstitialAd(interstitialAd: ADInterstitialAd!, didFailWithError error: NSError!) {
-        
+        self.navigationController?.navigationBarHidden = false
+        loadingView().hideActivityIndicatorWhenReturning(loadingViewContainer)
     }
     
     func interstitialAdDidUnload(interstitialAd: ADInterstitialAd!) {
         interstitialAdView.removeFromSuperview()
         self.navigationController?.navigationBarHidden = false
+        loadingView().hideActivityIndicatorWhenReturning(loadingViewContainer)
     }
     
     override func didReceiveMemoryWarning() {
