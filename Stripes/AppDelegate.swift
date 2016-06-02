@@ -81,7 +81,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let currentInstallation : PFInstallation = PFInstallation.currentInstallation()
         
         currentInstallation.setDeviceTokenFromData(deviceToken)
-        currentInstallation.channels = ["gameNotification"]
+        currentInstallation.channels = ["gameNotification", "testing", "Iamawesome"]
         
         if (PFUser.currentUser() != nil) {
             currentInstallation["user"] = PFUser.currentUser()
@@ -122,7 +122,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if (notification.objectForKey("content-available") != nil) {
             if notification.objectForKey("content-available") as! Int == 1 {
                 NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
-                //                NSNotificationCenter.defaultCenter().postNotificationName("resetLookingForGame", object: nil)
+            }
+            
+            if notification.objectForKey("random-game") as! Bool {
+                NSNotificationCenter.defaultCenter().postNotificationName("resetLookingForGame", object: nil)
             }
         } else {
             PFPush.handlePush(userInfo)

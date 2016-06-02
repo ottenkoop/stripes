@@ -51,10 +51,6 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         if (PFUser.currentUser()!["fullName"] == nil || PFUser.currentUser()!["email"] == nil) && (PFUser.currentUser()!["fbId"] != nil) {
             User.requestFaceBookLoggedInUserInfo()
         }
-        
-        var bla = PFUser.currentUser()!["gamesPlayed"] != nil ? (PFUser.currentUser()!["gamesPlayed"] as! Int + 1) : 1
-        
-        print(bla)
     }
     
     func deleteObjectFromSection() {
@@ -210,7 +206,8 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         
         uPoints = userIsPFUser ? gameObject["userPoints"] as! Int : gameObject["opponentPoints"] as! Int
         oppPoints = userIsPFUser ? gameObject["opponentPoints"] as! Int : gameObject["userPoints"] as! Int
-        oppFullName = userIsPFUser ? (gameObject["user2FullName"] as! NSString).componentsSeparatedByString(" ") : (gameObject["userFullName"] as! NSString).componentsSeparatedByString(" ")
+        
+        oppFullName = userIsPFUser ? (gameObject["userFullName"] as! NSString).componentsSeparatedByString(" ") : (gameObject["user2FullName"] as! NSString).componentsSeparatedByString(" ")
 
 
         if oppFullName.count > 1 {
@@ -290,17 +287,17 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func openGame() {
-        let containerToRemove = loadingView().showActivityIndicator(self.view)
+//        let containerToRemove = loadingView().showActivityIndicator(self.view)
         changeNavigationItemEnableStatus(false)
         
-        self.pushGameEngineController(containerToRemove)
+        self.pushGameEngineController()
     }
     
-    func pushGameEngineController(containerToRemove: UIView) {
+    func pushGameEngineController() {
         dispatch_async(dispatch_get_main_queue()) {
             let gC = gameEngineController()
             self.navigationController?.pushViewController(gC, animated: true)
-            loadingView().hideActivityIndicatorWhenReturning(containerToRemove)
+//            loadingView().hideActivityIndicatorWhenReturning(containerToRemove)
         }
     }
     
@@ -382,18 +379,12 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     
     func setBadgeNumber () {
         let currentInstallation = PFInstallation.currentInstallation()
-        
+    
         if gamesWithUserTurn.count != 0 {
             currentInstallation.badge = gamesWithUserTurn.count
         } else {
             currentInstallation.badge = 0
         }
-        
-        if currentInstallation.badge > 0 {
-            User.resetLookingForGame()
-        }
-        
-        currentInstallation.saveInBackground()
     }
     
     func addNavigationItems() {
@@ -447,34 +438,45 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func randomGame(rButton : UIButton!) {
-        SVProgressHUD.show()
-        let query = PFUser.query()
-        query!.whereKey("lookingForGame", equalTo: true)
+        let containerToRemove = loadingView().showActivityIndicator(self.view)
+        newGamePopup().removePopup(rButton)
         
-        var usersLookingForGame = []
-        
-        do {
-            usersLookingForGame = try query!.findObjects()
-        } catch {
-            usersLookingForGame = []
-        }
-        
-        if usersLookingForGame.count == 0 {
-            let alert = UIAlertView(title: "", message: "Searching for an opponent. This may take a while.", delegate: self, cancelButtonTitle: "Ok")
-            alert.show()
-            PFUser.currentUser()!.setObject(true, forKey: "lookingForGame")
-            PFUser.currentUser()!.saveInBackground()
-            SVProgressHUD.dismiss()
-        } else {
-            let int = Int(arc4random_uniform(UInt32(usersLookingForGame.count)))
-            let opponent = usersLookingForGame[int] as! PFUser
-            Game.addGame(opponent, gameWithSpecials: false, grid: 3)
-
-            SVProgressHUD.dismiss()
-            newGamePopup().removePopup(rButton)
+        0.5.waitSecondsAndDo({
+            let query = PFUser.query()
+            query!.whereKey("lookingForGame", equalTo: true)
             
-            changeNavigationItemEnableStatus(true)
-        }
+            var usersLookingForGame : Array = [PFObject]()
+            
+            do {
+                usersLookingForGame = try query!.findObjects()
+            } catch {
+                usersLookingForGame = []
+            }
+            
+            let opponentArray = Game.getOpponentWhichIsNotYetActiveInAnotherGameAgaintUser(usersLookingForGame)
+            
+            if usersLookingForGame.count == 0 || opponentArray.count == 0 {
+                let alert = UIAlertView(title: "No Opponent Found.", message: "Searching for another opponent. A game will start automatically when an opponent is found.", delegate: self, cancelButtonTitle: "Ok")
+                alert.show()
+                PFUser.currentUser()!.setObject(true, forKey: "lookingForGame")
+                PFUser.currentUser()!.saveInBackground()
+                SVProgressHUD.dismiss()
+            } else {
+                let opponent = opponentArray[0] as! PFUser
+                let alert = UIAlertView(title: "Opponent Found!", message: "Game is set up and \(opponent["fullName"]) is ready to battle! You can start the game in the 'Your Turn' section.", delegate: self, cancelButtonTitle: "Ok")
+                
+                newGameIsRandom = true
+                Game.addGame(opponent, gameWithSpecials: false, grid: 3)
+                alert.show()
+                
+                SVProgressHUD.dismiss()
+            }
+            
+            self.changeNavigationItemEnableStatus(true)
+            loadingView().hideActivityIndicatorWhenReturning(containerToRemove)
+        })
+        
+        
     }
     
     func cancelBtnPressed(cButton : UIButton!) {

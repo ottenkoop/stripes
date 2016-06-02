@@ -166,4 +166,19 @@ class Game: PFObject {
         
         return game
     }
+    
+    class func getOpponentWhichIsNotYetActiveInAnotherGameAgaintUser(usersLookingForGame : NSArray) -> NSArray {
+        for opp in usersLookingForGame {
+            let gameExists = searchModule.checkIfGameAlreadyExcists(opp as! PFUser)
+            
+            if !(gameExists) {
+                return [opp]
+            } else if ((opp as! PFUser == usersLookingForGame.lastObject as! PFUser) && opp as! PFUser == PFUser.currentUser()!) {
+                return []
+            }
+        }
+        
+        return []
+    }
+    
 }

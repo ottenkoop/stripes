@@ -31,4 +31,23 @@ class searchModule: PFObject {
         usersQuery!.whereKey("objectId", matchesRegex: searchString, modifiers: "i")
         return usersQuery!
     }
+    
+    class func checkIfGameAlreadyExcists(opponent : PFUser) -> Bool {
+        let predicate = NSPredicate(format: "user = %@ AND user2 = %@ OR user2 = %@ AND user = %@", PFUser.currentUser()!, opponent, PFUser.currentUser()!, opponent)
+        let gameQuery = PFQuery(className: "Game", predicate: predicate)
+        
+        var gameExists = false
+        
+        do {
+            let results = try gameQuery.findObjects()
+            if results.count > 0 {
+                gameExists = true
+            }
+        } catch {
+            gameExists = false
+        }
+        
+        return gameExists
+    }
+    
 }

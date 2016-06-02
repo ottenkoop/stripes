@@ -132,7 +132,7 @@ class addNewGameController: UITableViewController, UISearchResultsUpdating, UISe
     }
     
     func updateSearchResultsForSearchController(searchController: UISearchController) {
-        if searchController.searchBar.text?.characters.count > 1 {
+        if searchController.searchBar.text?.characters.count >= 3 {
             SVProgressHUD.show()
             self.allFriends.removeAll(keepCapacity: false)
             self.tableView.reloadData()

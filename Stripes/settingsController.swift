@@ -35,7 +35,7 @@ class settingsController : UITableViewController, UIActionSheetDelegate {
         case 0:
             return 4
         case 1:
-            return 1
+            return 2
         default:
             return 0
         }
@@ -84,14 +84,21 @@ class settingsController : UITableViewController, UIActionSheetDelegate {
                 ""
             }
         case 1:
-            if (PFUser.currentUser()!["fbId"] == nil) {
-                cell!.textLabel?.text = "Connect with Facebook"
-            } else {
-                cell!.textLabel?.text = "You are already connected with Facebook!"
+            switch indexPath.row {
+            case 0:
+                if (PFUser.currentUser()!["fbId"] == nil) {
+                    cell!.textLabel?.text = "Connect with Facebook"
+                } else {
+                    cell!.textLabel?.text = "You are already connected with Facebook!"
+                }
+            case 1:
+                cell!.textLabel?.text = "test push"
+            default:
+                ""
             }
 
         case 2:
-            cell!.textLabel?.text = "test crash"
+            cell!.textLabel?.text = "test push"
         default:
             cell!.textLabel?.text = "Niks"
             
@@ -107,9 +114,15 @@ class settingsController : UITableViewController, UIActionSheetDelegate {
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         switch indexPath.section {
         case 1:
-            User.requestFaceBookLoggedInUserInfo()
-        case 2:
-            Crashlytics.sharedInstance().crash()
+            switch indexPath.row {
+            case 0:
+                User.requestFaceBookLoggedInUserInfo()
+            case 1:
+                pushNotificationHandler.testPushNotification()
+            default:
+                ""
+            }
+            
         default:
             print("nee")
         }

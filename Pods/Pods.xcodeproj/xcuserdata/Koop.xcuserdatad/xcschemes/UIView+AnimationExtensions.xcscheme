@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "2E66D176034765C050348DD7"
+               BlueprintIdentifier = "C1B7FC3229758A54A387E762"
                BuildableName = "libUIView+AnimationExtensions.a"
                BlueprintName = "UIView+AnimationExtensions"
                ReferencedContainer = "container:Pods.xcodeproj">

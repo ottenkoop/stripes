@@ -40,7 +40,6 @@ class gameEngineController: UIViewController {
         addSpecialsBtn()
         addSubmitBtn()
         GameHandler.checkifGameIsFinished()
-        gameHasFinished()
     }
     
     func setCurrentGameVariables() {

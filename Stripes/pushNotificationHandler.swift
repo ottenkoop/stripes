@@ -8,6 +8,8 @@
 
 import Foundation
 
+var newGameIsRandom : Bool!
+
 class pushNotificationHandler: PFObject {
     
     class func sendUserTurnNotification(opponent : PFUser) {
@@ -40,13 +42,12 @@ class pushNotificationHandler: PFObject {
         
         var oppName = ""
         let oppFullName = (PFUser.currentUser()!["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
-//        let oppFullName : NSArray = ["Opponent", "lastName"]
         let lastName = oppFullName.lastObject as! String
         let lastLetter = lastName[lastName.startIndex]
         
         oppName = "\(oppFullName[0]) \(lastLetter)."
         
-        let data : NSDictionary = ["alert": "\(oppName) has challenged you to play a game!", "badge":"1", "content-available":"1", "sound":"default"]
+        let data : NSDictionary = ["alert": "\(oppName) has challenged you to play a game!", "badge":"1", "content-available":"1", "sound":"default", "random-game":"\(newGameIsRandom)"]
         
         query!.whereKey("channels", equalTo: "gameNotification")
         query!.whereKey("user", equalTo: user)
@@ -124,5 +125,40 @@ class pushNotificationHandler: PFObject {
         push.setQuery(query)
         push.setData(data as [NSObject : AnyObject])
         push.sendPushInBackground()
+    }
+    
+    class func testPushNotification() {
+//        let push = PFPush()
+        let query = PFInstallation.query()
+//
+//        let data : NSDictionary = ["alert": "This is a test push", "badge":"1", "content-available":"1", "sound":"default"]
+//    
+        query!.whereKey("user", equalTo: "Gma8HGEqkj")
+//        query!.whereKey("useMasterKey", equalTo: "true")
+//        
+//        push.setQuery(query)
+//        push.setData(data as [NSObject : AnyObject])
+//        
+//        print(push)
+//        print(data)
+        print("jeej")
+//        print(query.inspe)
+//        push.sendPushInBackground()
+//        PFCloud.callFunctionInBackground("testPush", withParameters: ["where": query!, "data": "Testing"])
+        
+        PFCloud.callFunctionInBackground("testPush", withParameters: ["data": "Testing"]){
+            (result, error) -> Void in
+            if error == nil {
+                print(result)
+                // status will be 400
+                // text will be "Missing Name"
+            } else {
+                print("error")
+                print(error)
+                // handle Parse.com's 141s
+            }
+        }
+        
+//        PFCloud.callFunctionInBackground("testPush", withParameters: ["message": message],
     }
 }
