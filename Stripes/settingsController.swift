@@ -91,14 +91,9 @@ class settingsController : UITableViewController, UIActionSheetDelegate {
                 } else {
                     cell!.textLabel?.text = "You are already connected with Facebook!"
                 }
-            case 1:
-                cell!.textLabel?.text = "test push"
             default:
                 ""
             }
-
-        case 2:
-            cell!.textLabel?.text = "test push"
         default:
             cell!.textLabel?.text = "Niks"
             
@@ -117,8 +112,6 @@ class settingsController : UITableViewController, UIActionSheetDelegate {
             switch indexPath.row {
             case 0:
                 User.requestFaceBookLoggedInUserInfo()
-            case 1:
-                pushNotificationHandler.testPushNotification()
             default:
                 ""
             }

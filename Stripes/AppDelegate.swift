@@ -118,19 +118,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
         
         let notification:NSDictionary = userInfo["aps"] as! NSDictionary
-        
-        if (notification.objectForKey("content-available") != nil) {
-            if notification.objectForKey("content-available") as! Int == 1 {
-                NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
-            }
-            
+
+        if (notification.objectForKey("random-game") != nil) {
             if notification.objectForKey("random-game") as! Bool {
                 NSNotificationCenter.defaultCenter().postNotificationName("resetLookingForGame", object: nil)
+            } else {
+                NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
             }
         } else {
             PFPush.handlePush(userInfo)
+            NSNotificationCenter.defaultCenter().postNotificationName("reloadGameTableView", object: nil)
         }
-
     }
     
     func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {

@@ -194,7 +194,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func addCustomCellContent(cell: UITableViewCell, gameObject: PFObject ) {
-        let userIsPFUser = gameObject["user"] as! PFUser == PFUser.currentUser()! ? true : false
+        let userIsPFUser = gameObject["user"].objectId == PFUser.currentUser()!.objectId ? true : false
         
         let oppName = UILabel()
         let pointsView = UILabel()
@@ -203,12 +203,10 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         var uPoints : Int = 0
         var oppFullName = []
         
-        
         uPoints = userIsPFUser ? gameObject["userPoints"] as! Int : gameObject["opponentPoints"] as! Int
         oppPoints = userIsPFUser ? gameObject["opponentPoints"] as! Int : gameObject["userPoints"] as! Int
         
-        oppFullName = userIsPFUser ? (gameObject["userFullName"] as! NSString).componentsSeparatedByString(" ") : (gameObject["user2FullName"] as! NSString).componentsSeparatedByString(" ")
-
+        oppFullName = userIsPFUser ? (gameObject["user2FullName"] as! NSString).componentsSeparatedByString(" ") : (gameObject["userFullName"] as! NSString).componentsSeparatedByString(" ")
 
         if oppFullName.count > 1 {
             let lastName = oppFullName.lastObject as! String
@@ -495,11 +493,13 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func bannerViewDidLoadAd(banner: ADBannerView!) {
+        print("viewLoadAd")
         self.bannerView.alpha = 1.0
     }
     
     func bannerViewActionDidFinish(banner: ADBannerView!) {
-        
+        print("didfinish")
+        self.bannerView.alpha = 1.0
     }
     
     func bannerViewActionShouldBegin(banner: ADBannerView!, willLeaveApplication willLeave: Bool) -> Bool {
@@ -507,6 +507,7 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func bannerView(banner: ADBannerView!, didFailToReceiveAdWithError error: NSError!) {
+        print(error)
         self.bannerView.alpha = 0.0
     }
     
@@ -519,8 +520,6 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         bannerView.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: self.view)
         bannerView.pinAttribute(.Left, toAttribute: .Left, ofItem: self.view)
         bannerView.pinAttribute(.Right, toAttribute: .Right, ofItem: self.view)
-        
-        bannerView.alpha = 0.0
     }
     
     func loadInterstitialAd() {

@@ -13,140 +13,59 @@ var newGameIsRandom : Bool!
 class pushNotificationHandler: PFObject {
     
     class func sendUserTurnNotification(opponent : PFUser) {
-        let query = PFInstallation.query()
-        let push = PFPush()
-        
-        var oppName = ""
         let oppFullName = (PFUser.currentUser()!["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
-//        let oppFullName : NSArray = ["Opponent", "lastName"]
-        let lastName = oppFullName.lastObject as! String
-        let lastLetter = lastName[lastName.startIndex]
+        let firstName = oppFullName.firstObject as! String
         
-        oppName = "\(oppFullName[0]) \(lastLetter)."
+        let message =  "It's your turn against \(firstName)!"
         
-        let data : NSDictionary = ["alert": "It's your turn against \(oppName)!", "badge":"1", "content-available":"1", "sound":"default"]
-        
-        query!.whereKey("channels", equalTo: "gameNotification")
-        query!.whereKey("user", equalTo: opponent)
-        
-        push.setQuery(query)
-        push.setData(data as [NSObject : AnyObject])
-        print(push)
-        
-        push.sendPushInBackground()
+        sendPush(message, recipientId: opponent.objectId!)
     }
     
     class func sendNewGameNotification(user : PFUser) {
-        let query = PFInstallation.query()
-        let push = PFPush()
-        
-        var oppName = ""
         let oppFullName = (PFUser.currentUser()!["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
-        let lastName = oppFullName.lastObject as! String
-        let lastLetter = lastName[lastName.startIndex]
+        let firstName = oppFullName.firstObject as! String
         
-        oppName = "\(oppFullName[0]) \(lastLetter)."
+        let message =  "\(firstName) has challenged you to play a game!"
         
-        let data : NSDictionary = ["alert": "\(oppName) has challenged you to play a game!", "badge":"1", "content-available":"1", "sound":"default", "random-game":"\(newGameIsRandom)"]
-        
-        query!.whereKey("channels", equalTo: "gameNotification")
-        query!.whereKey("user", equalTo: user)
-        
-        push.setQuery(query)
-        push.setData(data as [NSObject : AnyObject])
-        push.sendPushInBackground()
+        sendPush(message, recipientId: user.objectId!)
     }
     
     class func userResignedGame(game : PFObject) {
-        let push = PFPush()
-        let query = PFInstallation.query()
-        var oppName = ""
+        let opp : PFUser = getOpponent(game)
         let oppFullName = (PFUser.currentUser()!["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
-//        let oppFullName : NSArray = ["Opponent", "lastName"]
-        let lastName = oppFullName.lastObject as! String
-        let lastLetter = lastName[lastName.startIndex]
+        let firstName = oppFullName.firstObject as! String
         
-        oppName = "\(oppFullName[0]) \(lastLetter)."
+        let message =  "\(firstName) resigned!"
         
-        let data : NSDictionary = ["alert": "\(oppName) resigned!", "badge":"0", "content-available":"1", "sound":"default"]
-        
-        query!.whereKey("channels", equalTo: "gameNotification")
-        
-        if game["user"]!.objectId == PFUser.currentUser()!.objectId {
-            query!.whereKey("user", equalTo: game["user2"]!)
-        } else {
-            query!.whereKey("user", equalTo: game["user"]!)
-        }
-        
-        push.setQuery(query)
-        push.setData(data as [NSObject : AnyObject])
-        push.sendPushInBackground()
+        sendPush(message, recipientId: opp.objectId!)
     }
     
     class func gameFinishedNotification(game : PFObject, content : String) {
-        let push = PFPush()
-        let query = PFInstallation.query()
-        
-        let data : NSDictionary = ["alert": "\(content)", "badge":"1", "content-available":"1", "sound":"default"]
-        query!.whereKey("channels", equalTo: "gameNotification")
-        
-        if game["user"]!.objectId == PFUser.currentUser()!.objectId {
-            query!.whereKey("user", equalTo: game["user2"]!)
-        } else {
-            query!.whereKey("user", equalTo: game["user"]!)
-        }
-        
-        push.setQuery(query)
-        push.setData(data as [NSObject : AnyObject])
-        push.sendPushInBackground()
+        let message =  "\(content)"
+        let opp : PFUser = getOpponent(game)
+
+        sendPush(message, recipientId: opp.objectId!)
     }
     
     class func restartBattleNotification(weekBattle : PFObject) {
-        let push = PFPush()
-        let query = PFInstallation.query()
-        
-        var oppName = ""
+        let opp : PFUser = getOpponent(weekBattle)
         let oppFullName = (PFUser.currentUser()!["fullName"] as! NSString).componentsSeparatedByString(" ") as NSArray
-//        let oppFullName : NSArray = ["Opponent", "lastName"]
-        let lastName = oppFullName.lastObject as! String
-        let lastLetter = lastName[lastName.startIndex]
+        let firstName = oppFullName.firstObject as! String
         
-        oppName = "\(oppFullName[0]) \(lastLetter)."
+        let message =  "\(firstName) is challenging you for another Battle!"
         
-        let data : NSDictionary = ["alert": "\(oppName) is challenging you for another Battle!", "badge":"1", "content-available":"1", "sound":"default"]
-        query!.whereKey("channels", equalTo: "gameNotification")
-        
-        if weekBattle["user"]!.objectId == PFUser.currentUser()!.objectId {
-            query!.whereKey("user", equalTo: weekBattle["user2"]!)
-        } else {
-            query!.whereKey("user", equalTo: weekBattle["user"]!)
-        }
-        
-        push.setQuery(query)
-        push.setData(data as [NSObject : AnyObject])
-        push.sendPushInBackground()
+        sendPush(message, recipientId: opp.objectId!)
     }
     
     class func testPushNotification() {
-//        let push = PFPush()
-        let query = PFInstallation.query()
-//
-//        let data : NSDictionary = ["alert": "This is a test push", "badge":"1", "content-available":"1", "sound":"default"]
-//    
-        query!.whereKey("user", equalTo: "Gma8HGEqkj")
-//        query!.whereKey("useMasterKey", equalTo: "true")
-//        
-//        push.setQuery(query)
-//        push.setData(data as [NSObject : AnyObject])
-//        
-//        print(push)
-//        print(data)
-        print("jeej")
-//        print(query.inspe)
-//        push.sendPushInBackground()
-//        PFCloud.callFunctionInBackground("testPush", withParameters: ["where": query!, "data": "Testing"])
+        let message = (PFUser.currentUser()!["fullName"] as! String) + " sends you a test push"
+        let recipient : String = "Gma8HGEqkj"
         
-        PFCloud.callFunctionInBackground("testPush", withParameters: ["data": "Testing"]){
+        sendPush(message, recipientId: recipient)
+    }
+    
+    class func sendPush(message: String, recipientId: String) {
+        PFCloud.callFunctionInBackground("push", withParameters: ["message": message, "recipientId": recipientId]){
             (result, error) -> Void in
             if error == nil {
                 print(result)
@@ -158,7 +77,16 @@ class pushNotificationHandler: PFObject {
                 // handle Parse.com's 141s
             }
         }
+    }
+    
+    class func getOpponent(game : PFObject) -> PFUser {
+        var opponent : PFUser = PFUser()
+        if game["user"]!.objectId == PFUser.currentUser()!.objectId {
+            opponent = game["user2"]! as! PFUser
+        } else {
+            opponent = game["user"]! as! PFUser
+        }
         
-//        PFCloud.callFunctionInBackground("testPush", withParameters: ["message": message],
+        return opponent
     }
 }

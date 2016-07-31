@@ -72,16 +72,15 @@ class newGameTypeOptionsPopup {
     }
     
     func addGameWithSpecialsBtn() {
+        let imageUrl = (PFUser.currentUser()!["gamesPlayed"] as! Int > 5) ? "newGameWithSpecials" : "newGameWithSpecialsLocked"
         special2Btn.translatesAutoresizingMaskIntoConstraints = false
-        special2Btn.setImage(UIImage(named: "newGameWithSpecialsLocked"), forState: .Normal)
-        special2Btn.userInteractionEnabled = false
+        special2Btn.setImage(UIImage(named: imageUrl), forState: .Normal)
         
         container.addSubview(special2Btn)
         
         special2Btn.constrainToSize(CGSizeMake(217, 150))
         special2Btn.pinAttribute(.Top, toAttribute: .Bottom, ofItem: special1Btn, withConstant: 40)
         special2Btn.centerInContainerOnAxis(.CenterX)
-        //        special2Btn.pinAttribute(.Right, toAttribute: .Right, ofItem: container, withConstant: -20)
     }
     
     func addCancelBtn() {
