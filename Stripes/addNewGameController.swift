@@ -175,8 +175,27 @@ class addNewGameController: UITableViewController, UISearchResultsUpdating, UISe
     }
     
     func newGame(withSpecials:Bool) {
-        Game.addGame(opponent, gameWithSpecials: withSpecials, grid: 3)
-        self.navigationController!.popViewControllerAnimated(true)
+        let gameExists = checkIfGameExists()
+        
+        if gameExists {
+            let alert = UIAlertView(title: "This game does already exist.", message: "Finish the current game first or search for another opponent.", delegate: self, cancelButtonTitle: "Ok")
+            alert.show()
+            allFriends.removeAll(keepCapacity: false)
+            self.tableView.reloadData()
+        } else {
+            Game.addGame(opponent, gameWithSpecials: withSpecials, grid: 3)
+            self.navigationController!.popViewControllerAnimated(true)
+        }
+    }
+    
+    func checkIfGameExists() -> Bool {
+        let opponentArray = Game.getOpponentWhichIsNotYetActiveInAnotherGameAgaintUser([opponent])
+        
+        if opponentArray.count == 0 {
+            return true
+        }
+        
+        return false
     }
     
     func addNavigationItems() {

@@ -23,6 +23,7 @@ class User: PFObject {
                         currentUser["fullName"] = userInfo.objectForKey("name") as! String
                         currentUser["fbId"] = userInfo.objectForKey("id") as! String
                         currentUser["gender"] = userInfo.objectForKey("gender") as! String
+                        currentUser["gamesPlayed"] = 0
                         currentUser.saveInBackground()
                     } else {
                         print("error facebook info")
@@ -45,6 +46,8 @@ class User: PFObject {
         let user = PFUser.currentUser()!
         
         user["fullName"] = user["username"]
+        user["gamesPlayed"] = 0
+        user["lookingForGame"] = false
         PFUser.currentUser()!["fullName"] = user["username"]
         
         user.saveEventually()

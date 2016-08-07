@@ -79,6 +79,21 @@ class pushNotificationHandler: PFObject {
         }
     }
     
+    class func sendTestPush(message: String, recipientId: String) {
+        PFCloud.callFunctionInBackground("testPush", withParameters: ["message": message, "recipientId": recipientId]){
+            (result, error) -> Void in
+            if error == nil {
+                print(result)
+                // status will be 400
+                // text will be "Missing Name"
+            } else {
+                print("error")
+                print(error)
+                // handle Parse.com's 141s
+            }
+        }
+    }
+    
     class func getOpponent(game : PFObject) -> PFUser {
         var opponent : PFUser = PFUser()
         if game["user"]!.objectId == PFUser.currentUser()!.objectId {

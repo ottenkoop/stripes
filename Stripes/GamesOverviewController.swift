@@ -7,16 +7,12 @@
 //
 
 import Foundation
-import iAd
 import Crashlytics
 
 
-class GameOverviewController : UIViewController, UITableViewDelegate, UITableViewDataSource, ADBannerViewDelegate, ADInterstitialAdDelegate {
-    
-    let bannerView = ADBannerView()
+class GameOverviewController : UIViewController, UITableViewDelegate, UITableViewDataSource {
     var gameTableView : UITableView = UITableView()
     var cell : UITableViewCell?
-    var interstitialAd:ADInterstitialAd!
     var interstitialAdView: UIView = UIView()
     var loadingViewContainer: UIView = UIView()
     var showAdToUser : Bool = false
@@ -38,15 +34,9 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
         emptyLocalPinnedObjects()
         loadTableViewContent()
         
-        addBannerView()
-        
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(GameOverviewController.loadTableViewContent), name: "reloadGameTableView", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(User.resetLookingForGame), name: "resetLookingForGame", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(GameOverviewController.deleteObjectFromSection), name: "deleteObjectFromYourTurnSection", object: nil)
-
-        
-        // iAD interstitial
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(GameOverviewController.loadInterstitialAd), name:"loadInterstitialAd", object: nil)
         
         if (PFUser.currentUser()!["fullName"] == nil || PFUser.currentUser()!["email"] == nil) && (PFUser.currentUser()!["fbId"] != nil) {
             User.requestFaceBookLoggedInUserInfo()
@@ -63,8 +53,6 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     
     func resetCurrentGame() {
 //        currentGame = PFObject()
-        
-    
     }
     
     func addNewGameBtn() {
@@ -485,83 +473,6 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     func changeNavigationItemEnableStatus(status: Bool) {
         navigationItem.leftBarButtonItem?.enabled = status
         navigationItem.rightBarButtonItem?.enabled = status
-    }
-    
-    
-    //iAd
-    func bannerViewWillLoadAd(banner: ADBannerView!) {
-    }
-    
-    func bannerViewDidLoadAd(banner: ADBannerView!) {
-        print("viewLoadAd")
-        self.bannerView.alpha = 1.0
-    }
-    
-    func bannerViewActionDidFinish(banner: ADBannerView!) {
-        print("didfinish")
-        self.bannerView.alpha = 1.0
-    }
-    
-    func bannerViewActionShouldBegin(banner: ADBannerView!, willLeaveApplication willLeave: Bool) -> Bool {
-        return true
-    }
-    
-    func bannerView(banner: ADBannerView!, didFailToReceiveAdWithError error: NSError!) {
-        print(error)
-        self.bannerView.alpha = 0.0
-    }
-    
-    func addBannerView() {
-        self.view.addSubview(bannerView)
-        self.bannerView.delegate = self
-        
-        bannerView.translatesAutoresizingMaskIntoConstraints = false
-        bannerView.constrainToHeight(bannerView.bounds.height)
-        bannerView.pinAttribute(.Bottom, toAttribute: .Bottom, ofItem: self.view)
-        bannerView.pinAttribute(.Left, toAttribute: .Left, ofItem: self.view)
-        bannerView.pinAttribute(.Right, toAttribute: .Right, ofItem: self.view)
-    }
-    
-    func loadInterstitialAd() {
-        showAdToUser = false
-        interstitialAd = ADInterstitialAd()
-        interstitialAd.delegate = self
-    }
-    
-    func interstitialAdWillLoad(interstitialAd: ADInterstitialAd!) {
-        
-    }
-    
-    func interstitialAdDidLoad(interstitialAd: ADInterstitialAd!) {
-        interstitialAdView = UIView()
-        interstitialAdView.frame = self.view.bounds
-        self.view.addSubview(interstitialAdView)
-        
-        interstitialAd.presentInView(interstitialAdView)
-        self.navigationController?.navigationBarHidden = true
-        
-        UIViewController.prepareInterstitialAds()
-    }
-    
-    func interstitialAdActionDidFinish(interstitialAd: ADInterstitialAd!) {
-        interstitialAdView.removeFromSuperview()
-        self.navigationController?.navigationBarHidden = false
-        loadingView().hideActivityIndicatorWhenReturning(loadingViewContainer)
-    }
-    
-    func interstitialAdActionShouldBegin(interstitialAd: ADInterstitialAd!, willLeaveApplication willLeave: Bool) -> Bool {
-        return true
-    }
-    
-    func interstitialAd(interstitialAd: ADInterstitialAd!, didFailWithError error: NSError!) {
-        self.navigationController?.navigationBarHidden = false
-        loadingView().hideActivityIndicatorWhenReturning(loadingViewContainer)
-    }
-    
-    func interstitialAdDidUnload(interstitialAd: ADInterstitialAd!) {
-        interstitialAdView.removeFromSuperview()
-        self.navigationController?.navigationBarHidden = false
-        loadingView().hideActivityIndicatorWhenReturning(loadingViewContainer)
     }
     
     override func didReceiveMemoryWarning() {
