@@ -40,26 +40,26 @@ Parse.Cloud.define('testPush', function (request, response) {
 
     console.log("============== START");
     var targetUser = new Parse.User();
-    targetUser.id = request.params.recipientId;
+    targetUser.id = request.params.data["recipientId"];
+
+    console.log("============== recipientId:");
+    console.log(targetUser.id);
 
     var query = new Parse.Query(Parse.Installation);
     query.equalTo('user', targetUser);
 
-    var data = {
-      "alert": request.params.message,
-      "random-game": true, // extra data to send to the phone.
-      "sound": "Default" // default ios sound.
-    };
+    console.log("============== DATA:");
+    console.log(request.params.data);
 
     try {
       Parse.Push.send({
         where: query,
-        data: data
+        data: request.params.data
       }, {
         useMasterKey: true,
         success: function() {
           // Push was successful
-          response.success('Success! ' + request.params.message);
+          response.success('Success! ' + request.params.data);
         },
         error: function(error) {
           // Handle error

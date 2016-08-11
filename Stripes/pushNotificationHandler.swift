@@ -61,7 +61,7 @@ class pushNotificationHandler: PFObject {
         let message = (PFUser.currentUser()!["fullName"] as! String) + " sends you a test push"
         let recipient : String = "Gma8HGEqkj"
         
-        sendPush(message, recipientId: recipient)
+        sendTestPush(message, recipientId: recipient)
     }
     
     class func sendPush(message: String, recipientId: String) {
@@ -80,7 +80,24 @@ class pushNotificationHandler: PFObject {
     }
     
     class func sendTestPush(message: String, recipientId: String) {
-        PFCloud.callFunctionInBackground("testPush", withParameters: ["message": message, "recipientId": recipientId]){
+//        var data : [String: String] = [String: String]()
+//        data["message"] = message
+//        data["sound"] = "Default"
+//        data["recipientId"] = recipientId
+//        data["random-game"] = "true"
+        
+        let params = [
+            "data": [
+                "message": message,
+                "sound":  "Default",
+                "reciepientId": recipientId,
+                "random-game": "true"
+            ]
+        ]
+        
+        print(params)
+        
+        PFCloud.callFunctionInBackground("testPush", withParameters: ["data": params]){
             (result, error) -> Void in
             if error == nil {
                 print(result)

@@ -424,45 +424,40 @@ class GameOverviewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func randomGame(rButton : UIButton!) {
-        let containerToRemove = loadingView().showActivityIndicator(self.view)
         newGamePopup().removePopup(rButton)
+        let gameOptionBtns = newGameTypeOptionsPopup().openPopup(self.view)
         
-        0.5.waitSecondsAndDo({
-            let query = PFUser.query()
-            query!.whereKey("lookingForGame", equalTo: true)
+        gameOptionBtns[0].addTarget(self, action: #selector(GameOverviewController.randomGameStart(_:)), forControlEvents: .TouchUpInside)
+        gameOptionBtns[1].addTarget(self, action: #selector(GameOverviewController.randomGameStart(_:)), forControlEvents: .TouchUpInside)
+        gameOptionBtns[2].addTarget(self, action: #selector(GameOverviewController.randomGamePopupClose(_:)), forControlEvents: .TouchUpInside)
+    }
+    
+    func randomGameStart(btn: UIButton) {
+        let containerToRemove = loadingView().showActivityIndicator(self.view)
+        let withSpecials = (btn.tag == 1) ? false : true
+        
+        0.1.waitSecondsAndDo({
+            let gameFound : Bool = userRandomGame.gameAvailable(withSpecials)
             
-            var usersLookingForGame : Array = [PFObject]()
-            
-            do {
-                usersLookingForGame = try query!.findObjects()
-            } catch {
-                usersLookingForGame = []
-            }
-            
-            let opponentArray = Game.getOpponentWhichIsNotYetActiveInAnotherGameAgaintUser(usersLookingForGame)
-            
-            if usersLookingForGame.count == 0 || opponentArray.count == 0 {
-                let alert = UIAlertView(title: "No Opponent Found.", message: "Searching for another opponent. A game will start automatically when an opponent is found.", delegate: self, cancelButtonTitle: "Ok")
+            if gameFound {
+                let alert = UIAlertView(title: "Opponent Found!", message: "Game is set up! You can start the game in the 'Your Turn' section.", delegate: self, cancelButtonTitle: "Ok")
+                
                 alert.show()
-                PFUser.currentUser()!.setObject(true, forKey: "lookingForGame")
-                PFUser.currentUser()!.saveInBackground()
-                SVProgressHUD.dismiss()
             } else {
-                let opponent = opponentArray[0] as! PFUser
-                let alert = UIAlertView(title: "Opponent Found!", message: "Game is set up and \(opponent["fullName"]) is ready to battle! You can start the game in the 'Your Turn' section.", delegate: self, cancelButtonTitle: "Ok")
-                
-                newGameIsRandom = true
-                Game.addGame(opponent, gameWithSpecials: false, grid: 3)
+                let alert = UIAlertView(title: "No Opponent Found.", message: "Searching for another opponent. Stripes will notify you when a game is available!", delegate: self, cancelButtonTitle: "Ok")
                 alert.show()
-                
-                SVProgressHUD.dismiss()
             }
             
-            self.changeNavigationItemEnableStatus(true)
             loadingView().hideActivityIndicatorWhenReturning(containerToRemove)
+            self.randomGamePopupClose(btn)
         })
         
         
+    }
+    
+    func randomGamePopupClose(btn: UIButton!) {
+        newGameTypeOptionsPopup().hidePopup(btn)
+        changeNavigationItemEnableStatus(true)
     }
     
     func cancelBtnPressed(cButton : UIButton!) {

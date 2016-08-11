@@ -42,7 +42,7 @@ class User: PFObject {
 
     }
     
-    class func updateUserFullName() {
+    class func initSignUpUserData() {
         let user = PFUser.currentUser()!
         
         user["fullName"] = user["username"]

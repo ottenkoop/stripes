@@ -111,7 +111,7 @@ class LoginViewController: UIViewController, UIAlertViewDelegate, PFLogInViewCon
         self.dismissViewControllerAnimated(true, completion: nil)
         
         loadingView().showActivityIndicator(self.view)
-        User.updateUserFullName()
+        User.initSignUpUserData()
         openGameOverviewController()
     }
     

@@ -189,13 +189,7 @@ class addNewGameController: UITableViewController, UISearchResultsUpdating, UISe
     }
     
     func checkIfGameExists() -> Bool {
-        let opponentArray = Game.getOpponentWhichIsNotYetActiveInAnotherGameAgaintUser([opponent])
-        
-        if opponentArray.count == 0 {
-            return true
-        }
-        
-        return false
+        return searchModule.checkIfGameAlreadyExcists(opponent)
     }
     
     func addNavigationItems() {

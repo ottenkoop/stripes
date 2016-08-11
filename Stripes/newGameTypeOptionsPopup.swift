@@ -40,7 +40,7 @@ class newGameTypeOptionsPopup {
         uiView.addSubview(container)
         container.pulseToSize(1.1, duration: 0.2, repeat: false)
         
-        container.pinAttribute(.Top, toAttribute: .Top, ofItem: uiView, withConstant: 50)
+        container.pinAttribute(.Top, toAttribute: .Top, ofItem: uiView, withConstant: 70)
         container.centerInContainerOnAxis(.CenterX)
         
         addTitleLabel()
@@ -63,6 +63,7 @@ class newGameTypeOptionsPopup {
     func addNormalGameBtn() {
         special1Btn.translatesAutoresizingMaskIntoConstraints = false
         special1Btn.setImage(UIImage(named: "newGameWithoutSpecials"), forState: .Normal)
+        special1Btn.tag = 1
         
         container.addSubview(special1Btn)
         
@@ -74,6 +75,7 @@ class newGameTypeOptionsPopup {
     func addGameWithSpecialsBtn() {
         var imageUrl = "newGameWithSpecialsLocked"
         special2Btn.userInteractionEnabled = false
+        special2Btn.tag = 2
         
         if (PFUser.currentUser()!["gamesPlayed"] != nil && PFUser.currentUser()!["gamesPlayed"] as! Int > 5) {
             imageUrl = "newGameWithSpecials"

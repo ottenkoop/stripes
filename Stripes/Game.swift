@@ -10,16 +10,23 @@ class Game: PFObject {
     
     class func addGame(opponent : PFUser, gameWithSpecials : Bool, grid : Int) {
         let game = PFObject(className:"Game")
+        var opp : PFUser!
+        do {
+            opp = try opponent.fetch()
+        } catch {
+            opp = opponent
+            opp["fullName"] = "randomUser"
+        }
         
         game["user"] = PFUser.currentUser()
-        game["user2"] = opponent
+        game["user2"] = opp
         game["gameWithSpecials"] = gameWithSpecials
         game["userPoints"] = 0
         game["opponentPoints"] = 0
         game["userSpecialsLeft"] = 2
         game["opponentSpecialsLeft"] = 2
         game["userFullName"] = PFUser.currentUser()!["fullName"]
-        game["user2FullName"] = opponent["fullName"]
+        game["user2FullName"] = opp["fullName"]
         game["userOnTurn"] = PFUser.currentUser()
         game["grid"] = grid
         game["allScoredSquares"] = []
@@ -168,6 +175,8 @@ class Game: PFObject {
     }
     
     class func getOpponentWhichIsNotYetActiveInAnotherGameAgaintUser(usersLookingForGame : NSArray) -> NSArray {
+        print("1.01")
+        print(usersLookingForGame)
         for opp in usersLookingForGame {
             if opp.objectId == PFUser.currentUser()!.objectId {
                 continue

@@ -63,6 +63,8 @@
 		749F425A1A03A474003D9C2E /* Int.swift in Sources */ = {isa = PBXBuildFile; fileRef = 749F424F1A03A474003D9C2E /* Int.swift */; };
 		749F425B1A03A474003D9C2E /* NSArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 749F42501A03A474003D9C2E /* NSArray.swift */; };
 		749F425C1A03A474003D9C2E /* Range.swift in Sources */ = {isa = PBXBuildFile; fileRef = 749F42511A03A474003D9C2E /* Range.swift */; };
+		74B328E71D5B9C7100398A90 /* tutorialPopup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74B328E61D5B9C7100398A90 /* tutorialPopup.swift */; };
+		74B328E91D5B9D5400398A90 /* userRandomGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74B328E81D5B9D5400398A90 /* userRandomGame.swift */; };
 		74B546D71A3F216B00FF8F06 /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 74B546D61A3F216B00FF8F06 /* Social.framework */; };
 		74B71B6B1A3F0636009760FE /* HanziPenSC.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 74B71B6A1A3F0636009760FE /* HanziPenSC.ttf */; };
 		74B71B6F1A3F1D50009760FE /* libstdc++.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 74B71B6E1A3F1D50009760FE /* libstdc++.6.dylib */; };
@@ -144,6 +146,8 @@
 		749F424F1A03A474003D9C2E /* Int.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Int.swift; sourceTree = "<group>"; };
 		749F42501A03A474003D9C2E /* NSArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSArray.swift; sourceTree = "<group>"; };
 		749F42511A03A474003D9C2E /* Range.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Range.swift; sourceTree = "<group>"; };
+		74B328E61D5B9C7100398A90 /* tutorialPopup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = tutorialPopup.swift; sourceTree = "<group>"; };
+		74B328E81D5B9D5400398A90 /* userRandomGame.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = userRandomGame.swift; sourceTree = "<group>"; };
 		74B546D61A3F216B00FF8F06 /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
 		74B71B6A1A3F0636009760FE /* HanziPenSC.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = HanziPenSC.ttf; sourceTree = "<group>"; };
 		74B71B6E1A3F1D50009760FE /* libstdc++.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.dylib"; path = "usr/lib/libstdc++.6.dylib"; sourceTree = SDKROOT; };
@@ -254,6 +258,7 @@
 				741DC9DC1A039F5300621737 /* Game.swift */,
 				741DC9DE1A039F5300621737 /* stripeHandler.swift */,
 				7411C5EF1A67F309002DED93 /* weekBattle.swift */,
+				74B328E81D5B9D5400398A90 /* userRandomGame.swift */,
 			);
 			name = "Game models";
 			sourceTree = "<group>";
@@ -306,6 +311,7 @@
 				749B479F1A7667EE00DC2C1A /* weekBattleFinished.swift */,
 				743887FA1C300D67002C2F37 /* scoreBoard.swift */,
 				7462B0EB1C614A9E008DE1AF /* newGameTypeOptionsPopup.swift */,
+				74B328E61D5B9C7100398A90 /* tutorialPopup.swift */,
 			);
 			name = views;
 			sourceTree = "<group>";
@@ -567,7 +573,9 @@
 				749F42561A03A474003D9C2E /* Double.swift in Sources */,
 				743887FB1C300D67002C2F37 /* scoreBoard.swift in Sources */,
 				741DC9D71A039ED700621737 /* addNewGameController.swift in Sources */,
+				74B328E71D5B9C7100398A90 /* tutorialPopup.swift in Sources */,
 				741DC9E31A039F5300621737 /* User.swift in Sources */,
+				74B328E91D5B9D5400398A90 /* userRandomGame.swift in Sources */,
 				7488586F1A0A2A640065FCB8 /* loadingView.swift in Sources */,
 				746457511A2FCBFE003A8226 /* newGamePopup.swift in Sources */,
 				74BAB81C1A039DD800C2361F /* AppDelegate.swift in Sources */,

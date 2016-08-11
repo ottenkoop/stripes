@@ -88,9 +88,6 @@ class settingsController : UITableViewController, UIActionSheetDelegate {
                 } else {
                     cell!.textLabel?.text = "You are already connected with Facebook!"
                 }
-            case 1:
-                cell!.textLabel?.text = "Random game? Tap me to toggle."
-                label.text = (PFUser.currentUser()!["lookingForGame"] as! Bool) ? "Yes" : "No" 
             default:
                 ""
             }
@@ -112,12 +109,6 @@ class settingsController : UITableViewController, UIActionSheetDelegate {
             switch indexPath.row {
             case 0:
                 User.requestFaceBookLoggedInUserInfo()
-            case 1:
-                let value : Bool = PFUser.currentUser()!["lookingForGame"] as! Bool
-                PFUser.currentUser()!.setObject(!value, forKey: "lookingForGame")
-                
-                PFUser.currentUser()!.saveInBackground()
-                self.tableView.reloadData()
             default:
                 ""
             }
